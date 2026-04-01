@@ -1,0 +1,2748 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظام احتساب الضرائب العراقي</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@2.0.8/dist/lottie-player.js"></script>
+</head>
+<body>
+
+  <!-- ====== TOP PROGRESS BAR ====== -->
+  <div class="progress-bar-top" id="progressBar"></div>
+
+  <!-- ====== SPLASH SCREEN ====== -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-particles" id="splashParticles"></div>
+    <div class="splash-3d-scene">
+      <div class="splash-cube">
+        <div class="cube-face front"><i class="fas fa-landmark"></i></div>
+        <div class="cube-face back"><i class="fas fa-calculator"></i></div>
+        <div class="cube-face right"><i class="fas fa-coins"></i></div>
+        <div class="cube-face left"><i class="fas fa-chart-pie"></i></div>
+        <div class="cube-face top"><i class="fas fa-shield-alt"></i></div>
+        <div class="cube-face bottom"><i class="fas fa-file-invoice"></i></div>
+      </div>
+    </div>
+    <div class="splash-content">
+      <div class="splash-logo-animated">
+        <div class="splash-ring ring-1"></div>
+        <div class="splash-ring ring-2"></div>
+        <div class="splash-ring ring-3"></div>
+        <div class="splash-logo-inner"><i class="fas fa-landmark"></i></div>
+      </div>
+      <h1 class="splash-title-anim">نظام الضرائب العراقي</h1>
+      <p class="splash-sub-anim">الهيئة العامة للضرائب — وزارة المالية</p>
+      <div class="splash-loader"><div class="splash-bar"></div></div>
+      <div class="splash-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+    <!-- ====== AUTH SCREEN ====== -->
+  <div class="auth-screen" id="authScreen" style="display:none;">
+    <div class="auth-bg">
+      <div class="auth-bg-shape shape-1"></div>
+      <div class="auth-bg-shape shape-2"></div>
+      <div class="auth-bg-shape shape-3"></div>
+      <div class="auth-bg-shape shape-4"></div>
+      <div class="auth-bg-shape shape-5"></div>
+      <div class="auth-floating-icons">
+        <div class="auth-float-icon fi-1"><i class="fas fa-calculator"></i></div>
+        <div class="auth-float-icon fi-2"><i class="fas fa-coins"></i></div>
+        <div class="auth-float-icon fi-3"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="auth-float-icon fi-4"><i class="fas fa-chart-line"></i></div>
+        <div class="auth-float-icon fi-5"><i class="fas fa-landmark"></i></div>
+        <div class="auth-float-icon fi-6"><i class="fas fa-shield-alt"></i></div>
+        <div class="auth-float-icon fi-7"><i class="fas fa-balance-scale"></i></div>
+        <div class="auth-float-icon fi-8"><i class="fas fa-money-bill-wave"></i></div>
+      </div>
+    </div>
+    <div class="auth-wrapper">
+      <div class="auth-brand-panel">
+        <div class="auth-brand-content">
+          <div class="auth-brand-logo"><i class="fas fa-landmark"></i></div>
+          <h1>نظام الضرائب العراقي</h1>
+          <p class="auth-brand-sub">الهيئة العامة للضرائب — وزارة المالية</p>
+          <div class="auth-features-list">
+            <div class="auth-feature-item"><i class="fas fa-shield-alt"></i><span>نظام آمن ومشفر بالكامل</span></div>
+            <div class="auth-feature-item"><i class="fas fa-calculator"></i><span>احتساب ضريبي دقيق وفق القانون</span></div>
+            <div class="auth-feature-item"><i class="fas fa-chart-line"></i><span>تقارير وتحليلات شاملة</span></div>
+            <div class="auth-feature-item"><i class="fas fa-map-marked-alt"></i><span>تغطية جميع المحافظات العراقية</span></div>
+          </div>
+          <div class="auth-brand-stats">
+            <div class="auth-stat-item"><strong>١٨</strong><span>محافظة</span></div>
+            <div class="auth-stat-item"><strong>٥</strong><span>أنواع ضرائب</span></div>
+            <div class="auth-stat-item"><strong>+١٠٠٠</strong><span>مستخدم</span></div>
+          </div>
+        </div>
+        <div class="auth-brand-footer">&copy; ٢٠٢٦ الهيئة العامة للضرائب — جمهورية العراق</div>
+      </div>
+      <div class="auth-form-panel">
+        <div class="auth-form-scroll">
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</button>
+            <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')"><i class="fas fa-user-plus"></i> إنشاء حساب</button>
+          </div>
+          <div class="auth-form-body" id="authLoginForm">
+            <div class="auth-form-header"><h2>مرحباً بعودتك</h2><p>أدخل بياناتك للوصول إلى لوحة التحكم</p></div>
+            <div class="login-error" id="loginError" style="display:none;"><i class="fas fa-exclamation-circle"></i><span id="loginErrorMsg"></span></div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+              <div class="auth-field"><label><i class="fas fa-user"></i> اسم المستخدم</label><input type="text" id="loginUsername" placeholder="أدخل اسم المستخدم" autocomplete="username" required /></div>
+              <div class="auth-field"><label><i class="fas fa-lock"></i> كلمة المرور</label><div class="password-wrapper"><input type="password" id="loginPassword" placeholder="أدخل كلمة المرور" autocomplete="current-password" required /><button type="button" class="password-toggle" onclick="togglePassword()"><i class="fas fa-eye" id="passwordIcon"></i></button></div></div>
+              <div class="auth-options"><label class="checkbox-label"><input type="checkbox" id="rememberMe" /><span>تذكرني</span></label><a href="#" class="forgot-link" onclick="event.preventDefault();showToast('يرجى مراجعة مسؤول النظام')">نسيت كلمة المرور؟</a></div>
+              <button type="submit" class="auth-submit-btn" id="loginBtn"><span class="login-btn-text"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</span><span class="login-btn-loading" style="display:none;"><i class="fas fa-spinner fa-spin"></i> جاري الدخول...</span></button>
+            </form>
+            <div class="auth-divider"><span>أو الدخول السريع</span></div>
+            <div class="demo-accounts">
+              <button type="button" class="demo-btn" onclick="fillDemo('admin','admin123')"><i class="fas fa-user-shield"></i> مدير النظام</button>
+              <button type="button" class="demo-btn" onclick="fillDemo('accountant','123456')"><i class="fas fa-user-tie"></i> محاسب ضريبي</button>
+            </div>
+          </div>
+          <div class="auth-form-body" id="authRegisterForm" style="display:none;">
+            <div class="auth-form-header"><h2>إنشاء حساب جديد</h2><p>سجّل الآن واختر الباقة المناسبة لاحتياجاتك</p></div>
+            <div class="login-error" id="registerError" style="display:none;"><i class="fas fa-exclamation-circle"></i><span id="registerErrorMsg"></span></div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+              <div class="auth-field-row">
+                <div class="auth-field"><label><i class="fas fa-user"></i> الاسم الكامل</label><input type="text" id="regFullName" placeholder="الاسم الثلاثي" required /></div>
+                <div class="auth-field"><label><i class="fas fa-at"></i> البريد الإلكتروني</label><input type="email" id="regEmail" placeholder="example@email.com" required /></div>
+              </div>
+              <div class="auth-field-row">
+                <div class="auth-field"><label><i class="fas fa-phone"></i> رقم الهاتف</label><input type="tel" id="regPhone" placeholder="07XXXXXXXXX" required /></div>
+                <div class="auth-field"><label><i class="fas fa-map-marker-alt"></i> المحافظة</label>
+                  <select id="regProvince" required>
+                    <option value="">اختر المحافظة</option>
+                    <option value="baghdad">بغداد</option><option value="basra">البصرة</option><option value="nineveh">نينوى</option>
+                    <option value="erbil">أربيل</option><option value="najaf">النجف</option><option value="karbala">كربلاء</option>
+                    <option value="kirkuk">كركوك</option><option value="sulaymaniyah">السليمانية</option><option value="dhiqar">ذي قار</option>
+                    <option value="babel">بابل</option><option value="diyala">ديالى</option><option value="anbar">الأنبار</option>
+                    <option value="wasit">واسط</option><option value="maysan">ميسان</option><option value="muthanna">المثنى</option>
+                    <option value="qadisiyyah">القادسية</option><option value="saladin">صلاح الدين</option><option value="duhok">دهوك</option>
+                  </select>
+                </div>
+              </div>
+              <div class="auth-field"><label><i class="fas fa-user-tag"></i> اسم المستخدم</label><input type="text" id="regUsername" placeholder="اختر اسم مستخدم فريد" required minlength="3" /></div>
+              <div class="auth-field-row">
+                <div class="auth-field"><label><i class="fas fa-lock"></i> كلمة المرور</label><input type="password" id="regPassword" placeholder="٦ أحرف على الأقل" required minlength="6" /></div>
+                <div class="auth-field"><label><i class="fas fa-lock"></i> تأكيد كلمة المرور</label><input type="password" id="regPasswordConfirm" placeholder="أعد كلمة المرور" required /></div>
+              </div>
+              <button type="submit" class="auth-submit-btn reg-btn"><i class="fas fa-user-plus"></i> إنشاء الحساب</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PACKAGES SELECTION SCREEN ====== -->
+  <div class="packages-screen" id="packagesScreen" style="display:none;">
+    <div class="packages-bg">
+      <div class="pkg-bg-orb orb-1"></div>
+      <div class="pkg-bg-orb orb-2"></div>
+      <div class="pkg-bg-orb orb-3"></div>
+    </div>
+    <div class="packages-container">
+      <div class="packages-header">
+        <div class="packages-logo"><i class="fas fa-gem"></i></div>
+        <h1>اختر باقتك المناسبة</h1>
+        <p>اختر الخطة المثالية لاحتياجاتك الضريبية — يمكنك الترقية أو التبديل في أي وقت</p>
+        <div class="pkg-billing-toggle">
+          <span class="pkg-toggle-label" id="pkgMonthlyLabel">شهري</span>
+          <label class="pkg-toggle-switch">
+            <input type="checkbox" id="pkgBillingToggle" onchange="toggleBillingCycle()">
+            <span class="pkg-toggle-slider"></span>
+          </label>
+          <span class="pkg-toggle-label" id="pkgYearlyLabel">سنوي</span>
+          <span class="pkg-save-badge">وفّر ٢٠٪</span>
+        </div>
+      </div>
+      <div class="packages-grid packages-grid-5">
+
+        <!-- 1. Trial -->
+        <div class="package-card pkg-trial" onclick="selectPackage('trial')">
+          <div class="pkg-ribbon trial-ribbon"><span>تجربة مجانية</span></div>
+          <div class="package-icon trial-icon"><i class="fas fa-flask"></i></div>
+          <h3>الباقة التجريبية</h3>
+          <div class="package-price"><span class="price-amount">مجاني</span></div>
+          <p class="pkg-duration">١٤ يوم تجربة كاملة</p>
+          <p class="package-desc">جرّب جميع الميزات بدون التزام</p>
+          <ul class="package-features-list">
+            <li class="yes"><i class="fas fa-check-circle"></i> لوحة التحكم الرئيسية</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> وحدة ضريبية واحدة (الشركات)</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> التقويم الضريبي</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> ٥ عمليات حساب</li>
+            <li class="no"><i class="fas fa-lock"></i> باقي الوحدات الضريبية</li>
+            <li class="no"><i class="fas fa-lock"></i> التقارير والتصدير</li>
+            <li class="no"><i class="fas fa-lock"></i> الدعم الفني</li>
+            <li class="no"><i class="fas fa-lock"></i> إدارة المستخدمين</li>
+          </ul>
+          <button class="package-select-btn trial-btn">ابدأ التجربة المجانية</button>
+        </div>
+
+        <!-- 2. Basic -->
+        <div class="package-card" onclick="selectPackage('basic')">
+          <div class="package-icon basic-icon"><i class="fas fa-leaf"></i></div>
+          <h3>الباقة الأساسية</h3>
+          <div class="package-price">
+            <span class="price-amount" data-monthly="١٥,٠٠٠" data-yearly="١٤٤,٠٠٠">١٥,٠٠٠</span>
+            <span class="price-period" data-monthly="د.ع / شهرياً" data-yearly="د.ع / سنوياً">د.ع / شهرياً</span>
+          </div>
+          <p class="package-desc">للمحاسبين المستقلين والأفراد</p>
+          <ul class="package-features-list">
+            <li class="yes"><i class="fas fa-check-circle"></i> لوحة التحكم الرئيسية</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> وحدتان ضريبيتان (الشركات + العقار)</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> التقويم الضريبي</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> الإشعارات الأساسية</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> عمليات غير محدودة</li>
+            <li class="no"><i class="fas fa-lock"></i> التقارير والتحليلات</li>
+            <li class="no"><i class="fas fa-lock"></i> تصدير PDF / Excel</li>
+            <li class="no"><i class="fas fa-lock"></i> إدارة المستخدمين</li>
+            <li class="no"><i class="fas fa-lock"></i> المساعد الذكي</li>
+            <li class="no"><i class="fas fa-lock"></i> الدعم ذو الأولوية</li>
+          </ul>
+          <button class="package-select-btn basic-btn">اختيار الأساسية</button>
+        </div>
+
+        <!-- 3. Professional -->
+        <div class="package-card featured" onclick="selectPackage('professional')">
+          <div class="package-popular-tag"><i class="fas fa-fire"></i> الأكثر شيوعاً</div>
+          <div class="package-icon pro-icon"><i class="fas fa-crown"></i></div>
+          <h3>الباقة المتقدمة</h3>
+          <div class="package-price">
+            <span class="price-amount" data-monthly="٤٥,٠٠٠" data-yearly="٤٣٢,٠٠٠">٤٥,٠٠٠</span>
+            <span class="price-period" data-monthly="د.ع / شهرياً" data-yearly="د.ع / سنوياً">د.ع / شهرياً</span>
+          </div>
+          <p class="package-desc">للمحاسبين والشركات الصغيرة</p>
+          <ul class="package-features-list">
+            <li class="yes"><i class="fas fa-check-circle"></i> لوحة التحكم المتقدمة</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> جميع الوحدات الضريبية (٥)</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> التقويم + التذكيرات التلقائية</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> الإشعارات المتقدمة</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> التقارير والتحليلات</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> تصدير PDF / Excel</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> حاسبة الغرامات</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> مقارنة الضرائب</li>
+            <li class="no"><i class="fas fa-lock"></i> إدارة المستخدمين</li>
+            <li class="no"><i class="fas fa-lock"></i> المساعد الذكي المتقدم</li>
+          </ul>
+          <button class="package-select-btn pro-btn">اختيار المتقدمة</button>
+        </div>
+
+        <!-- 4. Business -->
+        <div class="package-card" onclick="selectPackage('business')">
+          <div class="package-icon biz-icon"><i class="fas fa-briefcase"></i></div>
+          <h3>باقة الأعمال</h3>
+          <div class="package-price">
+            <span class="price-amount" data-monthly="٨٥,٠٠٠" data-yearly="٨١٦,٠٠٠">٨٥,٠٠٠</span>
+            <span class="price-period" data-monthly="د.ع / شهرياً" data-yearly="د.ع / سنوياً">د.ع / شهرياً</span>
+          </div>
+          <p class="package-desc">للشركات المتوسطة ومكاتب المحاسبة</p>
+          <ul class="package-features-list">
+            <li class="yes"><i class="fas fa-check-circle"></i> كل ميزات المتقدمة</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> إدارة المستخدمين (حتى ١٠)</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> صلاحيات متعددة المستويات</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> المساعد الذكي</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> سجل التدقيق الكامل</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> إدارة المستندات</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> الدعم ذو الأولوية</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> تخصيص التقارير</li>
+            <li class="no"><i class="fas fa-lock"></i> API متقدم</li>
+            <li class="no"><i class="fas fa-lock"></i> مدير حساب مخصص</li>
+          </ul>
+          <button class="package-select-btn biz-btn">اختيار الأعمال</button>
+        </div>
+
+        <!-- 5. Enterprise -->
+        <div class="package-card pkg-enterprise" onclick="selectPackage('enterprise')">
+          <div class="pkg-ribbon ent-ribbon"><span>VIP</span></div>
+          <div class="package-icon ent-icon"><i class="fas fa-building"></i></div>
+          <h3>الباقة الشاملة</h3>
+          <div class="package-price">
+            <span class="price-amount" data-monthly="١٥٠,٠٠٠" data-yearly="١,٤٤٠,٠٠٠">١٥٠,٠٠٠</span>
+            <span class="price-period" data-monthly="د.ع / شهرياً" data-yearly="د.ع / سنوياً">د.ع / شهرياً</span>
+          </div>
+          <p class="package-desc">للمؤسسات والهيئات الحكومية الكبرى</p>
+          <ul class="package-features-list">
+            <li class="yes"><i class="fas fa-check-circle"></i> كل ميزات باقة الأعمال</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> مستخدمين غير محدودين</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> صلاحيات إدارية كاملة</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> المساعد الذكي المتقدم + AI</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> API كامل وتكامل الأنظمة</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> مدير حساب مخصص</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> دعم فني ٢٤/٧</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> نسخ احتياطي يومي</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> تدريب مخصص للفريق</li>
+            <li class="yes"><i class="fas fa-check-circle"></i> SLA مضمون ٩٩.٩٪</li>
+          </ul>
+          <button class="package-select-btn ent-btn">اختيار الشاملة</button>
+        </div>
+
+      </div>
+
+      <!-- Feature Comparison Table -->
+      <div class="pkg-comparison-section">
+        <h2 class="pkg-section-title"><i class="fas fa-th-list"></i> مقارنة تفصيلية بين الباقات</h2>
+        <div class="pkg-comparison-table-wrap">
+          <table class="pkg-comparison-table">
+            <thead>
+              <tr>
+                <th>الميزة</th>
+                <th><i class="fas fa-flask"></i> التجريبية</th>
+                <th><i class="fas fa-leaf"></i> الأساسية</th>
+                <th class="highlight-col"><i class="fas fa-crown"></i> المتقدمة</th>
+                <th><i class="fas fa-briefcase"></i> الأعمال</th>
+                <th><i class="fas fa-building"></i> الشاملة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>الوحدات الضريبية</td><td>١</td><td>٢</td><td class="highlight-col">٥</td><td>٥</td><td>٥</td></tr>
+              <tr><td>عدد العمليات</td><td>٥</td><td>غير محدود</td><td class="highlight-col">غير محدود</td><td>غير محدود</td><td>غير محدود</td></tr>
+              <tr><td>عدد المستخدمين</td><td>١</td><td>١</td><td class="highlight-col">٣</td><td>١٠</td><td>غير محدود</td></tr>
+              <tr><td>التقارير والتحليلات</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>تصدير PDF / Excel</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>حاسبة الغرامات</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>مقارنة الضرائب</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>إدارة المستندات</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>إدارة المستخدمين</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>سجل التدقيق</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>المساعد الذكي</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td><td><i class="fas fa-check pkg-yes"></i> متقدم + AI</td></tr>
+              <tr><td>الدعم الفني</td><td>بريد إلكتروني</td><td>بريد إلكتروني</td><td class="highlight-col">بريد + دردشة</td><td>أولوية عالية</td><td>٢٤/٧ مخصص</td></tr>
+              <tr><td>API وتكامل</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+              <tr><td>نسخ احتياطي</td><td><i class="fas fa-times pkg-no"></i></td><td>أسبوعي</td><td class="highlight-col">يومي</td><td>يومي</td><td>فوري</td></tr>
+              <tr><td>مدير حساب مخصص</td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td class="highlight-col"><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-times pkg-no"></i></td><td><i class="fas fa-check pkg-yes"></i></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="pkg-faq-section">
+        <h2 class="pkg-section-title"><i class="fas fa-question-circle"></i> الأسئلة الشائعة</h2>
+        <div class="pkg-faq-grid">
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>هل يمكنني تغيير الباقة لاحقاً؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">نعم، يمكنك الترقية أو التبديل بين الباقات في أي وقت من صفحة الباقات داخل النظام. سيتم تطبيق التغيير فوراً.</div>
+          </div>
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>ما هي مدة الفترة التجريبية؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">الفترة التجريبية ١٤ يوماً كاملة تتيح لك الوصول المحدود لاستكشاف النظام. لا يلزم إدخال بيانات الدفع.</div>
+          </div>
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>هل البيانات آمنة؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">نعم، نستخدم تشفير AES-256 لحماية جميع البيانات مع نسخ احتياطي منتظم وفقاً لباقتك المختارة.</div>
+          </div>
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>كيف يتم الدفع؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">ندعم الدفع عبر ماستركارد، فيزا، زين كاش، آسيا حوالة، ونظام الدفع الإلكتروني الحكومي. يمكن الدفع شهرياً أو سنوياً مع خصم ٢٠٪ على الدفع السنوي.</div>
+          </div>
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>هل يوجد عقد التزام؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">لا يوجد عقد التزام طويل المدة. يمكنك الإلغاء في أي وقت. الاشتراك السنوي يوفر خصماً لكنه لا يتطلب عقداً.</div>
+          </div>
+          <div class="pkg-faq-item" onclick="toggleFaq(this)">
+            <div class="pkg-faq-q"><span>هل يمكنني استرداد المبلغ؟</span><i class="fas fa-chevron-down"></i></div>
+            <div class="pkg-faq-a">نعم، نقدم ضمان استرداد كامل خلال ٣٠ يوماً من الاشتراك إذا لم يلبِّ النظام توقعاتك.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="pkg-trust-section">
+        <div class="pkg-trust-item"><i class="fas fa-shield-alt"></i><span>تشفير AES-256</span></div>
+        <div class="pkg-trust-item"><i class="fas fa-lock"></i><span>حماية البيانات</span></div>
+        <div class="pkg-trust-item"><i class="fas fa-undo"></i><span>ضمان استرداد ٣٠ يوم</span></div>
+        <div class="pkg-trust-item"><i class="fas fa-headset"></i><span>دعم فني متواصل</span></div>
+        <div class="pkg-trust-item"><i class="fas fa-server"></i><span>SLA ٩٩.٩٪</span></div>
+      </div>
+
+      <button class="packages-skip-btn" onclick="selectPackage('trial')">ابدأ التجربة المجانية لمدة ١٤ يوم <i class="fas fa-arrow-left"></i></button>
+    </div>
+  </div>
+
+
+  <!-- ====== MAIN APP ====== -->
+  <div class="app-container" id="appContainer" style="display:none;">
+    <!-- ====== SIDEBAR ====== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo"><i class="fas fa-landmark"></i></div>
+        <h2>نظام الضرائب العراقي</h2>
+        <p>الهيئة العامة للضرائب</p>
+        <div class="sidebar-package-badge" id="sidebarPackageBadge"></div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">القائمة الرئيسية</div>
+        <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+          <i class="fas fa-th-large"></i>
+          <span>لوحة التحكم</span>
+        </div>
+
+        <div class="nav-section-title">وحدات الضرائب</div>
+        <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')">
+          <i class="fas fa-building"></i>
+          <span>ضريبة دخل الشركات</span>
+        </div>
+        <div class="nav-item" data-page="land" onclick="navigateTo('land')">
+          <i class="fas fa-map-marked-alt"></i>
+          <span>ضريبة العرصات</span>
+        </div>
+        <div class="nav-item" data-page="property" onclick="navigateTo('property')">
+          <i class="fas fa-home"></i>
+          <span>ضريبة العقار</span>
+        </div>
+        <div class="nav-item" data-page="profession" onclick="navigateTo('profession')">
+          <i class="fas fa-user-tie"></i>
+          <span>ضريبة المهنة</span>
+        </div>
+        <div class="nav-item" data-page="sales" onclick="navigateTo('sales')">
+          <i class="fas fa-shopping-cart"></i>
+          <span>ضريبة المبيعات</span>
+        </div>
+
+        <div class="nav-section-title">إدارة النظام</div>
+        <div class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+          <i class="fas fa-chart-bar"></i>
+          <span>التقارير والتحليلات</span>
+        </div>
+        <div class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+          <i class="fas fa-folder-open"></i>
+          <span>المستندات</span>
+        </div>
+        <div class="nav-item" data-page="notifications" onclick="navigateTo('notifications')">
+          <i class="fas fa-bell"></i>
+          <span>الإشعارات</span>
+          <span class="badge">3</span>
+        </div>
+
+        <div class="nav-section-title">أدوات متقدمة</div>
+        <div class="nav-item" data-page="penalties" onclick="navigateTo('penalties')">
+          <i class="fas fa-gavel"></i>
+          <span>حاسبة الغرامات</span>
+        </div>
+        <div class="nav-item" data-page="comparison" onclick="navigateTo('comparison')">
+          <i class="fas fa-balance-scale"></i>
+          <span>مقارنة الضرائب</span>
+        </div>
+        <div class="nav-item" data-page="calendar" onclick="navigateTo('calendar')">
+          <i class="fas fa-calendar-alt"></i>
+          <span>التقويم الضريبي</span>
+        </div>
+        <div class="nav-item" data-page="audit" onclick="navigateTo('audit')">
+          <i class="fas fa-clipboard-list"></i>
+          <span>سجل العمليات</span>
+        </div>
+        <div class="nav-item" data-page="users" onclick="navigateTo('users')">
+          <i class="fas fa-users-cog"></i>
+          <span>إدارة المستخدمين</span>
+        </div>
+        <div class="nav-item" data-page="packages" onclick="navigateTo('packages')">
+          <i class="fas fa-gem"></i>
+          <span>الباقات والاشتراكات</span>
+        </div>
+        <div class="nav-item" data-page="provinces" onclick="navigateTo('provinces')">
+          <i class="fas fa-map"></i>
+          <span>المحافظات العراقية</span>
+        </div>
+        <div class="nav-section-title">المالية والفوترة</div>
+        <div class="nav-item" data-page="invoices" onclick="navigateTo('invoices')">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>الفوترة الإلكترونية</span>
+        </div>
+        <div class="nav-item" data-page="taxpayers" onclick="navigateTo('taxpayers')">
+          <i class="fas fa-users"></i>
+          <span>سجل المكلفين</span>
+        </div>
+        <div class="nav-item" data-page="attachments" onclick="navigateTo('attachments')">
+          <i class="fas fa-paperclip"></i>
+          <span>المرفقات المتقدمة</span>
+        </div>
+
+        <div class="nav-section-title">التحليلات والتقارير</div>
+        <div class="nav-item" data-page="heatmap" onclick="navigateTo('heatmap')">
+          <i class="fas fa-fire"></i>
+          <span>الخريطة الحرارية</span>
+        </div>
+        <div class="nav-item" data-page="kpi" onclick="navigateTo('kpi')">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>مؤشرات الأداء</span>
+        </div>
+        <div class="nav-item" data-page="reportbuilder" onclick="navigateTo('reportbuilder')">
+          <i class="fas fa-magic"></i>
+          <span>منشئ التقارير</span>
+        </div>
+
+        <div class="nav-section-title">العمليات</div>
+        <div class="nav-item" data-page="workflow" onclick="navigateTo('workflow')">
+          <i class="fas fa-project-diagram"></i>
+          <span>سير العمل</span>
+        </div>
+        <div class="nav-item" data-page="tickets" onclick="navigateTo('tickets')">
+          <i class="fas fa-headset"></i>
+          <span>تذاكر الدعم</span>
+        </div>
+        <div class="nav-item" data-page="appointments" onclick="navigateTo('appointments')">
+          <i class="fas fa-calendar-check"></i>
+          <span>المواعيد</span>
+        </div>
+        <div class="nav-item" data-page="esignature" onclick="navigateTo('esignature')">
+          <i class="fas fa-signature"></i>
+          <span>التوقيع الإلكتروني</span>
+        </div>
+        <div class="nav-item" data-page="tasks" onclick="navigateTo('tasks')">
+          <i class="fas fa-tasks"></i>
+          <span>إدارة المهام</span>
+        </div>
+
+        <div class="nav-section-title">الأمان والنظام</div>
+        <div class="nav-item" data-page="loginhistory" onclick="navigateTo('loginhistory')">
+          <i class="fas fa-history"></i>
+          <span>سجل الدخول</span>
+        </div>
+        <div class="nav-item" data-page="backup" onclick="navigateTo('backup')">
+          <i class="fas fa-database"></i>
+          <span>النسخ الاحتياطي</span>
+        </div>
+        <div class="nav-item" data-page="api" onclick="navigateTo('api')">
+          <i class="fas fa-plug"></i>
+          <span>واجهة API</span>
+        </div>
+
+        <div class="nav-section-title">الإعدادات</div>
+        <div class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+          <i class="fas fa-cog"></i>
+          <span>الإعدادات</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-avatar" id="userAvatar">م</div>
+        <div class="user-info">
+          <h4 id="userDisplayName">محمد أحمد</h4>
+          <p id="userRole">محاسب ضريبي</p>
+        </div>
+        <button class="header-btn" style="width:32px;height:32px;color:rgba(255,255,255,0.5);" title="تسجيل الخروج" onclick="handleLogout()">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ====== OVERLAY ====== -->
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="main-content">
+      <header class="top-header">
+        <div class="header-right">
+          <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+          </button>
+          <div>
+            <h1 id="page-title">لوحة التحكم</h1>
+            <span class="breadcrumb" id="breadcrumb">الرئيسية</span>
+          </div>
+        </div>
+        <div class="header-left">
+          <button class="header-btn" onclick="navigateTo('notifications')" title="الإشعارات">
+            <i class="fas fa-bell"></i>
+            <span class="notif-count">3</span>
+          </button>
+          <button class="header-btn" title="بحث" onclick="openSearchModal()">
+            <i class="fas fa-search"></i>
+          </button>
+          <button class="header-btn dark-mode-toggle" onclick="toggleDarkMode()" title="الوضع الليلي">
+            <i class="fas fa-moon" id="darkModeIcon"></i>
+          </button>
+          <button class="header-btn" onclick="exportToPDF()" title="تصدير PDF">
+            <i class="fas fa-file-pdf"></i>
+          </button>
+          <button class="header-btn" onclick="exportToExcel()" title="تصدير Excel">
+            <i class="fas fa-file-excel"></i>
+          </button>
+          <button class="header-btn" onclick="window.print()" title="طباعة">
+            <i class="fas fa-print"></i>
+          </button>
+          <div class="header-user" onclick="handleLogout()">
+            <div class="header-user-avatar" id="headerAvatar">م</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <!-- ==================== DASHBOARD ==================== -->
+        <section class="page-section active" id="page-dashboard">
+          <div class="welcome-banner animate-in">
+            <div class="welcome-3d-bg">
+              <div class="welcome-orbit">
+                <div class="orbit-dot od-1"></div>
+                <div class="orbit-dot od-2"></div>
+                <div class="orbit-dot od-3"></div>
+              </div>
+            </div>
+            <div class="welcome-text">
+              <h2 class="text-shimmer">مرحباً، <span id="welcomeName">محمد</span> 👋</h2>
+              <p>إليك ملخص النظام الضريبي لليوم</p>
+            </div>
+            <div class="welcome-illustration">
+              <div class="wi-3d-chart">
+                <div class="wi-bar bar-1"></div>
+                <div class="wi-bar bar-2"></div>
+                <div class="wi-bar bar-3"></div>
+                <div class="wi-bar bar-4"></div>
+              </div>
+            </div>
+            <div class="welcome-date">
+              <i class="fas fa-calendar-alt"></i>
+              <span id="todayDate"></span>
+            </div>
+          </div>
+
+          <div class="stats-grid animate-in">
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="0">
+              <div class="stat-icon blue animated-icon"><i class="fas fa-coins"></i><div class="stat-pulse"></div></div>
+              <div class="stat-info">
+                <h3 class="counter" data-target="125750000">١٢٥,٧٥٠,٠٠٠</h3>
+                <p>إجمالي الضرائب المستحقة (د.ع)</p>
+                <span class="stat-change up"><i class="fas fa-arrow-up"></i> ٨٪ عن العام الماضي</span>
+              </div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+              <div class="stat-icon green animated-icon"><i class="fas fa-check-double"></i><div class="stat-pulse"></div></div>
+              <div class="stat-info">
+                <h3 class="counter" data-target="89500000">٨٩,٥٠٠,٠٠٠</h3>
+                <p>المبالغ المدفوعة (د.ع)</p>
+                <span class="stat-change up"><i class="fas fa-arrow-up"></i> ١٢٪ تحسن</span>
+              </div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+              <div class="stat-icon orange animated-icon"><i class="fas fa-hourglass-half"></i><div class="stat-pulse"></div></div>
+              <div class="stat-info">
+                <h3 class="counter" data-target="36250000">٣٦,٢٥٠,٠٠٠</h3>
+                <p>المبالغ المتبقية (د.ع)</p>
+                <span class="stat-change down"><i class="fas fa-arrow-down"></i> بحاجة للدفع</span>
+              </div>
+            </div>
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+              <div class="stat-icon purple animated-icon"><i class="fas fa-file-invoice"></i><div class="stat-pulse"></div></div>
+              <div class="stat-info">
+                <h3 class="counter" data-target="14">١٤</h3>
+                <p>إقرارات ضريبية مقدمة</p>
+                <span class="stat-change up"><i class="fas fa-arrow-up"></i> ٣ جديدة</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title animate-in" data-aos="fade-up">
+            <i class="fas fa-calculator"></i>
+            <h2>الوحدات الضريبية</h2>
+          </div>
+          <div class="modules-grid animate-in">
+            <div class="module-card corporate" onclick="navigateTo('corporate')" data-aos="zoom-in" data-aos-delay="0">
+              <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-building"></i></div><div class="m3d-face m3d-back"><i class="fas fa-chart-line"></i></div></div></div>
+              <div class="module-icon"><i class="fas fa-building"></i></div>
+              <h3>ضريبة دخل الشركات</h3>
+              <p>أرباح الشركات، الإيرادات، واستقطاع الرواتب</p>
+              <div class="module-card-glow"></div>
+            </div>
+            <div class="module-card land" onclick="navigateTo('land')" data-aos="zoom-in" data-aos-delay="80">
+              <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-map-marked-alt"></i></div><div class="m3d-face m3d-back"><i class="fas fa-map"></i></div></div></div>
+              <div class="module-icon"><i class="fas fa-map-marked-alt"></i></div>
+              <h3>ضريبة العرصات</h3>
+              <p>الأراضي ضمن أمانة بغداد والأقضية والنواحي</p>
+              <div class="module-card-glow"></div>
+            </div>
+            <div class="module-card property" onclick="navigateTo('property')" data-aos="zoom-in" data-aos-delay="160">
+              <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-home"></i></div><div class="m3d-face m3d-back"><i class="fas fa-key"></i></div></div></div>
+              <div class="module-icon"><i class="fas fa-home"></i></div>
+              <h3>ضريبة العقار</h3>
+              <p>إيجار وبيع العقارات بمختلف أنواعها</p>
+              <div class="module-card-glow"></div>
+            </div>
+            <div class="module-card profession" onclick="navigateTo('profession')" data-aos="zoom-in" data-aos-delay="240">
+              <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-user-tie"></i></div><div class="m3d-face m3d-back"><i class="fas fa-briefcase"></i></div></div></div>
+              <div class="module-icon"><i class="fas fa-user-tie"></i></div>
+              <h3>ضريبة المهنة</h3>
+              <p>المحامين، الأطباء، التجار وأصحاب المحلات</p>
+              <div class="module-card-glow"></div>
+            </div>
+            <div class="module-card sales" onclick="navigateTo('sales')" data-aos="zoom-in" data-aos-delay="320">
+              <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-shopping-cart"></i></div><div class="m3d-face m3d-back"><i class="fas fa-receipt"></i></div></div></div>
+              <div class="module-icon"><i class="fas fa-shopping-cart"></i></div>
+              <h3>ضريبة المبيعات</h3>
+              <p>خدمات الهاتف، السيارات، تذاكر السفر والمزيد</p>
+              <div class="module-card-glow"></div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="grid-2 animate-in" data-aos="fade-up">
+            <div class="card chart-container-card">
+              <div class="card-header"><h3><i class="fas fa-chart-pie"></i> توزيع الضرائب</h3></div>
+              <div class="card-body"><canvas id="taxDistributionChart" height="280"></canvas></div>
+            </div>
+            <div class="card chart-container-card">
+              <div class="card-header"><h3><i class="fas fa-chart-line"></i> الإيرادات الشهرية</h3></div>
+              <div class="card-body"><canvas id="monthlyRevenueChart" height="280"></canvas></div>
+            </div>
+          </div>
+
+          <div class="grid-2 animate-in">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-history"></i> آخر العمليات</h3>
+                <button class="btn btn-sm btn-ghost" onclick="navigateTo('reports')">عرض الكل</button>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-date">٢٤ آذار ٢٠٢٦</div>
+                    <div class="timeline-text">تم احتساب ضريبة شركة النور - <strong>٥,٢٥٠,٠٠٠ د.ع</strong></div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">٢٣ آذار ٢٠٢٦</div>
+                    <div class="timeline-text">تقديم إقرار ضريبة العقار لمحل تجاري</div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">٢٢ آذار ٢٠٢٦</div>
+                    <div class="timeline-text">دفع ضريبة المهنة - د. سالم العبيدي</div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-date">٢٠ آذار ٢٠٢٦</div>
+                    <div class="timeline-text">تحديث بيانات عرصة في الكرادة</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-bell"></i> الإشعارات الأخيرة</h3>
+                <button class="btn btn-sm btn-ghost" onclick="navigateTo('notifications')">عرض الكل</button>
+              </div>
+              <div class="card-body">
+                <div class="notification-item">
+                  <div class="notification-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="notification-content">
+                    <h4>تذكير بموعد الدفع</h4>
+                    <p>موعد دفع ضريبة الشركات ينتهي خلال ٧ أيام</p>
+                    <span class="notification-time">منذ ساعتين</span>
+                  </div>
+                </div>
+                <div class="notification-item">
+                  <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
+                  <div class="notification-content">
+                    <h4>تحديث قانوني</h4>
+                    <p>تم تعديل نسب ضريبة المبيعات على السكائر</p>
+                    <span class="notification-time">منذ ٥ ساعات</span>
+                  </div>
+                </div>
+                <div class="notification-item">
+                  <div class="notification-icon payment"><i class="fas fa-check"></i></div>
+                  <div class="notification-content">
+                    <h4>تأكيد دفع</h4>
+                    <p>تم تأكيد دفع ضريبة العقار بنجاح</p>
+                    <span class="notification-time">أمس</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card animate-in" style="margin-top:20px;">
+            <div class="card-header">
+              <h3><i class="fas fa-calendar-check"></i> المواعيد القادمة للدفعات</h3>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>نوع الضريبة</th>
+                      <th>المكلّف</th>
+                      <th>المبلغ المستحق</th>
+                      <th>تاريخ الاستحقاق</th>
+                      <th>الحالة</th>
+                      <th>إجراء</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>ضريبة الشركات</strong></td>
+                      <td>شركة النور للتجارة</td>
+                      <td>٥,٢٥٠,٠٠٠ د.ع</td>
+                      <td>٣١ آذار ٢٠٢٦</td>
+                      <td><span class="status-badge pending">قيد الانتظار</span></td>
+                      <td><button class="btn btn-sm btn-primary">دفع</button></td>
+                    </tr>
+                    <tr>
+                      <td><strong>ضريبة العقار</strong></td>
+                      <td>محمد أحمد علي</td>
+                      <td>١,٨٠٠,٠٠٠ د.ع</td>
+                      <td>١٥ نيسان ٢٠٢٦</td>
+                      <td><span class="status-badge submitted">مُقدّم</span></td>
+                      <td><button class="btn btn-sm btn-ghost">تفاصيل</button></td>
+                    </tr>
+                    <tr>
+                      <td><strong>ضريبة المهنة</strong></td>
+                      <td>د. سالم العبيدي</td>
+                      <td>٧٥٠,٠٠٠ د.ع</td>
+                      <td>٣٠ نيسان ٢٠٢٦</td>
+                      <td><span class="status-badge approved">مُعتمد</span></td>
+                      <td><button class="btn btn-sm btn-success">دفع</button></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================== CORPORATE TAX ==================== -->
+        <section class="page-section" id="page-corporate">
+          <div class="section-hero" style="--hero-c1:#1a2980;--hero-c2:#0f1b4d;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-building"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>ضريبة دخل الشركات</h2>
+                <p>احتساب الضريبة على أرباح الشركات وفق قانون ١١٣ لسنة ١٩٨٢</p>
+              </div>
+            </div>
+          </div>
+          <div class="tabs-container">
+            <button class="tab active" onclick="switchTab(event,'tab-corp-info')">المعلومات</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-income')">الدخل والمصروفات</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-salary')">استقطاع الراتب</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-docs')">المستندات</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-result')">النتيجة</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-corp-info">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-info-circle"></i> معلومات الشركة</h3></div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group"><label>اسم الشركة</label><input type="text" id="corpName" placeholder="أدخل اسم الشركة"></div>
+                  <div class="form-group"><label>رقم التسجيل الضريبي</label><input type="text" id="corpTaxId" placeholder="أدخل رقم التسجيل"></div>
+                  <div class="form-group"><label>نوع النشاط</label>
+                    <select id="corpActivity">
+                      <option value="">اختر نوع النشاط</option>
+                      <option value="trade">تجارة</option>
+                      <option value="industry">صناعة</option>
+                      <option value="services">خدمات</option>
+                      <option value="contracting">مقاولات</option>
+                      <option value="oil">النفط والغاز</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>السنة المالية</label><input type="number" id="corpYear" value="2025" min="2000" max="2030"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-corp-income">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-money-bill-wave"></i> الإيرادات والمصروفات</h3></div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group"><label>إجمالي الإيرادات (د.ع)</label><input type="text" id="corpRevenue" placeholder="٠"></div>
+                  <div class="form-group"><label>المصروفات التشغيلية (د.ع)</label><input type="text" id="corpExpenses" placeholder="٠"></div>
+                  <div class="form-group"><label>الاستهلاكات (د.ع)</label><input type="text" id="corpDepreciation" placeholder="٠"></div>
+                  <div class="form-group"><label>مصروفات أخرى مستبعدة (د.ع)</label><input type="text" id="corpOtherExp" placeholder="٠"></div>
+                </div>
+                <div class="form-group" style="margin-top:16px;">
+                  <label class="checkbox-label"><input type="checkbox" id="corpExempt" /> <span>الشركة معفاة من الضريبة (قانون الاستثمار)</span></label>
+                </div>
+                <div class="form-group" id="corpExemptPercentGroup" style="display:none;margin-top:12px;">
+                  <label>نسبة الإعفاء (٪)</label>
+                  <input type="number" id="corpExemptPercent" value="100" min="0" max="100">
+                </div>
+                <div class="btn-group"><button class="btn btn-primary" onclick="calculateCorporateTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-corp-salary">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-users"></i> استقطاع ضريبة الرواتب</h3>
+                <button class="btn btn-sm btn-primary" onclick="addSalaryRow()"><i class="fas fa-plus"></i> إضافة موظف</button>
+              </div>
+              <div class="card-body">
+                <div class="table-container">
+                  <table id="salaryTable">
+                    <thead>
+                      <tr><th>الموظف</th><th>الراتب الشهري (د.ع)</th><th>الضريبة الشهرية</th><th>إجراء</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><input type="text" placeholder="اسم الموظف" class="table-input"></td>
+                        <td><input type="text" placeholder="٠" class="table-input" onchange="calculateSalaryTax(this)"></td>
+                        <td class="salary-result">٠ د.ع</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="removeSalaryRow(this)"><i class="fas fa-trash"></i></button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-corp-docs">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-paperclip"></i> المستندات المطلوبة</h3></div>
+              <div class="card-body">
+                <div class="upload-zone" onclick="triggerUpload()">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <h3>اسحب الملفات هنا أو انقر للرفع</h3>
+                  <p>PDF, JPG, PNG — حتى ١٠ ميجا</p>
+                  <input type="file" id="fileInput" style="display:none" multiple accept=".pdf,.jpg,.png">
+                </div>
+                <div class="checklist">
+                  <label class="checkbox-label"><input type="checkbox"><span>الميزانية العمومية</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>كشف الأرباح والخسائر</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>شهادة تسجيل الشركة</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>كشوفات الرواتب</span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-corp-result">
+            <div class="result-box" id="corpResultBox">
+              <div class="result-icon"><i class="fas fa-calculator"></i></div>
+              <h2>نتيجة الاحتساب</h2>
+              <p>قم بإدخال البيانات واحتساب الضريبة أولاً</p>
+              <div class="result-details" id="corpResultDetails" style="display:none;">
+                <div class="result-row"><span>صافي الدخل الخاضع:</span><strong id="corpNetIncome">-</strong></div>
+                <div class="result-row"><span>نسبة الضريبة:</span><strong id="corpTaxRate">-</strong></div>
+                <div class="result-row"><span>مبلغ الإعفاء:</span><strong id="corpExemptAmt">-</strong></div>
+                <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="corpTaxDue">-</strong></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== LAND TAX ==================== -->
+        <section class="page-section" id="page-land">
+          <div class="section-hero" style="--hero-c1:#065f46;--hero-c2:#059669;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-map-marked-alt"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>ضريبة العرصات</h2>
+                <p>احتساب ضريبة الأراضي ضمن حدود المحافظات العراقية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> احتساب ضريبة العرصات</h3></div>
+            <div class="card-body">
+              <div class="wizard-progress">
+                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٣</div>
+              </div>
+              <div class="wizard-labels">
+                <span>الموقع</span><span>التفاصيل</span><span>النتيجة</span>
+              </div>
+
+              <div class="wizard-card active" id="land-step-1">
+                <h3><i class="fas fa-map-pin"></i> موقع العرصة</h3>
+                <div class="form-grid">
+                  <div class="form-group"><label>المحافظة</label>
+                    <select id="landProvince" onchange="updateLandDistricts()">
+                      <option value="">اختر المحافظة</option>
+                      <option value="baghdad">بغداد</option>
+                      <option value="basra">البصرة</option>
+                      <option value="nineveh">نينوى</option>
+                      <option value="erbil">أربيل</option>
+                      <option value="najaf">النجف</option>
+                      <option value="karbala">كربلاء</option>
+                      <option value="kirkuk">كركوك</option>
+                      <option value="sulaymaniyah">السليمانية</option>
+                      <option value="dhiqar">ذي قار</option>
+                      <option value="babel">بابل</option>
+                      <option value="diyala">ديالى</option>
+                      <option value="anbar">الأنبار</option>
+                      <option value="wasit">واسط</option>
+                      <option value="maysan">ميسان</option>
+                      <option value="muthanna">المثنى</option>
+                      <option value="qadisiyyah">القادسية</option>
+                      <option value="saladin">صلاح الدين</option>
+                      <option value="duhok">دهوك</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>القضاء/الناحية</label>
+                    <select id="landDistrict"><option value="">اختر المحافظة أولاً</option></select>
+                  </div>
+                </div>
+                <div class="btn-group"><button class="btn btn-primary" onclick="nextLandStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
+              </div>
+
+              <div class="wizard-card" id="land-step-2">
+                <h3><i class="fas fa-ruler-combined"></i> تفاصيل العرصة</h3>
+                <div class="form-grid">
+                  <div class="form-group"><label>المساحة (متر مربع)</label><input type="text" id="landArea" placeholder="٠"></div>
+                  <div class="form-group"><label>نوع العرصة</label>
+                    <select id="landType">
+                      <option value="residential">سكنية</option>
+                      <option value="commercial">تجارية</option>
+                      <option value="agricultural">زراعية</option>
+                      <option value="industrial">صناعية</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>سعر المتر المربع (د.ع)</label><input type="text" id="landPrice" placeholder="يُحدد تلقائياً"></div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-ghost" onclick="prevLandStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" onclick="nextLandStep(3)">احتساب <i class="fas fa-calculator"></i></button>
+                </div>
+              </div>
+
+              <div class="wizard-card" id="land-step-3">
+                <div class="result-box" id="landResultBox">
+                  <div class="result-icon"><i class="fas fa-map"></i></div>
+                  <h2>نتيجة ضريبة العرصة</h2>
+                  <div class="result-details" id="landResultDetails" style="display:none;">
+                    <div class="result-row"><span>الموقع:</span><strong id="landLocation">-</strong></div>
+                    <div class="result-row"><span>المساحة:</span><strong id="landAreaResult">-</strong></div>
+                    <div class="result-row"><span>سعر المتر:</span><strong id="landPriceResult">-</strong></div>
+                    <div class="result-row"><span>القيمة الإجمالية:</span><strong id="landTotalValue">-</strong></div>
+                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="landTaxDue">-</strong></div>
+                  </div>
+                </div>
+                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevLandStep(2)"><i class="fas fa-arrow-right"></i> تعديل البيانات</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PROPERTY TAX ==================== -->
+        <section class="page-section" id="page-property">
+          <div class="section-hero" style="--hero-c1:#c2410c;--hero-c2:#ea580c;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-home"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>ضريبة العقار</h2>
+                <p>احتساب ضريبة إيجار وبيع العقارات بمختلف أنواعها</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-home"></i> احتساب ضريبة العقار</h3></div>
+            <div class="card-body">
+              <div class="wizard-progress">
+                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٣</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٤</div>
+              </div>
+              <div class="wizard-labels"><span>النوع</span><span>التفاصيل</span><span>المستندات</span><span>النتيجة</span></div>
+
+              <div class="wizard-card active" id="prop-step-1">
+                <h3><i class="fas fa-exchange-alt"></i> نوع العملية</h3>
+                <div class="chips-group">
+                  <button class="chip active" onclick="selectChip(this,'propOperation','sale')">بيع عقار</button>
+                  <button class="chip" onclick="selectChip(this,'propOperation','rent')">تأجير عقار</button>
+                </div>
+                <input type="hidden" id="propOperation" value="sale">
+                <div class="form-grid" style="margin-top:20px;">
+                  <div class="form-group"><label>نوع العقار</label>
+                    <select id="propType">
+                      <option value="house">دار سكن</option>
+                      <option value="apartment">شقة</option>
+                      <option value="shop">محل تجاري</option>
+                      <option value="building">بناية</option>
+                      <option value="land">أرض</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>العنوان</label><input type="text" id="propAddress" placeholder="العنوان الكامل"></div>
+                </div>
+                <div class="btn-group"><button class="btn btn-primary" onclick="nextPropStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
+              </div>
+
+              <div class="wizard-card" id="prop-step-2">
+                <h3><i class="fas fa-money-check-alt"></i> التفاصيل المالية</h3>
+                <div id="propSaleFields">
+                  <div class="form-grid">
+                    <div class="form-group"><label>قيمة البيع (د.ع)</label><input type="text" id="propSalePrice" placeholder="٠"></div>
+                    <div class="form-group"><label>سنة البناء</label><input type="number" id="propBuildYear" placeholder="٢٠٠٠" min="1900" max="2030"></div>
+                  </div>
+                </div>
+                <div id="propRentFields" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group"><label>الإيجار الشهري (د.ع)</label><input type="text" id="propRentAmount" placeholder="٠"></div>
+                    <div class="form-group"><label>مدة العقد (أشهر)</label><input type="number" id="propRentDuration" value="12" min="1" max="120"></div>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-ghost" onclick="prevPropStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" onclick="nextPropStep(3)">التالي <i class="fas fa-arrow-left"></i></button>
+                </div>
+              </div>
+
+              <div class="wizard-card" id="prop-step-3">
+                <h3><i class="fas fa-file-alt"></i> المستندات</h3>
+                <div class="checklist">
+                  <label class="checkbox-label"><input type="checkbox"><span>سند الملكية (الطابو)</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>هوية المالك</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>عقد البيع/الإيجار</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>قيمة العقار المقدرة</span></label>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-ghost" onclick="prevPropStep(2)"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" onclick="nextPropStep(4)">احتساب <i class="fas fa-calculator"></i></button>
+                </div>
+              </div>
+
+              <div class="wizard-card" id="prop-step-4">
+                <div class="result-box" id="propResultBox">
+                  <div class="result-icon"><i class="fas fa-home"></i></div>
+                  <h2>نتيجة ضريبة العقار</h2>
+                  <div class="result-details" id="propResultDetails" style="display:none;">
+                    <div class="result-row"><span>نوع العملية:</span><strong id="propOpType">-</strong></div>
+                    <div class="result-row"><span>القيمة الأساسية:</span><strong id="propBaseValue">-</strong></div>
+                    <div class="result-row"><span>نسبة الضريبة:</span><strong id="propTaxRate">-</strong></div>
+                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="propTaxDue">-</strong></div>
+                  </div>
+                </div>
+                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevPropStep(3)"><i class="fas fa-arrow-right"></i> تعديل البيانات</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================== PROFESSION TAX ==================== -->
+        <section class="page-section" id="page-profession">
+          <div class="section-hero" style="--hero-c1:#5b21b6;--hero-c2:#7c3aed;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>ضريبة المهنة</h2>
+                <p>احتساب ضريبة المحامين والأطباء والتجار</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-user-tie"></i> احتساب ضريبة المهنة</h3></div>
+            <div class="card-body">
+              <div class="wizard-progress">
+                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٣</div><div class="wizard-line"></div>
+                <div class="wizard-dot">٤</div>
+              </div>
+              <div class="wizard-labels"><span>المهنة</span><span>الدخل</span><span>المستندات</span><span>النتيجة</span></div>
+
+              <div class="wizard-card active" id="prof-step-1">
+                <h3><i class="fas fa-briefcase"></i> نوع المهنة</h3>
+                <div class="chips-group">
+                  <button class="chip active" onclick="selectChip(this,'profType','doctor')">طبيب</button>
+                  <button class="chip" onclick="selectChip(this,'profType','lawyer')">محامي</button>
+                  <button class="chip" onclick="selectChip(this,'profType','engineer')">مهندس</button>
+                  <button class="chip" onclick="selectChip(this,'profType','merchant')">تاجر</button>
+                  <button class="chip" onclick="selectChip(this,'profType','contractor')">مقاول</button>
+                  <button class="chip" onclick="selectChip(this,'profType','other')">أخرى</button>
+                </div>
+                <input type="hidden" id="profType" value="doctor">
+                <div class="form-grid" style="margin-top:20px;">
+                  <div class="form-group"><label>الاسم الكامل</label><input type="text" id="profName" placeholder="أدخل الاسم"></div>
+                  <div class="form-group"><label>رقم الهوية</label><input type="text" id="profId" placeholder="رقم الهوية الوطنية"></div>
+                </div>
+                <div class="btn-group"><button class="btn btn-primary" onclick="nextProfStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
+              </div>
+
+              <div class="wizard-card" id="prof-step-2">
+                <h3><i class="fas fa-coins"></i> تفاصيل الدخل</h3>
+                <div class="chips-group" style="margin-bottom:20px;">
+                  <button class="chip active" onclick="toggleProfIncomeMethod('annual')">سنوي</button>
+                  <button class="chip" onclick="toggleProfIncomeMethod('monthly')">شهري</button>
+                </div>
+                <div class="form-grid">
+                  <div class="form-group"><label id="profIncomeLabel">الدخل السنوي (د.ع)</label><input type="text" id="profIncome" placeholder="٠"></div>
+                  <div class="form-group"><label>المصروفات المهنية (د.ع)</label><input type="text" id="profExpenses" placeholder="٠"></div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-ghost" onclick="prevProfStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" onclick="nextProfStep(3)">التالي <i class="fas fa-arrow-left"></i></button>
+                </div>
+              </div>
+
+              <div class="wizard-card" id="prof-step-3">
+                <h3><i class="fas fa-file-alt"></i> المستندات</h3>
+                <div class="checklist">
+                  <label class="checkbox-label"><input type="checkbox"><span>إجازة مزاولة المهنة</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>هوية الأحوال المدنية</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>بيان الدخل السنوي</span></label>
+                  <label class="checkbox-label"><input type="checkbox"><span>إيصالات المصروفات</span></label>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-ghost" onclick="prevProfStep(2)"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" onclick="nextProfStep(4)">احتساب <i class="fas fa-calculator"></i></button>
+                </div>
+              </div>
+
+              <div class="wizard-card" id="prof-step-4">
+                <div class="result-box" id="profResultBox">
+                  <div class="result-icon"><i class="fas fa-user-tie"></i></div>
+                  <h2>نتيجة ضريبة المهنة</h2>
+                  <div class="result-details" id="profResultDetails" style="display:none;">
+                    <div class="result-row"><span>الدخل الصافي:</span><strong id="profNetIncome">-</strong></div>
+                    <div class="result-row"><span>بعد الإعفاء:</span><strong id="profAfterExempt">-</strong></div>
+                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="profTaxDue">-</strong></div>
+                  </div>
+                </div>
+                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevProfStep(3)"><i class="fas fa-arrow-right"></i> تعديل</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SALES TAX ==================== -->
+        <section class="page-section" id="page-sales">
+          <div class="section-hero" style="--hero-c1:#991b1b;--hero-c2:#dc2626;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-shopping-cart"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>ضريبة المبيعات</h2>
+                <p>احتساب الضريبة على الخدمات والسلع المختلفة</p>
+              </div>
+            </div>
+          </div>
+          <div class="tabs-container">
+            <button class="tab active" onclick="switchTab(event,'tab-sales-entry')">إدخال مبيعات</button>
+            <button class="tab" onclick="switchTab(event,'tab-sales-list')">قائمة المبيعات</button>
+            <button class="tab" onclick="switchTab(event,'tab-sales-report')">تقرير الضريبة</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-sales-entry">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-shopping-cart"></i> إدخال عملية بيع</h3></div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group"><label>فئة المنتج/الخدمة</label>
+                    <select id="salesCategory" onchange="updateSalesTaxRate()">
+                      <option value="" data-rate="0">اختر الفئة</option>
+                      <option value="phone" data-rate="20">خدمات الهاتف والإنترنت - ٢٠٪</option>
+                      <option value="cars" data-rate="15">السيارات - ١٥٪</option>
+                      <option value="travel" data-rate="15">تذاكر السفر - ١٥٪</option>
+                      <option value="tobacco" data-rate="100">السكائر والتبغ - ١٠٠٪</option>
+                      <option value="alcohol" data-rate="200">المشروبات الكحولية - ٢٠٠٪</option>
+                      <option value="perfume" data-rate="25">العطور ومستحضرات التجميل - ٢٥٪</option>
+                      <option value="electronics" data-rate="15">الأجهزة الإلكترونية - ١٥٪</option>
+                      <option value="gold" data-rate="15">الذهب والمجوهرات - ١٥٪</option>
+                      <option value="hotels" data-rate="10">الفنادق والمطاعم - ١٠٪</option>
+                    </select>
+                  </div>
+                  <div class="form-group"><label>نسبة الضريبة</label><input type="text" id="salesTaxRate" value="٠٪" readonly></div>
+                  <div class="form-group"><label>مبلغ البيع (د.ع)</label><input type="text" id="salesAmount" placeholder="٠"></div>
+                  <div class="form-group"><label>الكمية</label><input type="number" id="salesQty" value="1" min="1"></div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-primary" onclick="calculateSalesTax()"><i class="fas fa-calculator"></i> احتساب</button>
+                  <button class="btn btn-success" onclick="addSalesEntry()"><i class="fas fa-plus"></i> إضافة للقائمة</button>
+                </div>
+                <div class="summary-grid" id="salesSummary" style="display:none;margin-top:20px;">
+                  <div class="summary-item"><span>مبلغ البيع</span><strong id="salesSubtotal">-</strong></div>
+                  <div class="summary-item"><span>مبلغ الضريبة</span><strong id="salesTaxAmount">-</strong></div>
+                  <div class="summary-item highlight"><span>الإجمالي مع الضريبة</span><strong id="salesTotal">-</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-sales-list">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-list"></i> قائمة المبيعات المسجلة</h3></div>
+              <div class="card-body">
+                <div class="table-container">
+                  <table>
+                    <thead><tr><th>#</th><th>الفئة</th><th>المبلغ</th><th>الضريبة</th><th>الإجمالي</th></tr></thead>
+                    <tbody id="salesListBody">
+                      <tr><td colspan="5" class="empty-table">لا توجد مبيعات مسجلة بعد</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-sales-report">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-chart-pie"></i> تقرير ضريبة المبيعات</h3></div>
+              <div class="card-body">
+                <div class="summary-grid">
+                  <div class="summary-item"><span>إجمالي المبيعات</span><strong id="salesReportTotal">٠ د.ع</strong></div>
+                  <div class="summary-item"><span>إجمالي الضرائب</span><strong id="salesReportTax">٠ د.ع</strong></div>
+                  <div class="summary-item highlight"><span>عدد العمليات</span><strong id="salesReportCount">٠</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== REPORTS ==================== -->
+        <section class="page-section" id="page-reports">
+          <div class="section-hero" style="--hero-c1:#1e40af;--hero-c2:#3b82f6;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-chart-bar"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>التقارير والتحليلات</h2>
+                <p>استعراض وتحليل البيانات الضريبية بشكل تفصيلي</p>
+              </div>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h3>١٤</h3><p>إقرار ضريبي</p></div></div>
+            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3>١١</h3><p>تمت الموافقة</p></div></div>
+            <div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clock"></i></div><div class="stat-info"><h3>٣</h3><p>قيد المراجعة</p></div></div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header">
+              <h3><i class="fas fa-chart-bar"></i> التقارير المتاحة</h3>
+            </div>
+            <div class="card-body">
+              <div class="reports-list">
+                <div class="report-item">
+                  <div class="report-icon"><i class="fas fa-building"></i></div>
+                  <div class="report-info"><h4>تقرير ضريبة الشركات</h4><p>السنة المالية ٢٠٢٥</p></div>
+                  <button class="btn btn-sm btn-primary"><i class="fas fa-download"></i> تحميل</button>
+                </div>
+                <div class="report-item">
+                  <div class="report-icon"><i class="fas fa-map"></i></div>
+                  <div class="report-info"><h4>تقرير ضريبة العرصات</h4><p>الربع الأول ٢٠٢٦</p></div>
+                  <button class="btn btn-sm btn-primary"><i class="fas fa-download"></i> تحميل</button>
+                </div>
+                <div class="report-item">
+                  <div class="report-icon"><i class="fas fa-home"></i></div>
+                  <div class="report-info"><h4>تقرير ضريبة العقار</h4><p>آذار ٢٠٢٦</p></div>
+                  <button class="btn btn-sm btn-primary"><i class="fas fa-download"></i> تحميل</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><h3><i class="fas fa-gavel"></i> الإقرارات الضريبية</h3></div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>رقم الإقرار</th><th>نوع الضريبة</th><th>السنة</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+                  <tbody>
+                    <tr><td>IQ-2026-001</td><td>دخل الشركات</td><td>٢٠٢٥</td><td>٥,٢٥٠,٠٠٠ د.ع</td><td><span class="status-badge approved">مُعتمد</span></td></tr>
+                    <tr><td>IQ-2026-002</td><td>ضريبة العقار</td><td>٢٠٢٦</td><td>١,٨٠٠,٠٠٠ د.ع</td><td><span class="status-badge pending">قيد الانتظار</span></td></tr>
+                    <tr><td>IQ-2026-003</td><td>ضريبة المهنة</td><td>٢٠٢٦</td><td>٧٥٠,٠٠٠ د.ع</td><td><span class="status-badge submitted">مُقدّم</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== DOCUMENTS ==================== -->
+        <section class="page-section" id="page-documents">
+          <div class="section-hero" style="--hero-c1:#065f46;--hero-c2:#10b981;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-folder-open"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>إدارة المستندات</h2>
+                <p>رفع وتنظيم المستندات والوثائق الضريبية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-cloud-upload-alt"></i> رفع المستندات</h3></div>
+            <div class="card-body">
+              <div class="upload-zone" onclick="triggerUpload()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>اسحب الملفات هنا أو انقر للتحميل</h3>
+                <p>PDF, JPG, PNG, DOCX — حتى ٢٠ ميجا</p>
+                <input type="file" style="display:none" multiple>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><h3><i class="fas fa-folder"></i> المستندات المحفوظة</h3></div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>اسم المستند</th><th>النوع</th><th>الحجم</th><th>التاريخ</th><th>إجراء</th></tr></thead>
+                  <tbody>
+                    <tr><td><i class="fas fa-file-pdf" style="color:#ef476f;"></i> الميزانية_٢٠٢٥.pdf</td><td>ميزانية</td><td>٢.٤ MB</td><td>٢٤ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
+                    <tr><td><i class="fas fa-file-image" style="color:#00b4d8;"></i> صورة_الطابو.jpg</td><td>سند ملكية</td><td>١.١ MB</td><td>٢٣ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
+                    <tr><td><i class="fas fa-file-pdf" style="color:#ef476f;"></i> عقد_الإيجار.pdf</td><td>عقد</td><td>٨٥٠ KB</td><td>٢٠ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== NOTIFICATIONS ==================== -->
+        <section class="page-section" id="page-notifications">
+          <div class="section-hero" style="--hero-c1:#d97706;--hero-c2:#f59e0b;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-bell"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>الإشعارات والتنبيهات</h2>
+                <p>متابعة التنبيهات والمواعيد الضريبية المهمة</p>
+              </div>
+            </div>
+          </div>
+          <div class="tabs-container">
+            <button class="tab active" onclick="switchTab(event,'tab-notif-all')">جميع الإشعارات</button>
+            <button class="tab" onclick="switchTab(event,'tab-notif-payment')">مواعيد الدفع</button>
+            <button class="tab" onclick="switchTab(event,'tab-notif-legal')">تحديثات قانونية</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-notif-all">
+            <div class="card">
+              <div class="card-body" style="padding:0;">
+                <div class="notification-item" style="padding:20px;border-bottom:1px solid var(--border);">
+                  <div class="notification-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="notification-content">
+                    <h4>تذكير بموعد الدفع</h4>
+                    <p>موعد دفع ضريبة الشركات لشركة النور ينتهي خلال ٧ أيام</p>
+                    <span class="notification-time">منذ ساعتين</span>
+                  </div>
+                </div>
+                <div class="notification-item" style="padding:20px;border-bottom:1px solid var(--border);">
+                  <div class="notification-icon info"><i class="fas fa-info-circle"></i></div>
+                  <div class="notification-content">
+                    <h4>تحديث قانوني جديد</h4>
+                    <p>تم تعديل نسب ضريبة المبيعات على السكائر والتبغ</p>
+                    <span class="notification-time">منذ ٥ ساعات</span>
+                  </div>
+                </div>
+                <div class="notification-item" style="padding:20px;border-bottom:1px solid var(--border);">
+                  <div class="notification-icon payment"><i class="fas fa-check-circle"></i></div>
+                  <div class="notification-content">
+                    <h4>تأكيد دفع</h4>
+                    <p>تم تأكيد دفع ضريبة العقار بنجاح - إيصال رقم ٢٠٢٦٠٣٢٤</p>
+                    <span class="notification-time">أمس</span>
+                  </div>
+                </div>
+                <div class="notification-item" style="padding:20px;">
+                  <div class="notification-icon info"><i class="fas fa-bell"></i></div>
+                  <div class="notification-content">
+                    <h4>مراجعة الإقرار</h4>
+                    <p>تم الانتهاء من مراجعة إقرار ضريبة المهنة</p>
+                    <span class="notification-time">منذ ٣ أيام</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-notif-payment">
+            <div class="card">
+              <div class="card-body">
+                <div class="notification-item" style="padding:16px 0;border-bottom:1px solid var(--border);">
+                  <div class="notification-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                  <div class="notification-content">
+                    <h4>ضريبة الشركات — شركة النور</h4>
+                    <p>المبلغ: ٥,٢٥٠,٠٠٠ د.ع — الاستحقاق: ٣١ آذار ٢٠٢٦</p>
+                    <span class="notification-time">متبقي ٧ أيام</span>
+                  </div>
+                </div>
+                <div class="notification-item" style="padding:16px 0;">
+                  <div class="notification-icon payment"><i class="fas fa-calendar"></i></div>
+                  <div class="notification-content">
+                    <h4>ضريبة المهنة — د. سالم</h4>
+                    <p>المبلغ: ٧٥٠,٠٠٠ د.ع — الاستحقاق: ٣٠ نيسان ٢٠٢٦</p>
+                    <span class="notification-time">متبقي ٣٧ يوم</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-notif-legal">
+            <div class="card">
+              <div class="card-body">
+                <div class="notification-item" style="padding:16px 0;">
+                  <div class="notification-icon info"><i class="fas fa-gavel"></i></div>
+                  <div class="notification-content">
+                    <h4>تعديل قانون ضريبة المبيعات</h4>
+                    <p>تم تعديل المادة ٥ من قانون ضريبة المبيعات بخصوص نسب الضريبة على السكائر والتبغ</p>
+                    <span class="notification-time">١٨ آذار ٢٠٢٦</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== PENALTIES CALCULATOR ==================== -->
+        <section class="page-section" id="page-penalties">
+          <div class="section-hero" style="--hero-c1:#dc2626;--hero-c2:#ef4444;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-gavel"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>حاسبة الغرامات</h2>
+                <p>احتساب غرامات التأخر في السداد وفق القانون</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-gavel"></i> حاسبة الغرامات والجزاءات الضريبية</h3></div>
+            <div class="card-body">
+              <p style="color:var(--text-light);margin-bottom:20px;">وفقاً لقانون ضريبة الدخل رقم ١١٣ لسنة ١٩٨٢ وتعديلاته</p>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>نوع المخالفة</label>
+                  <select id="penaltyType">
+                    <option value="late_payment">تأخر في الدفع</option>
+                    <option value="late_declaration">تأخر في تقديم الإقرار</option>
+                    <option value="tax_evasion">تهرب ضريبي</option>
+                    <option value="false_info">معلومات كاذبة</option>
+                    <option value="no_records">عدم مسك سجلات</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>مبلغ الضريبة الأصلي (د.ع)</label>
+                  <input type="text" id="penaltyOriginalTax" placeholder="٠">
+                </div>
+                <div class="form-group">
+                  <label>تاريخ الاستحقاق</label>
+                  <input type="date" id="penaltyDueDate">
+                </div>
+                <div class="form-group">
+                  <label>تاريخ الدفع الفعلي</label>
+                  <input type="date" id="penaltyPayDate">
+                </div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="calculatePenalty()"><i class="fas fa-calculator"></i> حساب الغرامة</button>
+              </div>
+              <div class="result-box" id="penaltyResult" style="display:none;margin-top:24px;">
+                <div class="result-icon"><i class="fas fa-gavel"></i></div>
+                <h2>نتيجة حساب الغرامة</h2>
+                <div class="result-details">
+                  <div class="result-row"><span>نوع المخالفة:</span><strong id="penaltyTypeResult">-</strong></div>
+                  <div class="result-row"><span>مدة التأخير:</span><strong id="penaltyDays">-</strong></div>
+                  <div class="result-row"><span>نسبة الغرامة:</span><strong id="penaltyRate">-</strong></div>
+                  <div class="result-row"><span>مبلغ الضريبة الأصلي:</span><strong id="penaltyOriginal">-</strong></div>
+                  <div class="result-row total"><span>مبلغ الغرامة:</span><strong id="penaltyAmount">-</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAX COMPARISON ==================== -->
+        <section class="page-section" id="page-comparison">
+          <div class="section-hero" style="--hero-c1:#7c3aed;--hero-c2:#8b5cf6;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-balance-scale"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>مقارنة الضرائب</h2>
+                <p>مقارنة تفصيلية بين أنواع الضرائب المختلفة</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-balance-scale"></i> مقارنة الضرائب بين السنوات</h3></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>السنة الأولى</label>
+                  <input type="number" id="compYear1" value="2024" min="2000" max="2030">
+                </div>
+                <div class="form-group">
+                  <label>السنة الثانية</label>
+                  <input type="number" id="compYear2" value="2025" min="2000" max="2030">
+                </div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="generateComparison()"><i class="fas fa-chart-bar"></i> إنشاء المقارنة</button>
+              </div>
+              <div id="comparisonResults" style="display:none;margin-top:24px;">
+                <div class="card" style="margin-bottom:20px;">
+                  <div class="card-body"><canvas id="comparisonChart" height="300"></canvas></div>
+                </div>
+                <div class="table-container">
+                  <table>
+                    <thead>
+                      <tr><th>نوع الضريبة</th><th id="compHeader1">٢٠٢٤</th><th id="compHeader2">٢٠٢٥</th><th>التغيير</th><th>النسبة</th></tr>
+                    </thead>
+                    <tbody id="comparisonBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAX CALENDAR ==================== -->
+        <section class="page-section" id="page-calendar">
+          <div class="section-hero" style="--hero-c1:#0891b2;--hero-c2:#06b6d4;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-calendar-alt"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>التقويم الضريبي</h2>
+                <p>جدول المواعيد النهائية والأحداث الضريبية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header">
+              <h3><i class="fas fa-calendar-alt"></i> التقويم الضريبي</h3>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-sm btn-ghost" onclick="changeCalendarMonth(-1)"><i class="fas fa-chevron-right"></i></button>
+                <span id="calendarMonthTitle" style="font-weight:700;min-width:150px;text-align:center;line-height:36px;"></span>
+                <button class="btn btn-sm btn-ghost" onclick="changeCalendarMonth(1)"><i class="fas fa-chevron-left"></i></button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="calendar-grid" id="calendarGrid"></div>
+              <div style="margin-top:20px;">
+                <h4 style="margin-bottom:12px;"><i class="fas fa-list"></i> مواعيد الشهر</h4>
+                <div id="calendarEvents"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== AUDIT LOG ==================== -->
+        <section class="page-section" id="page-audit">
+          <div class="section-hero" style="--hero-c1:#4338ca;--hero-c2:#6366f1;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-clipboard-list"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>سجل التدقيق</h2>
+                <p>تتبع جميع العمليات والأنشطة في النظام</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header">
+              <h3><i class="fas fa-clipboard-list"></i> سجل العمليات</h3>
+              <button class="btn btn-sm btn-ghost" onclick="clearAuditLog()"><i class="fas fa-trash"></i> مسح السجل</button>
+            </div>
+            <div class="card-body">
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>#</th><th>العملية</th><th>المستخدم</th><th>التفاصيل</th><th>الوقت</th></tr></thead>
+                  <tbody id="auditLogBody">
+                    <tr><td colspan="5" class="empty-table">لا توجد عمليات مسجلة</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== USER MANAGEMENT ==================== -->
+        <section class="page-section" id="page-users">
+          <div class="section-hero" style="--hero-c1:#0f766e;--hero-c2:#14b8a6;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-users-cog"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>إدارة المستخدمين</h2>
+                <p>إدارة حسابات المستخدمين والصلاحيات</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header">
+              <h3><i class="fas fa-users-cog"></i> إدارة المستخدمين</h3>
+              <button class="btn btn-sm btn-primary" onclick="showAddUserForm()"><i class="fas fa-user-plus"></i> إضافة مستخدم</button>
+            </div>
+            <div class="card-body">
+              <div id="addUserForm" style="display:none;margin-bottom:24px;padding:20px;background:#f8f9fc;border-radius:var(--radius-sm);">
+                <h4 style="margin-bottom:16px;">إضافة مستخدم جديد</h4>
+                <div class="form-grid">
+                  <div class="form-group"><label>اسم المستخدم</label><input type="text" id="newUsername" placeholder="اسم المستخدم"></div>
+                  <div class="form-group"><label>الاسم الكامل</label><input type="text" id="newFullName" placeholder="الاسم الكامل"></div>
+                  <div class="form-group"><label>كلمة المرور</label><input type="password" id="newPassword" placeholder="كلمة المرور"></div>
+                  <div class="form-group"><label>الصلاحية</label>
+                    <select id="newRole">
+                      <option value="محاسب ضريبي">محاسب ضريبي</option>
+                      <option value="مدير النظام">مدير النظام</option>
+                      <option value="مراجع">مراجع</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-success" onclick="addNewUser()"><i class="fas fa-check"></i> حفظ</button>
+                  <button class="btn btn-ghost" onclick="document.getElementById('addUserForm').style.display='none'">إلغاء</button>
+                </div>
+              </div>
+              <div class="table-container">
+                <table>
+                  <thead><tr><th>المستخدم</th><th>الاسم الكامل</th><th>الصلاحية</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                  <tbody id="usersTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== SETTINGS ==================== -->
+        <section class="page-section" id="page-settings">
+          <div class="section-hero" style="--hero-c1:#6b7280;--hero-c2:#9ca3af;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-cogs"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>الإعدادات</h2>
+                <p>تخصيص إعدادات النظام والتفضيلات الشخصية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-cog"></i> إعدادات النظام</h3></div>
+            <div class="card-body">
+              <div class="settings-section">
+                <h4><i class="fas fa-palette"></i> المظهر</h4>
+                <div class="settings-item">
+                  <div><strong>الوضع الليلي</strong><p style="font-size:0.85rem;color:var(--text-light);">تفعيل المظهر الداكن للنظام</p></div>
+                  <label class="switch"><input type="checkbox" id="settingDarkMode" onchange="toggleDarkMode()"><span class="switch-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                  <div><strong>حجم الخط</strong><p style="font-size:0.85rem;color:var(--text-light);">تغيير حجم الخط الافتراضي</p></div>
+                  <select id="settingFontSize" onchange="changeFontSize(this.value)" style="padding:8px 16px;border:2px solid var(--border);border-radius:var(--radius-xs);">
+                    <option value="14">صغير</option>
+                    <option value="15" selected>متوسط</option>
+                    <option value="17">كبير</option>
+                  </select>
+                </div>
+              </div>
+              <div class="settings-section">
+                <h4><i class="fas fa-bell"></i> الإشعارات</h4>
+                <div class="settings-item">
+                  <div><strong>إشعارات المتصفح</strong><p style="font-size:0.85rem;color:var(--text-light);">إرسال تنبيهات لمواعيد الدفع</p></div>
+                  <label class="switch"><input type="checkbox" id="settingNotifications" onchange="toggleBrowserNotifications()"><span class="switch-slider"></span></label>
+                </div>
+                <div class="settings-item">
+                  <div><strong>حفظ تلقائي للمسودات</strong><p style="font-size:0.85rem;color:var(--text-light);">حفظ البيانات المدخلة تلقائياً</p></div>
+                  <label class="switch"><input type="checkbox" id="settingAutoSave" checked onchange="toggleAutoSave()"><span class="switch-slider"></span></label>
+                </div>
+              </div>
+              <div class="settings-section">
+                <h4><i class="fas fa-database"></i> البيانات</h4>
+                <div class="settings-item">
+                  <div><strong>تصدير جميع البيانات</strong><p style="font-size:0.85rem;color:var(--text-light);">تحميل نسخة احتياطية من البيانات</p></div>
+                  <button class="btn btn-sm btn-primary" onclick="exportAllData()"><i class="fas fa-download"></i> تصدير</button>
+                </div>
+                <div class="settings-item">
+                  <div><strong>مسح البيانات المحفوظة</strong><p style="font-size:0.85rem;color:var(--text-light);">حذف جميع المسودات والإعدادات المحفوظة</p></div>
+                  <button class="btn btn-sm btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> مسح</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      
+        <!-- ==================== PACKAGES PAGE ==================== -->
+        <section class="page-section" id="page-packages">
+          <div class="section-hero" style="--hero-c1:#d4a017;--hero-c2:#f0c75e;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-gem"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>الباقات والاشتراكات</h2>
+                <p>إدارة باقتك الحالية، الترقية، وسجل المدفوعات</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Subscription Status -->
+          <div class="card pkg-status-card" data-aos="fade-up">
+            <div class="card-body">
+              <div class="current-package-info" id="currentPackageInfo"></div>
+            </div>
+          </div>
+
+          <!-- Subscription Stats -->
+          <div class="pkg-stats-row" data-aos="fade-up" data-aos-delay="100">
+            <div class="pkg-stat-card">
+              <div class="pkg-stat-icon" style="background:rgba(5,150,105,0.1);color:#059669;"><i class="fas fa-calendar-check"></i></div>
+              <div class="pkg-stat-info">
+                <span class="pkg-stat-value" id="pkgDaysLeft">--</span>
+                <span class="pkg-stat-label">يوم متبقي</span>
+              </div>
+            </div>
+            <div class="pkg-stat-card">
+              <div class="pkg-stat-icon" style="background:rgba(37,99,235,0.1);color:#2563eb;"><i class="fas fa-calculator"></i></div>
+              <div class="pkg-stat-info">
+                <span class="pkg-stat-value" id="pkgCalcsUsed">--</span>
+                <span class="pkg-stat-label">عملية حساب</span>
+              </div>
+            </div>
+            <div class="pkg-stat-card">
+              <div class="pkg-stat-icon" style="background:rgba(212,160,23,0.1);color:#d4a017;"><i class="fas fa-file-export"></i></div>
+              <div class="pkg-stat-info">
+                <span class="pkg-stat-value" id="pkgExportsUsed">--</span>
+                <span class="pkg-stat-label">تقرير مُصدَّر</span>
+              </div>
+            </div>
+            <div class="pkg-stat-card">
+              <div class="pkg-stat-icon" style="background:rgba(124,58,237,0.1);color:#7c3aed;"><i class="fas fa-users"></i></div>
+              <div class="pkg-stat-info">
+                <span class="pkg-stat-value" id="pkgUsersCount">--</span>
+                <span class="pkg-stat-label">مستخدم نشط</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage Progress Bars -->
+          <div class="card" data-aos="fade-up" data-aos-delay="150">
+            <div class="card-header"><h3><i class="fas fa-chart-bar"></i> استخدام الباقة</h3></div>
+            <div class="card-body" id="pkgUsageBody">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Available Packages Grid -->
+          <div class="card" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-header">
+              <h3><i class="fas fa-th-large"></i> الباقات المتوفرة</h3>
+              <div class="pkg-inline-toggle">
+                <span class="pkg-toggle-label-sm">شهري</span>
+                <label class="pkg-toggle-switch-sm">
+                  <input type="checkbox" id="pkgInlineBillingToggle" onchange="toggleInlineBilling()">
+                  <span class="pkg-toggle-slider-sm"></span>
+                </label>
+                <span class="pkg-toggle-label-sm">سنوي <small style="color:var(--success);">-٢٠٪</small></span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="packages-grid-inline" id="packagesGridInline"></div>
+            </div>
+          </div>
+
+          <!-- Payment History -->
+          <div class="card" data-aos="fade-up" data-aos-delay="250">
+            <div class="card-header"><h3><i class="fas fa-receipt"></i> سجل المدفوعات</h3></div>
+            <div class="card-body">
+              <table class="data-table" id="pkgPaymentTable">
+                <thead>
+                  <tr>
+                    <th>التاريخ</th>
+                    <th>الباقة</th>
+                    <th>الدورة</th>
+                    <th>المبلغ</th>
+                    <th>الحالة</th>
+                    <th>الفاتورة</th>
+                  </tr>
+                </thead>
+                <tbody id="pkgPaymentBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="card" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-header"><h3><i class="fas fa-credit-card"></i> طرق الدفع</h3></div>
+            <div class="card-body">
+              <div class="pkg-payment-methods" id="pkgPaymentMethods">
+                <div class="pkg-pm-card active">
+                  <div class="pkg-pm-icon"><i class="fab fa-cc-visa"></i></div>
+                  <div class="pkg-pm-info">
+                    <span class="pkg-pm-name">Visa •••• 4532</span>
+                    <span class="pkg-pm-expiry">منتهي: ٠٩/٢٧</span>
+                  </div>
+                  <span class="pkg-pm-default">الافتراضية</span>
+                </div>
+                <div class="pkg-pm-card">
+                  <div class="pkg-pm-icon"><i class="fab fa-cc-mastercard"></i></div>
+                  <div class="pkg-pm-info">
+                    <span class="pkg-pm-name">Mastercard •••• 8891</span>
+                    <span class="pkg-pm-expiry">منتهي: ١٢/٢٦</span>
+                  </div>
+                </div>
+                <button class="pkg-pm-add" onclick="showToast('ستتوفر هذه الميزة قريباً')"><i class="fas fa-plus"></i> إضافة طريقة دفع</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subscription Settings -->
+          <div class="card" data-aos="fade-up" data-aos-delay="350">
+            <div class="card-header"><h3><i class="fas fa-cog"></i> إعدادات الاشتراك</h3></div>
+            <div class="card-body">
+              <div class="pkg-settings-list">
+                <div class="pkg-setting-item">
+                  <div class="pkg-setting-info">
+                    <h4>التجديد التلقائي</h4>
+                    <p>تجديد الاشتراك تلقائياً عند انتهاء الفترة الحالية</p>
+                  </div>
+                  <label class="switch"><input type="checkbox" checked onchange="togglePkgSetting('autoRenew', this.checked)"><span class="switch-slider"></span></label>
+                </div>
+                <div class="pkg-setting-item">
+                  <div class="pkg-setting-info">
+                    <h4>إشعارات انتهاء الاشتراك</h4>
+                    <p>تلقي تنبيه قبل ٧ أيام من انتهاء الاشتراك</p>
+                  </div>
+                  <label class="switch"><input type="checkbox" checked onchange="togglePkgSetting('expiryNotif', this.checked)"><span class="switch-slider"></span></label>
+                </div>
+                <div class="pkg-setting-item">
+                  <div class="pkg-setting-info">
+                    <h4>إيصالات عبر البريد الإلكتروني</h4>
+                    <p>إرسال إيصال الدفع تلقائياً إلى بريدك الإلكتروني</p>
+                  </div>
+                  <label class="switch"><input type="checkbox" checked onchange="togglePkgSetting('emailReceipts', this.checked)"><span class="switch-slider"></span></label>
+                </div>
+                <div class="pkg-setting-item">
+                  <div class="pkg-setting-info">
+                    <h4>التقارير الشهرية</h4>
+                    <p>تلقي تقرير شهري بملخص استخدامك للنظام</p>
+                  </div>
+                  <label class="switch"><input type="checkbox" onchange="togglePkgSetting('monthlyReport', this.checked)"><span class="switch-slider"></span></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cancel / Downgrade -->
+          <div class="pkg-actions-row" data-aos="fade-up" data-aos-delay="400">
+            <button class="btn btn-outline-danger" onclick="cancelSubscription()"><i class="fas fa-times-circle"></i> إلغاء الاشتراك</button>
+            <button class="btn btn-warning" onclick="showUpgradePackages()"><i class="fas fa-arrow-up"></i> ترقية الباقة</button>
+          </div>
+        </section>
+
+        <!-- ==================== PROVINCES PAGE ==================== -->
+        <section class="page-section" id="page-provinces">
+          <div class="section-hero" style="--hero-c1:#0f1b4d;--hero-c2:#1a2980;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-map"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>المحافظات العراقية</h2>
+                <p>استعراض بيانات جميع المحافظات الـ ١٨</p>
+              </div>
+            </div>
+          </div>
+          <div class="welcome-banner animate-in" style="margin-bottom:28px;">
+            <div class="welcome-text"><h2><i class="fas fa-map"></i> المحافظات العراقية</h2><p>استعرض جميع المحافظات العراقية الـ ١٨ وبيانات الضرائب المرتبطة بها</p></div>
+          </div>
+          <div class="provinces-grid" id="provincesGrid"></div>
+        </section>
+
+      </div><!-- end page-content -->
+    </main>
+  </div><!-- end app-container -->
+
+
+        <!-- ==================== INVOICES PAGE ==================== -->
+        <section class="page-section" id="page-invoices">
+          <div class="section-hero" style="--hero-c1:#0f1b4d;--hero-c2:#1e3a5f;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-file-invoice-dollar"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>الفوترة الإلكترونية</h2>
+                <p>إنشاء وإدارة الفواتير الضريبية الإلكترونية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-file-invoice-dollar"></i> الفواتير</h3>
+              <button class="btn btn-primary" onclick="createNewInvoice()"><i class="fas fa-plus"></i> فاتورة جديدة</button>
+            </div>
+            <div class="card-body">
+              <div class="invoice-stats-row">
+                <div class="inv-stat"><i class="fas fa-file-alt"></i><div><span class="inv-stat-num" id="invTotal">0</span><small>إجمالي الفواتير</small></div></div>
+                <div class="inv-stat"><i class="fas fa-check-circle" style="color:var(--success)"></i><div><span class="inv-stat-num" id="invPaid">0</span><small>مدفوعة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-clock" style="color:var(--warning)"></i><div><span class="inv-stat-num" id="invPending">0</span><small>معلقة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-times-circle" style="color:var(--danger)"></i><div><span class="inv-stat-num" id="invOverdue">0</span><small>متأخرة</small></div></div>
+              </div>
+              <div class="invoice-filters" style="margin:16px 0;display:flex;gap:10px;flex-wrap:wrap;">
+                <select class="form-control" style="max-width:180px;" onchange="filterInvoices(this.value)">
+                  <option value="all">جميع الحالات</option>
+                  <option value="paid">مدفوعة</option>
+                  <option value="pending">معلقة</option>
+                  <option value="overdue">متأخرة</option>
+                </select>
+                <input type="text" class="form-control" style="max-width:250px;" placeholder="بحث بالاسم أو رقم الفاتورة..." oninput="searchInvoices(this.value)">
+              </div>
+              <table class="data-table">
+                <thead><tr><th>#</th><th>المكلف</th><th>نوع الضريبة</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                <tbody id="invoicesTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Invoice Creation Modal -->
+          <div class="modal-overlay" id="invoiceModal" style="display:none;">
+            <div class="modal-content" style="max-width:650px;">
+              <div class="modal-header"><h3><i class="fas fa-file-invoice"></i> إنشاء فاتورة جديدة</h3><button onclick="closeInvoiceModal()" class="modal-close"><i class="fas fa-times"></i></button></div>
+              <div class="modal-body">
+                <div class="form-row"><div class="form-group"><label>اسم المكلف</label><input type="text" class="form-control" id="invClientName" placeholder="اسم المكلف أو الشركة"></div><div class="form-group"><label>نوع الضريبة</label><select class="form-control" id="invTaxType"><option>ضريبة دخل الشركات</option><option>ضريبة العرصات</option><option>ضريبة العقار</option><option>ضريبة المهنة</option><option>ضريبة المبيعات</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>المبلغ المستحق (د.ع)</label><input type="number" class="form-control" id="invAmount" placeholder="0"></div><div class="form-group"><label>تاريخ الاستحقاق</label><input type="date" class="form-control" id="invDueDate"></div></div>
+                <div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="invNotes" rows="3" placeholder="ملاحظات إضافية..."></textarea></div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" onclick="saveInvoice()"><i class="fas fa-save"></i> حفظ الفاتورة</button><button class="btn btn-secondary" onclick="closeInvoiceModal()">إلغاء</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TAXPAYERS PAGE ==================== -->
+        <section class="page-section" id="page-taxpayers">
+          <div class="section-hero" style="--hero-c1:#0d3b66;--hero-c2:#14506b;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>سجل المكلفين</h2>
+                <p>إدارة قاعدة بيانات المكلفين الضريبيين</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-users"></i> سجل المكلفين</h3>
+              <button class="btn btn-primary" onclick="addNewTaxpayer()"><i class="fas fa-user-plus"></i> إضافة مكلف</button>
+            </div>
+            <div class="card-body">
+              <div class="taxpayer-search-bar" style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                <input type="text" class="form-control" style="max-width:300px;" placeholder="بحث بالاسم أو الرقم الضريبي..." id="taxpayerSearch" oninput="searchTaxpayers(this.value)">
+                <select class="form-control" style="max-width:160px;" onchange="filterTaxpayerType(this.value)"><option value="all">جميع الأنواع</option><option value="individual">فرد</option><option value="company">شركة</option><option value="government">حكومي</option></select>
+                <select class="form-control" style="max-width:160px;" onchange="filterTaxpayerStatus(this.value)"><option value="all">جميع الحالات</option><option value="active">نشط</option><option value="inactive">غير نشط</option><option value="suspended">معلق</option></select>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>الرقم الضريبي</th><th>الاسم</th><th>النوع</th><th>المحافظة</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+                <tbody id="taxpayersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Taxpayer Modal -->
+          <div class="modal-overlay" id="taxpayerModal" style="display:none;">
+            <div class="modal-content" style="max-width:650px;">
+              <div class="modal-header"><h3><i class="fas fa-user-plus"></i> <span id="taxpayerModalTitle">إضافة مكلف جديد</span></h3><button onclick="closeTaxpayerModal()" class="modal-close"><i class="fas fa-times"></i></button></div>
+              <div class="modal-body">
+                <div class="form-row"><div class="form-group"><label>الاسم الكامل</label><input type="text" class="form-control" id="tpName"></div><div class="form-group"><label>النوع</label><select class="form-control" id="tpType"><option value="individual">فرد</option><option value="company">شركة</option><option value="government">حكومي</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>الرقم الضريبي</label><input type="text" class="form-control" id="tpTaxId"></div><div class="form-group"><label>المحافظة</label><select class="form-control" id="tpProvince"><option>بغداد</option><option>البصرة</option><option>نينوى</option><option>أربيل</option><option>النجف</option><option>كربلاء</option><option>ذي قار</option><option>بابل</option><option>ديالى</option><option>الأنبار</option><option>كركوك</option><option>صلاح الدين</option><option>واسط</option><option>ميسان</option><option>المثنى</option><option>القادسية</option><option>دهوك</option><option>السليمانية</option></select></div></div>
+                <div class="form-row"><div class="form-group"><label>رقم الهاتف</label><input type="tel" class="form-control" id="tpPhone"></div><div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-control" id="tpEmail"></div></div>
+                <div class="form-group"><label>العنوان</label><input type="text" class="form-control" id="tpAddress"></div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" onclick="saveTaxpayer()"><i class="fas fa-save"></i> حفظ</button><button class="btn btn-secondary" onclick="closeTaxpayerModal()">إلغاء</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== ATTACHMENTS PAGE ==================== -->
+        <section class="page-section" id="page-attachments">
+          <div class="section-hero" style="--hero-c1:#2d1b69;--hero-c2:#4a2c8a;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-paperclip"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>المرفقات المتقدمة</h2>
+                <p>إدارة الملفات والمستندات مع معاينة ذكية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-paperclip"></i> مدير المرفقات</h3></div>
+            <div class="card-body">
+              <div class="attachment-upload-zone" id="dropZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
+                <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:var(--primary);margin-bottom:12px;"></i>
+                <h3>اسحب الملفات هنا أو اضغط للاختيار</h3>
+                <p>يدعم: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (حد أقصى 25MB)</p>
+                <input type="file" id="fileUploadInput" style="display:none" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png" onchange="handleFileSelect(this.files)">
+                <button class="btn btn-primary" onclick="document.getElementById('fileUploadInput').click()"><i class="fas fa-folder-open"></i> اختيار ملفات</button>
+              </div>
+              <div class="attachments-list" id="attachmentsList" style="margin-top:20px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== HEATMAP PAGE ==================== -->
+        <section class="page-section" id="page-heatmap">
+          <div class="section-hero" style="--hero-c1:#8b0000;--hero-c2:#c41e3a;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-fire"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>الخريطة الحرارية</h2>
+                <p>تحليل توزيع الإيرادات الضريبية جغرافياً</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-fire"></i> الخريطة الحرارية للإيرادات</h3></div>
+            <div class="card-body">
+              <div class="heatmap-controls" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+                <select class="form-control" style="max-width:180px;" id="heatmapTaxType" onchange="updateHeatmap()"><option value="all">جميع الضرائب</option><option value="corporate">دخل الشركات</option><option value="property">العقار</option><option value="land">العرصات</option><option value="sales">المبيعات</option></select>
+                <select class="form-control" style="max-width:150px;" id="heatmapYear" onchange="updateHeatmap()"><option>2026</option><option>2025</option><option>2024</option></select>
+              </div>
+              <div class="heatmap-grid" id="heatmapGrid"></div>
+              <div class="heatmap-legend" style="display:flex;align-items:center;gap:8px;margin-top:16px;justify-content:center;">
+                <span style="font-size:0.8rem;">منخفض</span>
+                <div style="display:flex;gap:2px;">
+                  <div style="width:24px;height:16px;background:#e8f5e9;border-radius:3px;"></div>
+                  <div style="width:24px;height:16px;background:#a5d6a7;border-radius:3px;"></div>
+                  <div style="width:24px;height:16px;background:#66bb6a;border-radius:3px;"></div>
+                  <div style="width:24px;height:16px;background:#ff9800;border-radius:3px;"></div>
+                  <div style="width:24px;height:16px;background:#f44336;border-radius:3px;"></div>
+                </div>
+                <span style="font-size:0.8rem;">مرتفع</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== KPI PAGE ==================== -->
+        <section class="page-section" id="page-kpi">
+          <div class="section-hero" style="--hero-c1:#006064;--hero-c2:#00838f;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>مؤشرات الأداء الرئيسية</h2>
+                <p>تتبع الأداء وقياس الإنجازات</p>
+              </div>
+            </div>
+          </div>
+          <div class="kpi-dashboard" data-aos="fade-up">
+            <div class="kpi-row" id="kpiCardsRow"></div>
+            <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="200">
+              <div class="card-header"><h3><i class="fas fa-chart-line"></i> تتبع الأداء الشهري</h3></div>
+              <div class="card-body"><canvas id="kpiTrendChart" height="280"></canvas></div>
+            </div>
+            <div class="stats-grid" style="margin-top:20px;">
+              <div class="card" data-aos="fade-up" data-aos-delay="300"><div class="card-header"><h3><i class="fas fa-bullseye"></i> الأهداف</h3></div><div class="card-body" id="kpiGoals"></div></div>
+              <div class="card" data-aos="fade-up" data-aos-delay="400"><div class="card-header"><h3><i class="fas fa-trophy"></i> الإنجازات</h3></div><div class="card-body" id="kpiAchievements"></div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== REPORT BUILDER PAGE ==================== -->
+        <section class="page-section" id="page-reportbuilder">
+          <div class="section-hero" style="--hero-c1:#4a148c;--hero-c2:#6a1b9a;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-magic"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>منشئ التقارير</h2>
+                <p>إنشاء تقارير مخصصة بالسحب والإفلات</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-magic"></i> منشئ التقارير</h3>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-success" onclick="generateCustomReport()"><i class="fas fa-play"></i> إنشاء التقرير</button>
+                <button class="btn btn-secondary" onclick="exportCustomReport('pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+                <button class="btn btn-secondary" onclick="exportCustomReport('excel')"><i class="fas fa-file-excel"></i> Excel</button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="rb-config" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
+                <div class="form-group"><label>نوع التقرير</label><select class="form-control" id="rbType"><option value="summary">ملخص شامل</option><option value="detailed">تفصيلي</option><option value="comparison">مقارنة</option><option value="trend">اتجاهات</option></select></div>
+                <div class="form-group"><label>الفترة</label><select class="form-control" id="rbPeriod"><option value="month">شهري</option><option value="quarter">ربع سنوي</option><option value="year">سنوي</option><option value="custom">مخصص</option></select></div>
+                <div class="form-group"><label>نوع الضريبة</label><select class="form-control" id="rbTax"><option value="all">جميع الضرائب</option><option value="corporate">الشركات</option><option value="property">العقار</option><option value="land">العرصات</option><option value="profession">المهنة</option><option value="sales">المبيعات</option></select></div>
+              </div>
+              <div class="rb-fields" style="margin-bottom:20px;">
+                <label style="font-weight:600;margin-bottom:8px;display:block;">الحقول المراد تضمينها:</label>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;" id="rbFieldsCheckboxes">
+                  <label class="rb-check"><input type="checkbox" checked> الإيرادات</label>
+                  <label class="rb-check"><input type="checkbox" checked> عدد المكلفين</label>
+                  <label class="rb-check"><input type="checkbox" checked> نسبة التحصيل</label>
+                  <label class="rb-check"><input type="checkbox"> الغرامات</label>
+                  <label class="rb-check"><input type="checkbox"> المحافظات</label>
+                  <label class="rb-check"><input type="checkbox"> المقارنة السنوية</label>
+                  <label class="rb-check"><input type="checkbox"> التوقعات</label>
+                </div>
+              </div>
+              <div id="customReportOutput" style="display:none;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== WORKFLOW PAGE ==================== -->
+        <section class="page-section" id="page-workflow">
+          <div class="section-hero" style="--hero-c1:#1b5e20;--hero-c2:#2e7d32;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-project-diagram"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>سير العمل</h2>
+                <p>إدارة وتتبع العمليات الضريبية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-project-diagram"></i> مسارات سير العمل</h3>
+              <button class="btn btn-primary" onclick="createWorkflow()"><i class="fas fa-plus"></i> مسار جديد</button>
+            </div>
+            <div class="card-body">
+              <div class="workflow-board" id="workflowBoard">
+                <div class="wf-column" data-status="new"><div class="wf-column-header"><h4><i class="fas fa-inbox"></i> جديد</h4><span class="wf-count" id="wfNewCount">0</span></div><div class="wf-cards" id="wfNew"></div></div>
+                <div class="wf-column" data-status="review"><div class="wf-column-header"><h4><i class="fas fa-eye"></i> قيد المراجعة</h4><span class="wf-count" id="wfReviewCount">0</span></div><div class="wf-cards" id="wfReview"></div></div>
+                <div class="wf-column" data-status="approved"><div class="wf-column-header"><h4><i class="fas fa-check"></i> معتمد</h4><span class="wf-count" id="wfApprovedCount">0</span></div><div class="wf-cards" id="wfApproved"></div></div>
+                <div class="wf-column" data-status="completed"><div class="wf-column-header"><h4><i class="fas fa-flag-checkered"></i> مكتمل</h4><span class="wf-count" id="wfCompletedCount">0</span></div><div class="wf-cards" id="wfCompleted"></div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TICKETS PAGE ==================== -->
+        <section class="page-section" id="page-tickets">
+          <div class="section-hero" style="--hero-c1:#e65100;--hero-c2:#f57c00;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-headset"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>تذاكر الدعم الفني</h2>
+                <p>إرسال ومتابعة طلبات الدعم</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-headset"></i> تذاكر الدعم</h3>
+              <button class="btn btn-primary" onclick="createTicket()"><i class="fas fa-plus"></i> تذكرة جديدة</button>
+            </div>
+            <div class="card-body">
+              <div class="ticket-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-ticket-alt"></i><div><span class="inv-stat-num" id="tktTotal">0</span><small>الكل</small></div></div>
+                <div class="inv-stat"><i class="fas fa-spinner" style="color:var(--warning)"></i><div><span class="inv-stat-num" id="tktOpen">0</span><small>مفتوحة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-wrench" style="color:var(--info)"></i><div><span class="inv-stat-num" id="tktProgress">0</span><small>قيد المعالجة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-check-double" style="color:var(--success)"></i><div><span class="inv-stat-num" id="tktClosed">0</span><small>مغلقة</small></div></div>
+              </div>
+              <table class="data-table">
+                <thead><tr><th>#</th><th>الموضوع</th><th>الأولوية</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+                <tbody id="ticketsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- Ticket Modal -->
+          <div class="modal-overlay" id="ticketModal" style="display:none;">
+            <div class="modal-content" style="max-width:600px;">
+              <div class="modal-header"><h3><i class="fas fa-plus-circle"></i> تذكرة دعم جديدة</h3><button onclick="closeTicketModal()" class="modal-close"><i class="fas fa-times"></i></button></div>
+              <div class="modal-body">
+                <div class="form-group"><label>الموضوع</label><input type="text" class="form-control" id="tktSubject" placeholder="عنوان مختصر للمشكلة"></div>
+                <div class="form-row"><div class="form-group"><label>القسم</label><select class="form-control" id="tktDept"><option>الدعم الفني</option><option>المحاسبة</option><option>الاشتراكات</option><option>أخرى</option></select></div><div class="form-group"><label>الأولوية</label><select class="form-control" id="tktPriority"><option value="low">منخفضة</option><option value="medium" selected>متوسطة</option><option value="high">عالية</option><option value="urgent">عاجلة</option></select></div></div>
+                <div class="form-group"><label>وصف المشكلة</label><textarea class="form-control" id="tktDesc" rows="4" placeholder="صف المشكلة بالتفصيل..."></textarea></div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" onclick="saveTicket()"><i class="fas fa-paper-plane"></i> إرسال التذكرة</button><button class="btn btn-secondary" onclick="closeTicketModal()">إلغاء</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== APPOINTMENTS PAGE ==================== -->
+        <section class="page-section" id="page-appointments">
+          <div class="section-hero" style="--hero-c1:#0d47a1;--hero-c2:#1565c0;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>المواعيد</h2>
+                <p>جدولة وإدارة المواعيد الضريبية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-calendar-check"></i> المواعيد</h3>
+              <button class="btn btn-primary" onclick="createAppointment()"><i class="fas fa-plus"></i> موعد جديد</button>
+            </div>
+            <div class="card-body">
+              <div class="appointments-timeline" id="appointmentsTimeline"></div>
+            </div>
+          </div>
+          <!-- Appointment Modal -->
+          <div class="modal-overlay" id="appointmentModal" style="display:none;">
+            <div class="modal-content" style="max-width:550px;">
+              <div class="modal-header"><h3><i class="fas fa-calendar-plus"></i> موعد جديد</h3><button onclick="closeAppointmentModal()" class="modal-close"><i class="fas fa-times"></i></button></div>
+              <div class="modal-body">
+                <div class="form-group"><label>عنوان الموعد</label><input type="text" class="form-control" id="apptTitle" placeholder="مثال: مراجعة ملف المكلف"></div>
+                <div class="form-row"><div class="form-group"><label>التاريخ</label><input type="date" class="form-control" id="apptDate"></div><div class="form-group"><label>الوقت</label><input type="time" class="form-control" id="apptTime"></div></div>
+                <div class="form-group"><label>اسم المكلف (اختياري)</label><input type="text" class="form-control" id="apptClient"></div>
+                <div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="apptNotes" rows="2"></textarea></div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-primary" onclick="saveAppointment()"><i class="fas fa-save"></i> حفظ الموعد</button><button class="btn btn-secondary" onclick="closeAppointmentModal()">إلغاء</button></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== E-SIGNATURE PAGE ==================== -->
+        <section class="page-section" id="page-esignature">
+          <div class="section-hero" style="--hero-c1:#311b92;--hero-c2:#4527a0;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-signature"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>التوقيع الإلكتروني</h2>
+                <p>توقيع المستندات والفواتير إلكترونياً</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-signature"></i> التوقيع الإلكتروني</h3></div>
+            <div class="card-body">
+              <div class="esign-docs" id="esignDocs"></div>
+              <div class="esign-pad-container" style="margin-top:20px;">
+                <label style="font-weight:600;margin-bottom:8px;display:block;">لوحة التوقيع:</label>
+                <canvas id="signaturePad" width="500" height="200" style="border:2px dashed var(--border);border-radius:12px;cursor:crosshair;background:#fafafa;max-width:100%;"></canvas>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                  <button class="btn btn-secondary" onclick="clearSignature()"><i class="fas fa-eraser"></i> مسح</button>
+                  <button class="btn btn-primary" onclick="saveSignature()"><i class="fas fa-save"></i> حفظ التوقيع</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== TASKS PAGE ==================== -->
+        <section class="page-section" id="page-tasks">
+          <div class="section-hero" style="--hero-c1:#bf360c;--hero-c2:#e64a19;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>إدارة المهام</h2>
+                <p>تنظيم وتتبع المهام والإنجازات</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+              <h3><i class="fas fa-tasks"></i> المهام</h3>
+              <button class="btn btn-primary" onclick="addNewTask()"><i class="fas fa-plus"></i> مهمة جديدة</button>
+            </div>
+            <div class="card-body">
+              <div class="tasks-progress-bar" style="margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span>نسبة الإنجاز</span><span id="tasksProgressPercent">0%</span></div>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="tasksProgressFill" style="width:0%"></div></div>
+              </div>
+              <div class="tasks-filters" style="display:flex;gap:8px;margin-bottom:16px;">
+                <button class="btn btn-sm active" onclick="filterTasks('all',this)">الكل</button>
+                <button class="btn btn-sm" onclick="filterTasks('pending',this)">معلقة</button>
+                <button class="btn btn-sm" onclick="filterTasks('progress',this)">قيد التنفيذ</button>
+                <button class="btn btn-sm" onclick="filterTasks('done',this)">مكتملة</button>
+              </div>
+              <div class="tasks-list" id="tasksList"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== LOGIN HISTORY PAGE ==================== -->
+        <section class="page-section" id="page-loginhistory">
+          <div class="section-hero" style="--hero-c1:#263238;--hero-c2:#37474f;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-history"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>سجل الدخول</h2>
+                <p>عرض جميع عمليات تسجيل الدخول</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-history"></i> سجل عمليات الدخول</h3></div>
+            <div class="card-body">
+              <table class="data-table">
+                <thead><tr><th>التاريخ والوقت</th><th>المستخدم</th><th>عنوان IP</th><th>المتصفح</th><th>الموقع</th><th>الحالة</th></tr></thead>
+                <tbody id="loginHistoryBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== BACKUP PAGE ==================== -->
+        <section class="page-section" id="page-backup">
+          <div class="section-hero" style="--hero-c1:#004d40;--hero-c2:#00695c;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-database"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>النسخ الاحتياطي</h2>
+                <p>إدارة النسخ الاحتياطي واستعادة البيانات</p>
+              </div>
+            </div>
+          </div>
+          <div class="stats-grid" data-aos="fade-up">
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-cloud-upload-alt"></i> إنشاء نسخة احتياطية</h3></div>
+              <div class="card-body" style="text-align:center;padding:30px;">
+                <i class="fas fa-database" style="font-size:3rem;color:var(--primary);margin-bottom:16px;"></i>
+                <p style="margin-bottom:16px;color:var(--text-secondary);">آخر نسخة: <span id="lastBackupDate">لم يتم النسخ بعد</span></p>
+                <button class="btn btn-primary" onclick="createBackup()" id="backupBtn"><i class="fas fa-download"></i> إنشاء نسخة احتياطية الآن</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h3><i class="fas fa-upload"></i> استعادة البيانات</h3></div>
+              <div class="card-body" style="text-align:center;padding:30px;">
+                <i class="fas fa-undo" style="font-size:3rem;color:var(--warning);margin-bottom:16px;"></i>
+                <p style="margin-bottom:16px;color:var(--text-secondary);">استعادة من نسخة احتياطية سابقة</p>
+                <button class="btn btn-warning" onclick="restoreBackup()"><i class="fas fa-upload"></i> استعادة من ملف</button>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-header"><h3><i class="fas fa-list"></i> النسخ الاحتياطية المحفوظة</h3></div>
+            <div class="card-body"><div id="backupsList"></div></div>
+          </div>
+          <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-header"><h3><i class="fas fa-cog"></i> إعدادات النسخ الاحتياطي التلقائي</h3></div>
+            <div class="card-body">
+              <div class="pkg-settings-list">
+                <div class="pkg-setting-item"><div class="pkg-setting-info"><h4>النسخ التلقائي</h4><p>إنشاء نسخة احتياطية تلقائياً حسب الجدول</p></div><label class="switch"><input type="checkbox" id="autoBackupToggle" onchange="toggleAutoBackup(this.checked)"><span class="switch-slider"></span></label></div>
+                <div class="pkg-setting-item"><div class="pkg-setting-info"><h4>التكرار</h4><p>تكرار النسخ الاحتياطي التلقائي</p></div><select class="form-control" style="max-width:160px;" id="backupFrequency"><option value="daily">يومي</option><option value="weekly">أسبوعي</option><option value="monthly">شهري</option></select></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== API PAGE ==================== -->
+        <section class="page-section" id="page-api">
+          <div class="section-hero" style="--hero-c1:#1a237e;--hero-c2:#283593;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-plug"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>واجهة API</h2>
+                <p>إدارة التكامل مع الأنظمة الخارجية</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" data-aos="fade-up">
+            <div class="card-header"><h3><i class="fas fa-key"></i> مفتاح API</h3></div>
+            <div class="card-body">
+              <div class="api-key-display" style="display:flex;align-items:center;gap:10px;background:var(--bg-secondary);padding:14px 18px;border-radius:10px;margin-bottom:16px;">
+                <code style="flex:1;font-size:0.95rem;letter-spacing:1px;" id="apiKeyDisplay">••••••••••••••••••••••••••••</code>
+                <button class="btn btn-sm" onclick="toggleApiKey()"><i class="fas fa-eye"></i></button>
+                <button class="btn btn-sm" onclick="copyApiKey()"><i class="fas fa-copy"></i></button>
+              </div>
+              <button class="btn btn-warning" onclick="regenerateApiKey()"><i class="fas fa-sync"></i> إعادة توليد المفتاح</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-header"><h3><i class="fas fa-code"></i> نقاط النهاية (Endpoints)</h3></div>
+            <div class="card-body">
+              <div class="api-endpoints" id="apiEndpoints"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-header"><h3><i class="fas fa-chart-bar"></i> إحصائيات الاستخدام</h3></div>
+            <div class="card-body">
+              <div class="api-usage-stats" id="apiUsageStats"></div>
+              <canvas id="apiUsageChart" height="200" style="margin-top:16px;"></canvas>
+            </div>
+          </div>
+        </section>
+
+
+    <!-- ====== SEARCH MODAL ====== -->
+  <div class="search-modal" id="searchModal">
+    <div class="search-modal-backdrop" onclick="closeSearchModal()"></div>
+    <div class="search-modal-content">
+      <div class="search-modal-header">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="ابحث في النظام... (ضريبة، شركة، إعدادات...)" oninput="performSearch(this.value)" autocomplete="off">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="search-results" id="searchResults">
+        <div class="search-empty"><i class="fas fa-search"></i><p>اكتب للبحث في الصفحات والوظائف</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== CHATBOT ====== -->
+  <button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()">
+    <i class="fas fa-robot"></i>
+  </button>
+  <div class="chatbot-panel" id="chatbotPanel">
+    <div class="chatbot-header">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+        <div><h4>مساعد الضرائب</h4><span style="font-size:0.75rem;opacity:0.7;">متصل</span></div>
+      </div>
+      <button onclick="toggleChatbot()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chatbot-messages" id="chatbotMessages">
+      <div class="chat-message bot">
+        <div class="chat-bubble">مرحباً! أنا مساعد الضرائب العراقي 🏛️ يمكنني الإجابة على أسئلتك حول القوانين الضريبية. اكتب سؤالك أو اختر من الأسئلة الشائعة:</div>
+      </div>
+      <div class="chat-suggestions">
+        <button onclick="askChatbot('ما هي نسبة ضريبة الشركات؟')">نسبة ضريبة الشركات</button>
+        <button onclick="askChatbot('كيف تحسب ضريبة الدخل؟')">حساب ضريبة الدخل</button>
+        <button onclick="askChatbot('ما هي غرامة التأخير؟')">غرامة التأخير</button>
+        <button onclick="askChatbot('ما هو مبلغ الإعفاء الضريبي؟')">الإعفاء الضريبي</button>
+      </div>
+    </div>
+    <div class="chatbot-input">
+      <input type="text" id="chatInput" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key==='Enter')sendChatMessage()">
+      <button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
