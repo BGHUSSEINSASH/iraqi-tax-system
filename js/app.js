@@ -6,6 +6,11 @@
 
 // ========== PACKAGE SYSTEM ==========
 var PACKAGES = {
+  trial: {
+    name: 'التجريبية',
+    icon: 'fa-flask',
+    pages: ['dashboard','corporate','calendar','notifications','settings','packages','contact']
+  },
   basic: {
     name: 'الأساسية',
     icon: 'fa-leaf',
@@ -15,6 +20,11 @@ var PACKAGES = {
     name: 'المتقدمة',
     icon: 'fa-crown',
     pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks','contact']
+  },
+  business: {
+    name: 'باقة الأعمال',
+    icon: 'fa-briefcase',
+    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','audit','users','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks','contact']
   },
   enterprise: {
     name: 'الشاملة',
@@ -434,7 +444,11 @@ function navigateTo(page) {
   // Close mobile sidebar
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  var mc = document.querySelector('.main-content');
+  if (mc) mc.scrollTo({ top: 0, behavior: 'instant' });
+  var pc = document.querySelector('.page-content');
+  if (pc) pc.scrollTo({ top: 0, behavior: 'instant' });
   // Refresh dynamic pages
   if (page === 'users') renderUsersTable();
   if (page === 'audit') renderAuditLog();
@@ -504,12 +518,48 @@ function showToast(message, isError) {
 
 function triggerUpload() { document.getElementById('fileInput') && document.getElementById('fileInput').click(); }
 
+// ========== BILLING TOGGLE (PACKAGES) ==========
+function toggleBillingCycle() {
+  var isYearly = document.getElementById('pkgBillingToggle').checked;
+  document.querySelectorAll('.package-price .price-amount').forEach(function(el) {
+    var monthly = el.getAttribute('data-monthly');
+    var yearly = el.getAttribute('data-yearly');
+    if (monthly && yearly) el.textContent = isYearly ? yearly : monthly;
+  });
+  document.querySelectorAll('.package-price .price-period').forEach(function(el) {
+    var monthly = el.getAttribute('data-monthly');
+    var yearly = el.getAttribute('data-yearly');
+    if (monthly && yearly) el.textContent = isYearly ? yearly : monthly;
+  });
+  var mLabel = document.getElementById('pkgMonthlyLabel');
+  var yLabel = document.getElementById('pkgYearlyLabel');
+  if (mLabel) mLabel.style.fontWeight = isYearly ? '400' : '700';
+  if (yLabel) yLabel.style.fontWeight = isYearly ? '700' : '400';
+}
+
+// ========== CONTACT FORM ==========
+function submitContactForm() {
+  var name = document.getElementById('contactName').value.trim();
+  var phone = document.getElementById('contactPhone').value.trim();
+  var email = document.getElementById('contactEmail').value.trim();
+  var service = document.getElementById('contactService').value;
+  var details = document.getElementById('contactDetails').value.trim();
+  if (!name) { showToast('يرجى إدخال اسم الشركة أو المكلف', true); return; }
+  if (!phone) { showToast('يرجى إدخال رقم الهاتف', true); return; }
+  if (!service) { showToast('يرجى اختيار نوع الخدمة المطلوبة', true); return; }
+  var requests = JSON.parse(localStorage.getItem('contactRequests') || '[]');
+  requests.push({ name: name, phone: phone, email: email, service: service, details: details, date: new Date().toISOString() });
+  localStorage.setItem('contactRequests', JSON.stringify(requests));
+  document.getElementById('contactSuccessMsg').style.display = 'block';
+  showToast('تم إرسال طلبك بنجاح! سنتواصل معك قريباً');
+  addAuditEntry('طلب تواصل', 'طلب إعداد حسابات ختامية من: ' + name);
+}
+
 // ========== CHIP SELECTION ==========
 function selectChip(chip, inputId, value) {
   chip.parentElement.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
   chip.classList.add('active');
   document.getElementById(inputId).value = value;
-  if (inputId === 'propOperation') { handlePropertyOperationChange(value); }
 }
 
 // ========== CORPORATE TAX — PROFIT TAX ==========
@@ -529,6 +579,15 @@ function calculateCorporateProfitTax() {
   document.getElementById('corpProfitResultBox').style.display = 'block';
   showToast('تم احتساب ضريبة أرباح الشركة بنجاح');
 }
+
+// ========== SALARY TAX CONSTANTS ==========
+var SALARY_ANNUAL_EXEMPTION = 5000000;
+var SALARY_BRACKETS = [
+  { limit: 250000, rate: 0.03 },
+  { limit: 500000, rate: 0.05 },
+  { limit: 1000000, rate: 0.10 },
+  { limit: Infinity, rate: 0.15 }
+];
 
 // ========== CORPORATE TAX — EMPLOYEE TAX ==========
 function calculateCompanyEmployeeTax(inputEl) {
@@ -756,14 +815,6 @@ function calculateDeduction() {
 }
 
 // ========== SALARY TAX ==========
-var SALARY_ANNUAL_EXEMPTION = 5000000;
-var SALARY_BRACKETS = [
-  { limit: 250000, rate: 0.03 },
-  { limit: 500000, rate: 0.05 },
-  { limit: 1000000, rate: 0.10 },
-  { limit: Infinity, rate: 0.15 }
-];
-
 function calculateIncomeTax(annualIncome) {
   var taxable = annualIncome - SALARY_ANNUAL_EXEMPTION;
   if (taxable <= 0) return 0;
@@ -822,11 +873,6 @@ function updateLandDistricts() {
     LAND_DISTRICTS[province].forEach(function(d) {
       distSelect.innerHTML += '<option value="' + d + '">' + d + '</option>';
     });
-  }
-  // Auto-fill price
-  var type = document.getElementById('landType').value;
-  if (province && LAND_PRICES[province]) {
-    document.getElementById('landPrice').value = formatNumber(LAND_PRICES[province][type]);
   }
 }
 
@@ -901,9 +947,6 @@ function calculatePartialLandExemption() {
   document.getElementById('landPartialResult').style.display = 'block';
   showToast(taxableArea > 0 ? 'تم احتساب الضريبة على المساحة الزائدة عن 800 م²' : 'المساحة بالكامل معفية (أقل من 800 م²)');
 }
-  document.getElementById('landResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة العرصة بنجاح');
-}
 
 // ========== LAND WIZARD ==========
 function nextLandStep(n) {
@@ -943,8 +986,6 @@ function calculatePropertyTax() {
   setText('propBaseValue', formatNumber(annualRent) + ' د.ع');
   setText('propTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
   document.getElementById('propResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة العقار بنجاح');
-}
   showToast('تم احتساب ضريبة العقار بنجاح');
 }
 
@@ -2553,27 +2594,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Check payment reminders
   setTimeout(checkPaymentReminders, 3000);
-
-// ============================================================
-//  FEATURE: CONTACT FORM (تواصل معنا)
-// ============================================================
-function submitContactForm() {
-  var name = document.getElementById('contactName').value.trim();
-  var phone = document.getElementById('contactPhone').value.trim();
-  var email = document.getElementById('contactEmail').value.trim();
-  var service = document.getElementById('contactService').value;
-  var details = document.getElementById('contactDetails').value.trim();
-  if (!name) { showToast('يرجى إدخال اسم الشركة أو المكلف', true); return; }
-  if (!phone) { showToast('يرجى إدخال رقم الهاتف', true); return; }
-  if (!service) { showToast('يرجى اختيار نوع الخدمة المطلوبة', true); return; }
-  // Save request locally
-  var requests = JSON.parse(localStorage.getItem('contactRequests') || '[]');
-  requests.push({ name: name, phone: phone, email: email, service: service, details: details, date: new Date().toISOString() });
-  localStorage.setItem('contactRequests', JSON.stringify(requests));
-  document.getElementById('contactSuccessMsg').style.display = 'block';
-  showToast('تم إرسال طلبك بنجاح! سنتواصل معك قريباً');
-  addAuditEntry('طلب تواصل', 'طلب إعداد حسابات ختامية من: ' + name);
-}
 
   // Log login
   addAuditEntry('تشغيل النظام', 'تم تحميل النظام بنجاح');
