@@ -2197,10 +2197,6 @@
           <div class="provinces-grid" id="provincesGrid"></div>
         </section>
 
-      </div><!-- end page-content -->
-    </main>
-  </div><!-- end app-container -->
-
 
         <!-- ==================== INVOICES PAGE ==================== -->
         <section class="page-section" id="page-invoices">
@@ -2338,6 +2334,19 @@
           <div class="card" data-aos="fade-up">
             <div class="card-header"><h3><i class="fas fa-paperclip"></i> مدير المرفقات</h3></div>
             <div class="card-body">
+              <div class="invoice-stats-row" style="margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-folder-open" style="color:var(--primary)"></i><div><span class="inv-stat-num" id="attachTotal">25</span><small>إجمالي الملفات</small></div></div>
+                <div class="inv-stat"><i class="fas fa-file-pdf" style="color:#e53935"></i><div><span class="inv-stat-num" id="attachPdf">14</span><small>ملفات PDF</small></div></div>
+                <div class="inv-stat"><i class="fas fa-file-image" style="color:#43a047"></i><div><span class="inv-stat-num" id="attachImages">8</span><small>صور</small></div></div>
+                <div class="inv-stat"><i class="fas fa-file-excel" style="color:#1e88e5"></i><div><span class="inv-stat-num" id="attachExcel">3</span><small>جداول Excel</small></div></div>
+              </div>
+              <div class="info-banner" style="background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd;border-radius:10px;padding:12px 16px;margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="color:#1e40af;font-size:13px;"><i class="fas fa-hdd" style="margin-left:6px;"></i> مساحة التخزين المستخدمة</span>
+                  <span style="color:#1e40af;font-weight:600;">2.3 GB / 10 GB</span>
+                </div>
+                <div class="progress-bar-bg" style="margin-top:8px;height:8px;"><div class="progress-bar-fill" style="width:23%;background:linear-gradient(90deg,#3b82f6,#2563eb);"></div></div>
+              </div>
               <div class="attachment-upload-zone" id="dropZone" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
                 <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:var(--primary);margin-bottom:12px;"></i>
                 <h3>اسحب الملفات هنا أو اضغط للاختيار</h3>
@@ -2373,6 +2382,12 @@
           <div class="card" data-aos="fade-up">
             <div class="card-header"><h3><i class="fas fa-fire"></i> الخريطة الحرارية للإيرادات</h3></div>
             <div class="card-body">
+              <div class="invoice-stats-row" style="margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-coins" style="color:var(--primary)"></i><div><span class="inv-stat-num">4.2B</span><small>إجمالي الإيرادات (د.ع)</small></div></div>
+                <div class="inv-stat"><i class="fas fa-crown" style="color:#f59e0b"></i><div><span class="inv-stat-num">بغداد</span><small>أعلى محافظة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-map-marker-alt" style="color:var(--success)"></i><div><span class="inv-stat-num">18</span><small>محافظة مغطاة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-chart-line" style="color:var(--info)"></i><div><span class="inv-stat-num">+12%</span><small>نمو سنوي</small></div></div>
+              </div>
               <div class="heatmap-controls" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
                 <select class="form-control" style="max-width:180px;" id="heatmapTaxType" onchange="updateHeatmap()"><option value="all">جميع الضرائب</option><option value="corporate">دخل الشركات</option><option value="property">العقار</option><option value="land">العرصات</option><option value="sales">المبيعات</option></select>
                 <select class="form-control" style="max-width:150px;" id="heatmapYear" onchange="updateHeatmap()"><option>2026</option><option>2025</option><option>2024</option></select>
@@ -2414,14 +2429,30 @@
             </div>
           </div>
           <div class="kpi-dashboard" data-aos="fade-up">
+            <div class="invoice-stats-row" style="margin-bottom:20px;">
+              <div class="inv-stat"><i class="fas fa-percentage" style="color:var(--success)"></i><div><span class="inv-stat-num">87.3%</span><small>نسبة التحصيل</small></div></div>
+              <div class="inv-stat"><i class="fas fa-money-bill-wave" style="color:var(--primary)"></i><div><span class="inv-stat-num">4.2B</span><small>إجمالي الإيرادات (د.ع)</small></div></div>
+              <div class="inv-stat"><i class="fas fa-receipt" style="color:var(--info)"></i><div><span class="inv-stat-num">12,450</span><small>عدد المعاملات</small></div></div>
+              <div class="inv-stat"><i class="fas fa-stopwatch" style="color:var(--warning)"></i><div><span class="inv-stat-num">2.3 يوم</span><small>متوسط وقت المعالجة</small></div></div>
+            </div>
             <div class="kpi-row" id="kpiCardsRow"></div>
             <div class="card" style="margin-top:20px;" data-aos="fade-up" data-aos-delay="200">
               <div class="card-header"><h3><i class="fas fa-chart-line"></i> تتبع الأداء الشهري</h3></div>
               <div class="card-body"><canvas id="kpiTrendChart" height="280"></canvas></div>
             </div>
             <div class="stats-grid" style="margin-top:20px;">
-              <div class="card" data-aos="fade-up" data-aos-delay="300"><div class="card-header"><h3><i class="fas fa-bullseye"></i> الأهداف</h3></div><div class="card-body" id="kpiGoals"></div></div>
-              <div class="card" data-aos="fade-up" data-aos-delay="400"><div class="card-header"><h3><i class="fas fa-trophy"></i> الإنجازات</h3></div><div class="card-body" id="kpiAchievements"></div></div>
+              <div class="card" data-aos="fade-up" data-aos-delay="300"><div class="card-header"><h3><i class="fas fa-bullseye"></i> الأهداف</h3></div><div class="card-body" id="kpiGoals">
+                <div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>تحصيل 90% من الضرائب المستحقة</span><span style="font-weight:600;color:var(--primary);">87%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:87%;"></div></div></div>
+                <div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>معالجة جميع الطلبات خلال 3 أيام</span><span style="font-weight:600;color:var(--warning);">72%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:72%;background:var(--warning);"></div></div></div>
+                <div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>تسجيل 500 مكلف جديد</span><span style="font-weight:600;color:var(--success);">95%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:95%;background:var(--success);"></div></div></div>
+                <div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>تقليل الشكاوى بنسبة 20%</span><span style="font-weight:600;color:var(--info);">65%</span></div><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:65%;background:var(--info);"></div></div></div>
+              </div></div>
+              <div class="card" data-aos="fade-up" data-aos-delay="400"><div class="card-header"><h3><i class="fas fa-trophy"></i> الإنجازات</h3></div><div class="card-body" id="kpiAchievements">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);"><i class="fas fa-medal" style="color:#f59e0b;font-size:1.4rem;"></i><div><strong>تجاوز هدف الربع الأول</strong><p style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">تم تحصيل 1.2 مليار بدلاً من 1 مليار</p></div></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);"><i class="fas fa-award" style="color:#8b5cf6;font-size:1.4rem;"></i><div><strong>أسرع وقت معالجة</strong><p style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">متوسط 1.8 يوم في شهر آذار</p></div></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);"><i class="fas fa-star" style="color:#06b6d4;font-size:1.4rem;"></i><div><strong>رضا المكلفين 94%</strong><p style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">بناءً على 850 استبيان</p></div></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><i class="fas fa-shield-alt" style="color:#10b981;font-size:1.4rem;"></i><div><strong>صفر اختراقات أمنية</strong><p style="font-size:0.8rem;color:var(--text-secondary);margin-top:2px;">على مدار 12 شهراً</p></div></div>
+              </div></div>
             </div>
           </div>
         </section>
@@ -2592,6 +2623,18 @@
               <button class="btn btn-primary" onclick="createAppointment()"><i class="fas fa-plus"></i> موعد جديد</button>
             </div>
             <div class="card-body">
+              <div class="invoice-stats-row" style="margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-calendar-day" style="color:var(--primary)"></i><div><span class="inv-stat-num" id="apptTotalCount">24</span><small>إجمالي المواعيد</small></div></div>
+                <div class="inv-stat"><i class="fas fa-calendar-check" style="color:var(--success)"></i><div><span class="inv-stat-num" id="apptTodayCount">3</span><small>مواعيد اليوم</small></div></div>
+                <div class="inv-stat"><i class="fas fa-calendar-week" style="color:var(--info)"></i><div><span class="inv-stat-num" id="apptWeekCount">8</span><small>هذا الأسبوع</small></div></div>
+                <div class="inv-stat"><i class="fas fa-ban" style="color:var(--danger)"></i><div><span class="inv-stat-num" id="apptCancelledCount">2</span><small>ملغاة</small></div></div>
+              </div>
+              <div class="tasks-filters" style="display:flex;gap:8px;margin-bottom:16px;">
+                <button class="btn btn-sm active" onclick="filterAppointments('all',this)">الكل</button>
+                <button class="btn btn-sm" onclick="filterAppointments('today',this)">اليوم</button>
+                <button class="btn btn-sm" onclick="filterAppointments('week',this)">هذا الأسبوع</button>
+                <button class="btn btn-sm" onclick="filterAppointments('month',this)">هذا الشهر</button>
+              </div>
               <div class="appointments-timeline" id="appointmentsTimeline"></div>
             </div>
           </div>
@@ -2633,6 +2676,12 @@
           <div class="card" data-aos="fade-up">
             <div class="card-header"><h3><i class="fas fa-signature"></i> التوقيع الإلكتروني</h3></div>
             <div class="card-body">
+              <div class="invoice-stats-row" style="margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-clock" style="color:var(--warning)"></i><div><span class="inv-stat-num" id="esignPending">12</span><small>بانتظار التوقيع</small></div></div>
+                <div class="inv-stat"><i class="fas fa-check-double" style="color:var(--success)"></i><div><span class="inv-stat-num" id="esignSigned">45</span><small>تم توقيعها</small></div></div>
+                <div class="inv-stat"><i class="fas fa-times-circle" style="color:var(--danger)"></i><div><span class="inv-stat-num" id="esignRejected">3</span><small>مرفوضة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-file-signature" style="color:var(--info)"></i><div><span class="inv-stat-num" id="esignTotal">60</span><small>الإجمالي</small></div></div>
+              </div>
               <div class="esign-docs" id="esignDocs"></div>
               <div class="esign-pad-container" style="margin-top:20px;">
                 <label style="font-weight:600;margin-bottom:8px;display:block;">لوحة التوقيع:</label>
@@ -2710,6 +2759,22 @@
           <div class="card" data-aos="fade-up">
             <div class="card-header"><h3><i class="fas fa-history"></i> سجل عمليات الدخول</h3></div>
             <div class="card-body">
+              <div class="invoice-stats-row" style="margin-bottom:20px;">
+                <div class="inv-stat"><i class="fas fa-sign-in-alt" style="color:var(--primary)"></i><div><span class="inv-stat-num">1,247</span><small>إجمالي عمليات الدخول</small></div></div>
+                <div class="inv-stat"><i class="fas fa-check-circle" style="color:var(--success)"></i><div><span class="inv-stat-num">1,198</span><small>ناجحة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i><div><span class="inv-stat-num">49</span><small>فاشلة</small></div></div>
+                <div class="inv-stat"><i class="fas fa-desktop" style="color:var(--info)"></i><div><span class="inv-stat-num">8</span><small>أجهزة فريدة</small></div></div>
+              </div>
+              <div class="invoice-filters" style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;">
+                <input type="date" class="form-control" style="max-width:170px;" id="loginHistoryFrom" placeholder="من تاريخ">
+                <input type="date" class="form-control" style="max-width:170px;" id="loginHistoryTo" placeholder="إلى تاريخ">
+                <select class="form-control" style="max-width:150px;" id="loginHistoryStatus" onchange="filterLoginHistory(this.value)">
+                  <option value="all">جميع الحالات</option>
+                  <option value="success">ناجحة</option>
+                  <option value="failed">فاشلة</option>
+                </select>
+                <input type="text" class="form-control" style="max-width:200px;" placeholder="بحث بالاسم أو IP..." oninput="searchLoginHistory(this.value)">
+              </div>
               <table class="data-table">
                 <thead><tr><th>التاريخ والوقت</th><th>المستخدم</th><th>عنوان IP</th><th>المتصفح</th><th>الموقع</th><th>الحالة</th></tr></thead>
                 <tbody id="loginHistoryBody"></tbody>
@@ -2874,6 +2939,9 @@
           </div>
         </section>
 
+      </div><!-- end page-content -->
+    </main>
+  </div><!-- end app-container -->
 
     <!-- ====== SEARCH MODAL ====== -->
   <div class="search-modal" id="searchModal">
