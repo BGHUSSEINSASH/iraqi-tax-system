@@ -390,7 +390,7 @@
         <div class="nav-section-title">وحدات الضرائب</div>
         <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')">
           <i class="fas fa-building"></i>
-          <span>ضريبة دخل الشركات</span>
+          <span>ضريبة الشركات</span>
         </div>
         <div class="nav-item" data-page="land" onclick="navigateTo('land')">
           <i class="fas fa-map-marked-alt"></i>
@@ -522,6 +522,12 @@
           <i class="fas fa-cog"></i>
           <span>الإعدادات</span>
         </div>
+
+        <div class="nav-section-title">خدمات إضافية</div>
+        <div class="nav-item" data-page="contact" onclick="navigateTo('contact')" style="background:linear-gradient(135deg,rgba(212,160,23,0.15),rgba(212,160,23,0.05));border:1px solid rgba(212,160,23,0.3);border-radius:10px;margin:4px 8px;">
+          <i class="fas fa-headset" style="color:var(--accent);"></i>
+          <span style="color:var(--accent-light);font-weight:700;">تواصل معنا — الحسابات الختامية</span>
+        </div>
       </nav>
 
       <div class="sidebar-footer">
@@ -650,8 +656,8 @@
             <div class="module-card corporate" onclick="navigateTo('corporate')" data-aos="zoom-in" data-aos-delay="0">
               <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-building"></i></div><div class="m3d-face m3d-back"><i class="fas fa-chart-line"></i></div></div></div>
               <div class="module-icon"><i class="fas fa-building"></i></div>
-              <h3>ضريبة دخل الشركات</h3>
-              <p>أرباح الشركات، الإيرادات، واستقطاع الرواتب</p>
+              <h3>ضريبة الشركات</h3>
+              <p>أرباح الشركة، موظفي الشركة، وعقود الشركة</p>
               <div class="module-card-glow"></div>
             </div>
             <div class="module-card land" onclick="navigateTo('land')" data-aos="zoom-in" data-aos-delay="80">
@@ -665,7 +671,7 @@
               <div class="module-3d-scene"><div class="module-3d-obj"><div class="m3d-face m3d-front"><i class="fas fa-home"></i></div><div class="m3d-face m3d-back"><i class="fas fa-key"></i></div></div></div>
               <div class="module-icon"><i class="fas fa-home"></i></div>
               <h3>ضريبة العقار</h3>
-              <p>إيجار وبيع العقارات بمختلف أنواعها</p>
+              <p>ضريبة العقار المؤجر بنسبة 10% سنوياً</p>
               <div class="module-card-glow"></div>
             </div>
             <div class="module-card profession" onclick="navigateTo('profession')" data-aos="zoom-in" data-aos-delay="240">
@@ -823,120 +829,222 @@
                 <i class="fas fa-building"></i>
               </div>
               <div class="section-hero-text">
-                <h2>ضريبة دخل الشركات</h2>
-                <p>احتساب الضريبة على أرباح الشركات وفق قانون ١١٣ لسنة ١٩٨٢</p>
+                <h2>ضريبة الشركات</h2>
+                <p>احتساب ضريبة أرباح الشركة وموظفيها وعقودها وفق القانون العراقي</p>
               </div>
             </div>
           </div>
           <div class="tabs-container">
-            <button class="tab active" onclick="switchTab(event,'tab-corp-info')">المعلومات</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-income')">الدخل والمصروفات</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-salary')">استقطاع الراتب</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-docs')">المستندات</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-result')">النتيجة</button>
+            <button class="tab active" onclick="switchTab(event,'tab-corp-profits')">ضريبة أرباح الشركة</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-employees')">ضريبة موظفي الشركة</button>
+            <button class="tab" onclick="switchTab(event,'tab-corp-contracts')">ضريبة عقود الشركة</button>
           </div>
 
-          <div class="tab-panel active" id="tab-corp-info">
+          <!-- ===== تاب ضريبة أرباح الشركة ===== -->
+          <div class="tab-panel active" id="tab-corp-profits">
             <div class="card">
-              <div class="card-header"><h3><i class="fas fa-info-circle"></i> معلومات الشركة</h3></div>
+              <div class="card-header"><h3><i class="fas fa-chart-line"></i> احتساب ضريبة أرباح الشركة</h3></div>
               <div class="card-body">
+                <div class="info-banner" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:1px solid #c7d2fe;border-radius:10px;padding:16px;margin-bottom:20px;">
+                  <p style="color:#3730a3;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> أرباح الشركة − مصاريف الشركة = الربح الصافي × 15% = ضريبة إيراد الشركة</p>
+                </div>
                 <div class="form-grid">
                   <div class="form-group"><label>اسم الشركة</label><input type="text" id="corpName" placeholder="أدخل اسم الشركة"></div>
                   <div class="form-group"><label>رقم التسجيل الضريبي</label><input type="text" id="corpTaxId" placeholder="أدخل رقم التسجيل"></div>
-                  <div class="form-group"><label>نوع النشاط</label>
-                    <select id="corpActivity">
-                      <option value="">اختر نوع النشاط</option>
-                      <option value="trade">تجارة</option>
-                      <option value="industry">صناعة</option>
-                      <option value="services">خدمات</option>
-                      <option value="contracting">مقاولات</option>
-                      <option value="oil">النفط والغاز</option>
-                    </select>
+                  <div class="form-group"><label>إيراد الشركة (أرباح الشركة) (د.ع)</label><input type="text" id="corpRevenue" placeholder="٠"></div>
+                  <div class="form-group"><label>مصاريف الشركة (د.ع)</label><input type="text" id="corpExpenses" placeholder="٠"></div>
+                </div>
+                <div class="btn-group" style="margin-top:16px;">
+                  <button class="btn btn-primary" onclick="calculateCorporateProfitTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+                </div>
+                <div class="result-box" id="corpProfitResultBox" style="margin-top:20px;display:none;">
+                  <div class="result-details" style="display:block;">
+                    <div class="result-row"><span>إيراد الشركة:</span><strong id="corpProfitRevenue">-</strong></div>
+                    <div class="result-row"><span>مصاريف الشركة:</span><strong id="corpProfitExpenses">-</strong></div>
+                    <div class="result-row"><span>الربح الصافي:</span><strong id="corpProfitNet">-</strong></div>
+                    <div class="result-row"><span>نسبة الضريبة:</span><strong>١٥٪</strong></div>
+                    <div class="result-row total"><span>ضريبة إيراد الشركة:</span><strong id="corpProfitTaxDue">-</strong></div>
                   </div>
-                  <div class="form-group"><label>السنة المالية</label><input type="number" id="corpYear" value="2025" min="2000" max="2030"></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="tab-panel" id="tab-corp-income">
-            <div class="card">
-              <div class="card-header"><h3><i class="fas fa-money-bill-wave"></i> الإيرادات والمصروفات</h3></div>
-              <div class="card-body">
-                <div class="form-grid">
-                  <div class="form-group"><label>إجمالي الإيرادات (د.ع)</label><input type="text" id="corpRevenue" placeholder="٠"></div>
-                  <div class="form-group"><label>المصروفات التشغيلية (د.ع)</label><input type="text" id="corpExpenses" placeholder="٠"></div>
-                  <div class="form-group"><label>الاستهلاكات (د.ع)</label><input type="text" id="corpDepreciation" placeholder="٠"></div>
-                  <div class="form-group"><label>مصروفات أخرى مستبعدة (د.ع)</label><input type="text" id="corpOtherExp" placeholder="٠"></div>
-                </div>
-                <div class="form-group" style="margin-top:16px;">
-                  <label class="checkbox-label"><input type="checkbox" id="corpExempt" /> <span>الشركة معفاة من الضريبة (قانون الاستثمار)</span></label>
-                </div>
-                <div class="form-group" id="corpExemptPercentGroup" style="display:none;margin-top:12px;">
-                  <label>نسبة الإعفاء (٪)</label>
-                  <input type="number" id="corpExemptPercent" value="100" min="0" max="100">
-                </div>
-                <div class="btn-group"><button class="btn btn-primary" onclick="calculateCorporateTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-panel" id="tab-corp-salary">
+          <!-- ===== تاب ضريبة موظفي الشركة ===== -->
+          <div class="tab-panel" id="tab-corp-employees">
             <div class="card">
               <div class="card-header">
-                <h3><i class="fas fa-users"></i> استقطاع ضريبة الرواتب</h3>
-                <button class="btn btn-sm btn-primary" onclick="addSalaryRow()"><i class="fas fa-plus"></i> إضافة موظف</button>
+                <h3><i class="fas fa-users"></i> احتساب ضريبة موظفي الشركة (ضريبة رواتب الموظفين)</h3>
+                <button class="btn btn-sm btn-primary" onclick="addCompanyEmployeeRow()"><i class="fas fa-plus"></i> إضافة موظف</button>
               </div>
               <div class="card-body">
+                <div class="info-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:20px;">
+                  <p style="color:#166534;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> أدخل بيانات كل موظف لاحتساب الضريبة. النتائج تُنقل تلقائياً إلى استمارة ض.د14 والمذكرة السنوية.</p>
+                </div>
                 <div class="table-container">
-                  <table id="salaryTable">
+                  <table id="companyEmployeeTable" style="min-width:900px;">
                     <thead>
-                      <tr><th>الموظف</th><th>الراتب الشهري (د.ع)</th><th>الضريبة الشهرية</th><th>إجراء</th></tr>
+                      <tr>
+                        <th>اسم الموظف</th>
+                        <th>الجنسية</th>
+                        <th>الجنس</th>
+                        <th>الراتب الشهري (د.ع)</th>
+                        <th>الحالة الزوجية</th>
+                        <th>عدد الأطفال</th>
+                        <th>الضريبة الشهرية</th>
+                        <th>الضريبة السنوية</th>
+                        <th>إجراء</th>
+                      </tr>
                     </thead>
                     <tbody>
                       <tr>
-                        <td><input type="text" placeholder="اسم الموظف" class="table-input"></td>
-                        <td><input type="text" placeholder="٠" class="table-input" onchange="calculateSalaryTax(this)"></td>
-                        <td class="salary-result">٠ د.ع</td>
-                        <td><button class="btn btn-sm btn-danger" onclick="removeSalaryRow(this)"><i class="fas fa-trash"></i></button></td>
+                        <td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>
+                        <td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>
+                        <td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>
+                        <td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>
+                        <td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>
+                        <td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>
+                        <td class="emp-monthly-tax">٠ د.ع</td>
+                        <td class="emp-annual-tax">٠ د.ع</td>
+                        <td><button class="btn btn-sm btn-danger" onclick="removeCompanyEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
+                <div class="btn-group" style="margin-top:16px;">
+                  <button class="btn btn-primary" onclick="exportFormD14()"><i class="fas fa-file-alt"></i> تصدير استمارة ض.د14</button>
+                  <button class="btn btn-warning" onclick="exportAnnualMemo()"><i class="fas fa-file-invoice"></i> تصدير المذكرة السنوية</button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="tab-panel" id="tab-corp-docs">
+          <!-- ===== تاب ضريبة عقود الشركة ===== -->
+          <div class="tab-panel" id="tab-corp-contracts">
             <div class="card">
-              <div class="card-header"><h3><i class="fas fa-paperclip"></i> المستندات المطلوبة</h3></div>
+              <div class="card-header"><h3><i class="fas fa-file-contract"></i> احتساب ضريبة عقود الشركة</h3></div>
               <div class="card-body">
-                <div class="upload-zone" onclick="triggerUpload()">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <h3>اسحب الملفات هنا أو انقر للرفع</h3>
-                  <p>PDF, JPG, PNG — حتى ١٠ ميجا</p>
-                  <input type="file" id="fileInput" style="display:none" multiple accept=".pdf,.jpg,.png">
+                <div class="tabs-container" style="margin-bottom:20px;">
+                  <button class="tab active" onclick="switchContractSubTab(event,'subtab-contract-tax')">ضريبة العقد</button>
+                  <button class="tab" onclick="switchContractSubTab(event,'subtab-contract-employees')">ضريبة موظفي العقد</button>
+                  <button class="tab" onclick="switchContractSubTab(event,'subtab-contract-deductions')">استقطاع الأمانات الضريبية</button>
                 </div>
-                <div class="checklist">
-                  <label class="checkbox-label"><input type="checkbox"><span>الميزانية العمومية</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>كشف الأرباح والخسائر</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>شهادة تسجيل الشركة</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>كشوفات الرواتب</span></label>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <div class="tab-panel" id="tab-corp-result">
-            <div class="result-box" id="corpResultBox">
-              <div class="result-icon"><i class="fas fa-calculator"></i></div>
-              <h2>نتيجة الاحتساب</h2>
-              <p>قم بإدخال البيانات واحتساب الضريبة أولاً</p>
-              <div class="result-details" id="corpResultDetails" style="display:none;">
-                <div class="result-row"><span>صافي الدخل الخاضع:</span><strong id="corpNetIncome">-</strong></div>
-                <div class="result-row"><span>نسبة الضريبة:</span><strong id="corpTaxRate">-</strong></div>
-                <div class="result-row"><span>مبلغ الإعفاء:</span><strong id="corpExemptAmt">-</strong></div>
-                <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="corpTaxDue">-</strong></div>
+                <!-- ضريبة العقد -->
+                <div class="contract-subtab active" id="subtab-contract-tax">
+                  <div class="info-banner" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:10px;padding:16px;margin-bottom:20px;">
+                    <p style="color:#92400e;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> أدخل بيانات العقد وسيتم احتساب الضريبة حسب نوع العقد والنسبة المقررة.</p>
+                  </div>
+                  <div class="form-grid">
+                    <div class="form-group"><label>اسم الشركة / المقاول</label><input type="text" id="contractCompany" placeholder="اسم الشركة"></div>
+                    <div class="form-group"><label>نوع العقد</label>
+                      <select id="contractType" onchange="updateContractTaxRate()">
+                        <option value="">اختر نوع العقد</option>
+                        <option value="construction">مقاولات إنشائية (3.3%)</option>
+                        <option value="supply">عقد توريد (3.3%)</option>
+                        <option value="services">عقد خدمات (3.3%)</option>
+                        <option value="consulting">عقد استشارات (7%)</option>
+                        <option value="transport">عقد نقل (3.3%)</option>
+                        <option value="maintenance">عقد صيانة (3.3%)</option>
+                        <option value="rent_equipment">تأجير معدات (10%)</option>
+                        <option value="foreign">عقد شركة أجنبية (7%)</option>
+                      </select>
+                    </div>
+                    <div class="form-group"><label>قيمة العقد (د.ع)</label><input type="text" id="contractValue" placeholder="٠"></div>
+                    <div class="form-group"><label>تاريخ التوقيع</label><input type="date" id="contractSignDate"></div>
+                    <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="contractEndDate"></div>
+                    <div class="form-group"><label>نسبة الضريبة</label><input type="text" id="contractTaxRateDisplay" readonly placeholder="يُحدد حسب نوع العقد"></div>
+                  </div>
+                  <div class="btn-group" style="margin-top:16px;">
+                    <button class="btn btn-primary" onclick="calculateContractTax()"><i class="fas fa-calculator"></i> احتساب ضريبة العقد</button>
+                  </div>
+                  <div class="result-box" id="contractTaxResult" style="margin-top:20px;display:none;">
+                    <div class="result-details" style="display:block;">
+                      <div class="result-row"><span>نوع العقد:</span><strong id="contractTypeResult">-</strong></div>
+                      <div class="result-row"><span>قيمة العقد:</span><strong id="contractValueResult">-</strong></div>
+                      <div class="result-row"><span>نسبة الضريبة:</span><strong id="contractRateResult">-</strong></div>
+                      <div class="result-row"><span>مدة العقد:</span><strong id="contractDurationResult">-</strong></div>
+                      <div class="result-row total"><span>ضريبة العقد:</span><strong id="contractTaxDue">-</strong></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ضريبة موظفي العقد -->
+                <div class="contract-subtab" id="subtab-contract-employees" style="display:none;">
+                  <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+                    <div class="card-header">
+                      <h3><i class="fas fa-hard-hat"></i> ضريبة موظفي العقد</h3>
+                      <button class="btn btn-sm btn-primary" onclick="addContractEmployeeRow()"><i class="fas fa-plus"></i> إضافة موظف</button>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-container">
+                        <table id="contractEmployeeTable" style="min-width:900px;">
+                          <thead>
+                            <tr>
+                              <th>اسم الموظف</th>
+                              <th>الجنسية</th>
+                              <th>الجنس</th>
+                              <th>الراتب الشهري (د.ع)</th>
+                              <th>الحالة الزوجية</th>
+                              <th>عدد الأطفال</th>
+                              <th>الضريبة الشهرية</th>
+                              <th>الضريبة السنوية</th>
+                              <th>إجراء</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>
+                              <td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>
+                              <td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>
+                              <td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>
+                              <td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>
+                              <td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>
+                              <td class="emp-monthly-tax">٠ د.ع</td>
+                              <td class="emp-annual-tax">٠ د.ع</td>
+                              <td><button class="btn btn-sm btn-danger" onclick="removeContractEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- استقطاع الأمانات الضريبية -->
+                <div class="contract-subtab" id="subtab-contract-deductions" style="display:none;">
+                  <div class="card" style="box-shadow:none;border:1px solid var(--border);">
+                    <div class="card-header"><h3><i class="fas fa-hand-holding-usd"></i> استقطاع الأمانات الضريبية الخاصة بالعقد</h3></div>
+                    <div class="card-body">
+                      <div class="info-banner" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5;border-radius:10px;padding:16px;margin-bottom:20px;">
+                        <p style="color:#991b1b;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> يتم استقطاع الأمانات الضريبية من كل دفعة مستحقة للمقاول وفق النسب المقررة قانونياً.</p>
+                      </div>
+                      <div class="form-grid">
+                        <div class="form-group"><label>قيمة الدفعة المستحقة (د.ع)</label><input type="text" id="deductionPayment" placeholder="٠"></div>
+                        <div class="form-group"><label>نسبة الاستقطاع (٪)</label>
+                          <select id="deductionRate">
+                            <option value="3.3">3.3% — استقطاع قياسي</option>
+                            <option value="7">7% — عقود استشارية وأجنبية</option>
+                            <option value="10">10% — تأجير معدات</option>
+                          </select>
+                        </div>
+                        <div class="form-group"><label>رقم الدفعة</label><input type="text" id="deductionNumber" placeholder="مثال: الدفعة رقم ١"></div>
+                      </div>
+                      <div class="btn-group" style="margin-top:16px;">
+                        <button class="btn btn-primary" onclick="calculateDeduction()"><i class="fas fa-calculator"></i> احتساب الاستقطاع</button>
+                      </div>
+                      <div class="result-box" id="deductionResult" style="margin-top:20px;display:none;">
+                        <div class="result-details" style="display:block;">
+                          <div class="result-row"><span>قيمة الدفعة:</span><strong id="deductionPaymentResult">-</strong></div>
+                          <div class="result-row"><span>نسبة الاستقطاع:</span><strong id="deductionRateResult">-</strong></div>
+                          <div class="result-row total"><span>مبلغ الاستقطاع:</span><strong id="deductionAmountResult">-</strong></div>
+                          <div class="result-row"><span>المبلغ الصافي بعد الاستقطاع:</span><strong id="deductionNetResult">-</strong></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -958,88 +1066,145 @@
               </div>
               <div class="section-hero-text">
                 <h2>ضريبة العرصات</h2>
-                <p>احتساب ضريبة الأراضي ضمن حدود المحافظات العراقية</p>
+                <p>احتساب ضريبة الأراضي ضمن حدود أمانة بغداد ومراكز المحافظات والأقضية والنواحي</p>
               </div>
             </div>
           </div>
+
+          <!-- احتساب ضريبة العرصة -->
           <div class="card">
             <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> احتساب ضريبة العرصات</h3></div>
             <div class="card-body">
-              <div class="wizard-progress">
-                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٣</div>
+              <div class="info-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <p style="color:#166534;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> سعر متر العرصة × عدد المترات = سعر العرصة الكلي × 2% = ضريبة العرصة السنوية</p>
               </div>
-              <div class="wizard-labels">
-                <span>الموقع</span><span>التفاصيل</span><span>النتيجة</span>
+              <div class="form-grid">
+                <div class="form-group"><label>المحافظة</label>
+                  <select id="landProvince" onchange="updateLandDistricts()">
+                    <option value="">اختر المحافظة</option>
+                    <option value="baghdad">بغداد</option>
+                    <option value="basra">البصرة</option>
+                    <option value="nineveh">نينوى</option>
+                    <option value="erbil">أربيل</option>
+                    <option value="najaf">النجف</option>
+                    <option value="karbala">كربلاء</option>
+                    <option value="kirkuk">كركوك</option>
+                    <option value="sulaymaniyah">السليمانية</option>
+                    <option value="dhiqar">ذي قار</option>
+                    <option value="babel">بابل</option>
+                    <option value="diyala">ديالى</option>
+                    <option value="anbar">الأنبار</option>
+                    <option value="wasit">واسط</option>
+                    <option value="maysan">ميسان</option>
+                    <option value="muthanna">المثنى</option>
+                    <option value="qadisiyyah">القادسية</option>
+                    <option value="saladin">صلاح الدين</option>
+                    <option value="duhok">دهوك</option>
+                  </select>
+                </div>
+                <div class="form-group"><label>القضاء/الناحية</label>
+                  <select id="landDistrict"><option value="">اختر المحافظة أولاً</option></select>
+                </div>
+                <div class="form-group"><label>عدد الأمتار للعرصة (متر مربع)</label><input type="text" id="landArea" placeholder="٠"></div>
+                <div class="form-group"><label>سعر المتر (د.ع)</label><input type="text" id="landPrice" placeholder="أدخل سعر المتر"></div>
+              </div>
+              <div class="btn-group" style="margin-top:16px;">
+                <button class="btn btn-primary" onclick="calculateLandTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+              </div>
+              <div class="result-box" id="landResultBox" style="margin-top:20px;">
+                <div class="result-icon"><i class="fas fa-map"></i></div>
+                <h2>نتيجة ضريبة العرصة</h2>
+                <div class="result-details" id="landResultDetails" style="display:none;">
+                  <div class="result-row"><span>الموقع:</span><strong id="landLocation">-</strong></div>
+                  <div class="result-row"><span>عدد الأمتار:</span><strong id="landAreaResult">-</strong></div>
+                  <div class="result-row"><span>سعر المتر:</span><strong id="landPriceResult">-</strong></div>
+                  <div class="result-row"><span>سعر العرصة الكلي:</span><strong id="landTotalValue">-</strong></div>
+                  <div class="result-row"><span>نسبة الضريبة:</span><strong>٢٪ سنوياً</strong></div>
+                  <div class="result-row total"><span>ضريبة العرصة السنوية:</span><strong id="landTaxDue">-</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- الاعفاءات -->
+          <div class="card" style="margin-top:20px;">
+            <div class="card-header" style="background:linear-gradient(135deg,#059669,#065f46);color:#fff;">
+              <h3><i class="fas fa-shield-alt"></i> اعرف إن كنت معفي من ضريبة العرصات</h3>
+            </div>
+            <div class="card-body">
+              <p style="color:var(--text-secondary);margin-bottom:20px;">اختر الحالة التي تنطبق عليك لمعرفة إن كنت معفياً من ضريبة العرصات:</p>
+              <div class="exemption-options" style="display:grid;gap:12px;">
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="area_800" onchange="checkLandExemption(this.value)">
+                  <span><strong>أ.</strong> العرصة لا تتجاوز 800 متر مربع (ما يتجاوز 800م² يخضع للضريبة)</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="over_15_years" onchange="checkLandExemption(this.value)">
+                  <span><strong>ب.</strong> العرصة مملوكة لمدة تزيد عن 15 سنة</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="government" onchange="checkLandExemption(this.value)">
+                  <span><strong>ت.</strong> العرصة عائدة إلى الدوائر الرسمية أو شبه الرسمية</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="waqf" onchange="checkLandExemption(this.value)">
+                  <span><strong>ث.</strong> العرصة عائدة إلى الأوقاف العامة وغير مؤجرة</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="unions" onchange="checkLandExemption(this.value)">
+                  <span><strong>ج.</strong> العرصة عائدة إلى النقابات والجمعيات والمقابر</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="legal_block" onchange="checkLandExemption(this.value)">
+                  <span><strong>ح.</strong> العرصة يتعذر التصرف بها بسبب قانوني</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="public_use" onchange="checkLandExemption(this.value)">
+                  <span><strong>خ.</strong> العرصة مخصصة للأغراض والمنافع العامة</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#f0fdf4;padding:14px 16px;border-radius:10px;border:1px solid #bbf7d0;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="outside_limits" onchange="checkLandExemption(this.value)">
+                  <span><strong>د.</strong> العرصة خارج حدود أمانة بغداد ومراكز المحافظات والأقضية والنواحي</span>
+                </label>
+
+                <label class="checkbox-label" style="background:#fff7ed;padding:14px 16px;border-radius:10px;border:1px solid #fed7aa;cursor:pointer;">
+                  <input type="radio" name="landExemption" value="none" onchange="checkLandExemption(this.value)">
+                  <span><strong>لا ينطبق عليّ أي إعفاء</strong> — العرصة خاضعة للضريبة بالكامل</span>
+                </label>
               </div>
 
-              <div class="wizard-card active" id="land-step-1">
-                <h3><i class="fas fa-map-pin"></i> موقع العرصة</h3>
+              <div id="landExemptionResult" style="margin-top:20px;display:none;"></div>
+
+              <!-- حقل إضافي لإعفاء 800 متر -->
+              <div id="landExemptionPartial" style="margin-top:20px;display:none;">
+                <div class="info-banner" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:10px;padding:16px;margin-bottom:16px;">
+                  <p style="color:#92400e;font-size:13px;"><i class="fas fa-exclamation-triangle" style="margin-left:6px;"></i> أول 800 متر معفية. ما يزيد عنها يخضع للضريبة.</p>
+                </div>
                 <div class="form-grid">
-                  <div class="form-group"><label>المحافظة</label>
-                    <select id="landProvince" onchange="updateLandDistricts()">
-                      <option value="">اختر المحافظة</option>
-                      <option value="baghdad">بغداد</option>
-                      <option value="basra">البصرة</option>
-                      <option value="nineveh">نينوى</option>
-                      <option value="erbil">أربيل</option>
-                      <option value="najaf">النجف</option>
-                      <option value="karbala">كربلاء</option>
-                      <option value="kirkuk">كركوك</option>
-                      <option value="sulaymaniyah">السليمانية</option>
-                      <option value="dhiqar">ذي قار</option>
-                      <option value="babel">بابل</option>
-                      <option value="diyala">ديالى</option>
-                      <option value="anbar">الأنبار</option>
-                      <option value="wasit">واسط</option>
-                      <option value="maysan">ميسان</option>
-                      <option value="muthanna">المثنى</option>
-                      <option value="qadisiyyah">القادسية</option>
-                      <option value="saladin">صلاح الدين</option>
-                      <option value="duhok">دهوك</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label>القضاء/الناحية</label>
-                    <select id="landDistrict"><option value="">اختر المحافظة أولاً</option></select>
+                  <div class="form-group"><label>المساحة الكلية للعرصة (م²)</label><input type="text" id="landExemptArea" placeholder="مثال: 1000"></div>
+                  <div class="form-group"><label>سعر المتر المربع (د.ع)</label><input type="text" id="landExemptPrice" placeholder="أدخل سعر المتر"></div>
+                </div>
+                <div class="btn-group" style="margin-top:12px;">
+                  <button class="btn btn-primary" onclick="calculatePartialLandExemption()"><i class="fas fa-calculator"></i> احتساب الضريبة بعد الإعفاء</button>
+                </div>
+                <div class="result-box" id="landPartialResult" style="margin-top:16px;display:none;">
+                  <div class="result-details" style="display:block;">
+                    <div class="result-row"><span>المساحة الكلية:</span><strong id="partialTotalArea">-</strong></div>
+                    <div class="result-row"><span>المساحة المعفية:</span><strong id="partialExemptArea">-</strong></div>
+                    <div class="result-row"><span>المساحة الخاضعة للضريبة:</span><strong id="partialTaxableArea">-</strong></div>
+                    <div class="result-row"><span>سعر المتر:</span><strong id="partialPrice">-</strong></div>
+                    <div class="result-row"><span>قيمة المساحة الخاضعة:</span><strong id="partialTaxableValue">-</strong></div>
+                    <div class="result-row total"><span>الضريبة المستحقة (2%):</span><strong id="partialTaxDue">-</strong></div>
                   </div>
                 </div>
-                <div class="btn-group"><button class="btn btn-primary" onclick="nextLandStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
-              </div>
-
-              <div class="wizard-card" id="land-step-2">
-                <h3><i class="fas fa-ruler-combined"></i> تفاصيل العرصة</h3>
-                <div class="form-grid">
-                  <div class="form-group"><label>المساحة (متر مربع)</label><input type="text" id="landArea" placeholder="٠"></div>
-                  <div class="form-group"><label>نوع العرصة</label>
-                    <select id="landType">
-                      <option value="residential">سكنية</option>
-                      <option value="commercial">تجارية</option>
-                      <option value="agricultural">زراعية</option>
-                      <option value="industrial">صناعية</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label>سعر المتر المربع (د.ع)</label><input type="text" id="landPrice" placeholder="يُحدد تلقائياً"></div>
-                </div>
-                <div class="btn-group">
-                  <button class="btn btn-ghost" onclick="prevLandStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
-                  <button class="btn btn-primary" onclick="nextLandStep(3)">احتساب <i class="fas fa-calculator"></i></button>
-                </div>
-              </div>
-
-              <div class="wizard-card" id="land-step-3">
-                <div class="result-box" id="landResultBox">
-                  <div class="result-icon"><i class="fas fa-map"></i></div>
-                  <h2>نتيجة ضريبة العرصة</h2>
-                  <div class="result-details" id="landResultDetails" style="display:none;">
-                    <div class="result-row"><span>الموقع:</span><strong id="landLocation">-</strong></div>
-                    <div class="result-row"><span>المساحة:</span><strong id="landAreaResult">-</strong></div>
-                    <div class="result-row"><span>سعر المتر:</span><strong id="landPriceResult">-</strong></div>
-                    <div class="result-row"><span>القيمة الإجمالية:</span><strong id="landTotalValue">-</strong></div>
-                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="landTaxDue">-</strong></div>
-                  </div>
-                </div>
-                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevLandStep(2)"><i class="fas fa-arrow-right"></i> تعديل البيانات</button></div>
               </div>
             </div>
           </div>
@@ -1061,89 +1226,46 @@
               </div>
               <div class="section-hero-text">
                 <h2>ضريبة العقار</h2>
-                <p>احتساب ضريبة إيجار وبيع العقارات بمختلف أنواعها</p>
+                <p>احتساب ضريبة العقار المؤجر بنسبة 10% من قيمة الإيجار السنوية</p>
               </div>
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><h3><i class="fas fa-home"></i> احتساب ضريبة العقار</h3></div>
+            <div class="card-header"><h3><i class="fas fa-home"></i> احتساب ضريبة العقار المؤجر</h3></div>
             <div class="card-body">
-              <div class="wizard-progress">
-                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٣</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٤</div>
+              <div class="info-banner" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);border:1px solid #fdba74;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <p style="color:#9a3412;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> قيمة الإيجار الشهرية × عدد الأشهر المؤجرة = الإيجار السنوي × 10% = ضريبة العقار</p>
               </div>
-              <div class="wizard-labels"><span>النوع</span><span>التفاصيل</span><span>المستندات</span><span>النتيجة</span></div>
-
-              <div class="wizard-card active" id="prop-step-1">
-                <h3><i class="fas fa-exchange-alt"></i> نوع العملية</h3>
-                <div class="chips-group">
-                  <button class="chip active" onclick="selectChip(this,'propOperation','sale')">بيع عقار</button>
-                  <button class="chip" onclick="selectChip(this,'propOperation','rent')">تأجير عقار</button>
+              <div class="form-grid">
+                <div class="form-group"><label>نوع العقار</label>
+                  <select id="propType">
+                    <option value="house">دار سكن</option>
+                    <option value="apartment">شقة</option>
+                    <option value="shop">محل تجاري</option>
+                    <option value="building">بناية</option>
+                    <option value="office">مكتب</option>
+                    <option value="warehouse">مخزن</option>
+                  </select>
                 </div>
-                <input type="hidden" id="propOperation" value="sale">
-                <div class="form-grid" style="margin-top:20px;">
-                  <div class="form-group"><label>نوع العقار</label>
-                    <select id="propType">
-                      <option value="house">دار سكن</option>
-                      <option value="apartment">شقة</option>
-                      <option value="shop">محل تجاري</option>
-                      <option value="building">بناية</option>
-                      <option value="land">أرض</option>
-                    </select>
-                  </div>
-                  <div class="form-group"><label>العنوان</label><input type="text" id="propAddress" placeholder="العنوان الكامل"></div>
-                </div>
-                <div class="btn-group"><button class="btn btn-primary" onclick="nextPropStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
+                <div class="form-group"><label>موقع العقار</label><input type="text" id="propAddress" placeholder="المحافظة / المنطقة / الشارع"></div>
+                <div class="form-group"><label>قيمة الإيجار الشهرية (د.ع)</label><input type="text" id="propRentAmount" placeholder="٠"></div>
+                <div class="form-group"><label>عدد الأشهر المؤجر فيها العقار</label><input type="number" id="propRentDuration" value="12" min="1" max="12"></div>
               </div>
-
-              <div class="wizard-card" id="prop-step-2">
-                <h3><i class="fas fa-money-check-alt"></i> التفاصيل المالية</h3>
-                <div id="propSaleFields">
-                  <div class="form-grid">
-                    <div class="form-group"><label>قيمة البيع (د.ع)</label><input type="text" id="propSalePrice" placeholder="٠"></div>
-                    <div class="form-group"><label>سنة البناء</label><input type="number" id="propBuildYear" placeholder="٢٠٠٠" min="1900" max="2030"></div>
-                  </div>
-                </div>
-                <div id="propRentFields" style="display:none;">
-                  <div class="form-grid">
-                    <div class="form-group"><label>الإيجار الشهري (د.ع)</label><input type="text" id="propRentAmount" placeholder="٠"></div>
-                    <div class="form-group"><label>مدة العقد (أشهر)</label><input type="number" id="propRentDuration" value="12" min="1" max="120"></div>
-                  </div>
-                </div>
-                <div class="btn-group">
-                  <button class="btn btn-ghost" onclick="prevPropStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
-                  <button class="btn btn-primary" onclick="nextPropStep(3)">التالي <i class="fas fa-arrow-left"></i></button>
-                </div>
+              <div class="btn-group" style="margin-top:16px;">
+                <button class="btn btn-primary" onclick="calculatePropertyTax()"><i class="fas fa-calculator"></i> احتساب ضريبة العقار</button>
               </div>
-
-              <div class="wizard-card" id="prop-step-3">
-                <h3><i class="fas fa-file-alt"></i> المستندات</h3>
-                <div class="checklist">
-                  <label class="checkbox-label"><input type="checkbox"><span>سند الملكية (الطابو)</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>هوية المالك</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>عقد البيع/الإيجار</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>قيمة العقار المقدرة</span></label>
+              <div class="result-box" id="propResultBox" style="margin-top:20px;">
+                <div class="result-icon"><i class="fas fa-home"></i></div>
+                <h2>نتيجة ضريبة العقار</h2>
+                <div class="result-details" id="propResultDetails" style="display:none;">
+                  <div class="result-row"><span>نوع العقار:</span><strong id="propOpType">-</strong></div>
+                  <div class="result-row"><span>موقع العقار:</span><strong id="propLocationResult">-</strong></div>
+                  <div class="result-row"><span>الإيجار الشهري:</span><strong id="propMonthlyRent">-</strong></div>
+                  <div class="result-row"><span>عدد الأشهر:</span><strong id="propMonths">-</strong></div>
+                  <div class="result-row"><span>قيمة الإيجار السنوية:</span><strong id="propBaseValue">-</strong></div>
+                  <div class="result-row"><span>نسبة الضريبة:</span><strong id="propTaxRate">١٠٪</strong></div>
+                  <div class="result-row total"><span>ضريبة العقار المستحقة:</span><strong id="propTaxDue">-</strong></div>
                 </div>
-                <div class="btn-group">
-                  <button class="btn btn-ghost" onclick="prevPropStep(2)"><i class="fas fa-arrow-right"></i> السابق</button>
-                  <button class="btn btn-primary" onclick="nextPropStep(4)">احتساب <i class="fas fa-calculator"></i></button>
-                </div>
-              </div>
-
-              <div class="wizard-card" id="prop-step-4">
-                <div class="result-box" id="propResultBox">
-                  <div class="result-icon"><i class="fas fa-home"></i></div>
-                  <h2>نتيجة ضريبة العقار</h2>
-                  <div class="result-details" id="propResultDetails" style="display:none;">
-                    <div class="result-row"><span>نوع العملية:</span><strong id="propOpType">-</strong></div>
-                    <div class="result-row"><span>القيمة الأساسية:</span><strong id="propBaseValue">-</strong></div>
-                    <div class="result-row"><span>نسبة الضريبة:</span><strong id="propTaxRate">-</strong></div>
-                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="propTaxDue">-</strong></div>
-                  </div>
-                </div>
-                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevPropStep(3)"><i class="fas fa-arrow-right"></i> تعديل البيانات</button></div>
               </div>
             </div>
           </div>
@@ -2691,6 +2813,63 @@
             <div class="card-body">
               <div class="api-usage-stats" id="apiUsageStats"></div>
               <canvas id="apiUsageChart" height="200" style="margin-top:16px;"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== CONTACT / FINAL ACCOUNTS ==================== -->
+        <section class="page-section" id="page-contact">
+          <div class="section-hero" style="--hero-c1:#d4a017;--hero-c2:#a67c00;" data-aos="fade-down">
+            <div class="section-hero-bg">
+              <div class="hero-particle hp-1"></div>
+              <div class="hero-particle hp-2"></div>
+              <div class="hero-particle hp-3"></div>
+              <div class="hero-wave"></div>
+            </div>
+            <div class="section-hero-content">
+              <div class="section-hero-icon-3d">
+                <div class="hero-icon-ring"></div>
+                <i class="fas fa-headset"></i>
+              </div>
+              <div class="section-hero-text">
+                <h2>تواصل معنا — إعداد الحسابات الختامية</h2>
+                <p>في حال حاجتكم إلى إعداد الحسابات الختامية، يرجى التواصل معنا وسنقوم بمساعدتكم</p>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3><i class="fas fa-envelope-open-text"></i> نموذج طلب إعداد الحسابات الختامية</h3></div>
+            <div class="card-body">
+              <div class="info-banner" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <p style="color:#92400e;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> يمكننا مساعدتكم في إعداد الحسابات الختامية والتقارير المالية السنوية. يرجى ملء النموذج أدناه وسنتواصل معكم في أقرب وقت.</p>
+              </div>
+              <div class="form-grid">
+                <div class="form-group"><label>اسم الشركة / المكلف</label><input type="text" id="contactName" placeholder="الاسم الكامل"></div>
+                <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="contactPhone" placeholder="07XX XXX XXXX"></div>
+                <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="contactEmail" placeholder="example@email.com"></div>
+                <div class="form-group"><label>نوع الخدمة المطلوبة</label>
+                  <select id="contactService">
+                    <option value="">اختر نوع الخدمة</option>
+                    <option value="final_accounts">إعداد الحسابات الختامية</option>
+                    <option value="annual_report">التقرير المالي السنوي</option>
+                    <option value="tax_review">مراجعة ضريبية شاملة</option>
+                    <option value="consulting">استشارة ضريبية</option>
+                    <option value="other">أخرى</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:12px;">
+                <label>تفاصيل إضافية</label>
+                <textarea id="contactDetails" rows="4" placeholder="اكتب تفاصيل طلبك هنا..." style="width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;resize:vertical;font-family:inherit;"></textarea>
+              </div>
+              <div class="btn-group" style="margin-top:16px;">
+                <button class="btn btn-primary" onclick="submitContactForm()"><i class="fas fa-paper-plane"></i> إرسال الطلب</button>
+              </div>
+              <div id="contactSuccessMsg" style="display:none;margin-top:20px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:20px;text-align:center;">
+                <i class="fas fa-check-circle" style="font-size:40px;color:#059669;"></i>
+                <h3 style="color:#166534;margin-top:10px;">تم إرسال طلبك بنجاح!</h3>
+                <p style="color:#166534;">سيتم التواصل معك في أقرب وقت ممكن.</p>
+              </div>
             </div>
           </div>
         </section>

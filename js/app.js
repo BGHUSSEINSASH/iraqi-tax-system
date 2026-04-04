@@ -9,17 +9,17 @@ var PACKAGES = {
   basic: {
     name: 'الأساسية',
     icon: 'fa-leaf',
-    pages: ['dashboard','corporate','calendar','notifications','settings','packages','provinces','tasks']
+    pages: ['dashboard','corporate','calendar','notifications','settings','packages','provinces','tasks','contact']
   },
   professional: {
     name: 'المتقدمة',
     icon: 'fa-crown',
-    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks']
+    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks','contact']
   },
   enterprise: {
     name: 'الشاملة',
     icon: 'fa-building',
-    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','audit','users','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','workflow','tickets','appointments','esignature','tasks','loginhistory','backup','api']
+    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','audit','users','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','workflow','tickets','appointments','esignature','tasks','loginhistory','backup','api','contact']
   }
 };
 
@@ -399,20 +399,22 @@ function showProgressBar() {
 
 // ========== NAVIGATION ==========
 const pageTitles = {
-  dashboard: 'لوحة التحكم', corporate: 'ضريبة دخل الشركات', land: 'ضريبة العرصات',
+  dashboard: 'لوحة التحكم', corporate: 'ضريبة الشركات', land: 'ضريبة العرصات',
   property: 'ضريبة العقار', profession: 'ضريبة المهنة', sales: 'ضريبة المبيعات',
   reports: 'التقارير والتحليلات', documents: 'المستندات', notifications: 'الإشعارات',
   penalties: 'حاسبة الغرامات', comparison: 'مقارنة الضرائب', calendar: 'التقويم الضريبي',
-  audit: 'سجل العمليات', users: 'إدارة المستخدمين', settings: 'الإعدادات'
+  audit: 'سجل العمليات', users: 'إدارة المستخدمين', settings: 'الإعدادات',
+  contact: 'تواصل معنا — الحسابات الختامية'
 };
 const breadcrumbs = {
-  dashboard: 'الرئيسية', corporate: 'الرئيسية / الضرائب / دخل الشركات',
+  dashboard: 'الرئيسية', corporate: 'الرئيسية / الضرائب / الشركات',
   land: 'الرئيسية / الضرائب / العرصات', property: 'الرئيسية / الضرائب / العقار',
   profession: 'الرئيسية / الضرائب / المهنة', sales: 'الرئيسية / الضرائب / المبيعات',
   reports: 'الرئيسية / التقارير', documents: 'الرئيسية / المستندات', notifications: 'الرئيسية / الإشعارات',
   penalties: 'الرئيسية / أدوات / الغرامات', comparison: 'الرئيسية / أدوات / المقارنة',
   calendar: 'الرئيسية / أدوات / التقويم', audit: 'الرئيسية / إدارة / سجل العمليات',
-  users: 'الرئيسية / إدارة / المستخدمين', settings: 'الرئيسية / الإعدادات'
+  users: 'الرئيسية / إدارة / المستخدمين', settings: 'الرئيسية / الإعدادات',
+  contact: 'الرئيسية / تواصل معنا'
 };
 
 function navigateTo(page) {
@@ -510,33 +512,247 @@ function selectChip(chip, inputId, value) {
   if (inputId === 'propOperation') { handlePropertyOperationChange(value); }
 }
 
-// ========== CORPORATE TAX ==========
-function calculateCorporateTax() {
+// ========== CORPORATE TAX — PROFIT TAX ==========
+function calculateCorporateProfitTax() {
   var revenue = getVal('corpRevenue');
   var expenses = getVal('corpExpenses');
-  var depreciation = getVal('corpDepreciation');
-  var otherExp = getVal('corpOtherExp');
-  var netIncome = revenue - expenses - depreciation + otherExp;
-  if (netIncome <= 0) { showToast('صافي الدخل سالب أو صفر، لا توجد ضريبة مستحقة', true); return; }
+  if (!revenue) { showToast('يرجى إدخال إيراد الشركة', true); return; }
+  var netProfit = revenue - expenses;
+  if (netProfit <= 0) { showToast('الربح الصافي سالب أو صفر، لا توجد ضريبة مستحقة', true); return; }
+  var rate = 0.15;
+  var tax = netProfit * rate;
 
-  var activity = document.getElementById('corpActivity').value;
-  var rate = activity === 'oil' ? 0.35 : 0.15;
-  var tax = netIncome * rate;
-  var exemptAmt = 0;
+  setText('corpProfitRevenue', formatNumber(revenue) + ' د.ع');
+  setText('corpProfitExpenses', formatNumber(expenses) + ' د.ع');
+  setText('corpProfitNet', formatNumber(netProfit) + ' د.ع');
+  setText('corpProfitTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
+  document.getElementById('corpProfitResultBox').style.display = 'block';
+  showToast('تم احتساب ضريبة أرباح الشركة بنجاح');
+}
 
-  if (document.getElementById('corpExempt').checked) {
-    var exemptPercent = parseFloat(document.getElementById('corpExemptPercent').value) || 100;
-    exemptAmt = tax * (exemptPercent / 100);
-    tax -= exemptAmt;
+// ========== CORPORATE TAX — EMPLOYEE TAX ==========
+function calculateCompanyEmployeeTax(inputEl) {
+  var row = inputEl.closest('tr');
+  var salaryInput = row.querySelector('.emp-salary');
+  var maritalSelect = row.querySelector('.emp-marital');
+  var childrenInput = row.querySelector('.emp-children');
+  var monthly = parseArabicNumber(salaryInput.value);
+  var marital = maritalSelect.value;
+  var children = parseInt(childrenInput.value) || 0;
+  var annual = monthly * 12;
+
+  // Iraqi tax: annual exemption 5,000,000 + married bonus 1,000,000 + children 500,000 each
+  var exemption = SALARY_ANNUAL_EXEMPTION;
+  if (marital === 'married') exemption += 1000000;
+  exemption += children * 500000;
+
+  var taxable = annual - exemption;
+  if (taxable <= 0) {
+    row.querySelector('.emp-monthly-tax').textContent = '٠ د.ع (معفي)';
+    row.querySelector('.emp-annual-tax').textContent = '٠ د.ع (معفي)';
+    return;
   }
+  var tax = 0, prev = 0;
+  for (var i = 0; i < SALARY_BRACKETS.length; i++) {
+    var b = SALARY_BRACKETS[i];
+    var chunk = Math.min(taxable, b.limit) - prev;
+    if (chunk <= 0) break;
+    tax += chunk * b.rate;
+    prev = Math.min(taxable, b.limit);
+    if (prev >= taxable) break;
+  }
+  row.querySelector('.emp-monthly-tax').textContent = formatNumber(Math.round(tax / 12)) + ' د.ع';
+  row.querySelector('.emp-annual-tax').textContent = formatNumber(Math.round(tax)) + ' د.ع';
+}
 
-  setText('corpNetIncome', formatNumber(netIncome) + ' د.ع');
-  setText('corpTaxRate', (rate * 100) + '٪');
-  setText('corpExemptAmt', formatNumber(exemptAmt) + ' د.ع');
-  setText('corpTaxDue', formatNumber(Math.max(0, tax)) + ' د.ع');
-  document.getElementById('corpResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة الشركات بنجاح');
-  switchTab({ target: document.querySelector('#page-corporate .tab:last-child') }, 'tab-corp-result');
+function addCompanyEmployeeRow() {
+  var tbody = document.querySelector('#companyEmployeeTable tbody');
+  var row = document.createElement('tr');
+  row.innerHTML = '<td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>' +
+    '<td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>' +
+    '<td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>' +
+    '<td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>' +
+    '<td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>' +
+    '<td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>' +
+    '<td class="emp-monthly-tax">٠ د.ع</td>' +
+    '<td class="emp-annual-tax">٠ د.ع</td>' +
+    '<td><button class="btn btn-sm btn-danger" onclick="removeCompanyEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>';
+  tbody.appendChild(row);
+}
+
+function removeCompanyEmployeeRow(btn) {
+  var tbody = btn.closest('tbody');
+  if (tbody.rows.length > 1) btn.closest('tr').remove();
+  else showToast('يجب الإبقاء على صف واحد على الأقل', true);
+}
+
+function exportFormD14() {
+  var rows = document.querySelectorAll('#companyEmployeeTable tbody tr');
+  var data = [];
+  rows.forEach(function(row, i) {
+    var name = row.querySelector('.emp-name').value || 'موظف ' + (i + 1);
+    var nationality = row.querySelector('.emp-nationality').value === 'iraqi' ? 'عراقي' : 'أجنبي';
+    var gender = row.querySelector('.emp-gender').value === 'male' ? 'ذكر' : 'أنثى';
+    var salary = row.querySelector('.emp-salary').value || '0';
+    var marital = row.querySelector('.emp-marital').value === 'married' ? 'متزوج' : 'أعزب';
+    var children = row.querySelector('.emp-children').value || '0';
+    var monthlyTax = row.querySelector('.emp-monthly-tax').textContent;
+    var annualTax = row.querySelector('.emp-annual-tax').textContent;
+    data.push({ name: name, nationality: nationality, gender: gender, salary: salary, marital: marital, children: children, monthlyTax: monthlyTax, annualTax: annualTax });
+  });
+  if (data.length === 0 || !data[0].salary || data[0].salary === '0') { showToast('يرجى إدخال بيانات الموظفين أولاً', true); return; }
+
+  var html = '<div style="direction:rtl;font-family:Tajawal,sans-serif;padding:30px;">' +
+    '<div style="text-align:center;margin-bottom:30px;"><h2>استمارة ض.د14</h2><p>كشف بالرواتب والأجور والمخصصات وضريبة الدخل المستقطعة</p></div>' +
+    '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#0f1b4d;color:#fff;">' +
+    '<th style="border:1px solid #333;padding:10px;">ت</th><th style="border:1px solid #333;padding:10px;">اسم الموظف</th>' +
+    '<th style="border:1px solid #333;padding:10px;">الجنسية</th><th style="border:1px solid #333;padding:10px;">الجنس</th>' +
+    '<th style="border:1px solid #333;padding:10px;">الراتب الشهري</th><th style="border:1px solid #333;padding:10px;">الحالة الزوجية</th>' +
+    '<th style="border:1px solid #333;padding:10px;">عدد الأطفال</th><th style="border:1px solid #333;padding:10px;">الضريبة الشهرية</th>' +
+    '<th style="border:1px solid #333;padding:10px;">الضريبة السنوية</th></tr></thead><tbody>';
+  data.forEach(function(d, i) {
+    html += '<tr><td style="border:1px solid #ccc;padding:8px;text-align:center;">' + (i + 1) + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;">' + d.name + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.nationality + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.gender + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.salary + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.marital + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.children + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.monthlyTax + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.annualTax + '</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  if (typeof html2pdf !== 'undefined') {
+    var el = document.createElement('div'); el.innerHTML = html;
+    document.body.appendChild(el);
+    html2pdf().set({ margin: 10, filename: 'استمارة_ض_د14.pdf', jsPDF: { direction: 'rtl' } }).from(el).save().then(function() { document.body.removeChild(el); });
+    showToast('جاري تصدير استمارة ض.د14');
+  } else { showToast('تعذر تصدير PDF', true); }
+}
+
+function exportAnnualMemo() {
+  var rows = document.querySelectorAll('#companyEmployeeTable tbody tr');
+  var data = [];
+  var totalMonthly = 0, totalAnnual = 0;
+  rows.forEach(function(row, i) {
+    var name = row.querySelector('.emp-name').value || 'موظف ' + (i + 1);
+    var salary = row.querySelector('.emp-salary').value || '0';
+    var monthlyTax = row.querySelector('.emp-monthly-tax').textContent;
+    var annualTax = row.querySelector('.emp-annual-tax').textContent;
+    data.push({ name: name, salary: salary, monthlyTax: monthlyTax, annualTax: annualTax });
+    totalMonthly += parseArabicNumber(row.querySelector('.emp-monthly-tax').textContent);
+    totalAnnual += parseArabicNumber(row.querySelector('.emp-annual-tax').textContent);
+  });
+  if (data.length === 0 || !data[0].salary || data[0].salary === '0') { showToast('يرجى إدخال بيانات الموظفين أولاً', true); return; }
+
+  var html = '<div style="direction:rtl;font-family:Tajawal,sans-serif;padding:30px;">' +
+    '<div style="text-align:center;margin-bottom:30px;"><h2>المذكرة السنوية</h2><p>ملخص ضريبة رواتب الموظفين للسنة المالية</p></div>' +
+    '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#065f46;color:#fff;">' +
+    '<th style="border:1px solid #333;padding:10px;">ت</th><th style="border:1px solid #333;padding:10px;">اسم الموظف</th>' +
+    '<th style="border:1px solid #333;padding:10px;">الراتب الشهري</th><th style="border:1px solid #333;padding:10px;">الضريبة الشهرية</th>' +
+    '<th style="border:1px solid #333;padding:10px;">الضريبة السنوية</th></tr></thead><tbody>';
+  data.forEach(function(d, i) {
+    html += '<tr><td style="border:1px solid #ccc;padding:8px;text-align:center;">' + (i + 1) + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;">' + d.name + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.salary + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.monthlyTax + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.annualTax + '</td></tr>';
+  });
+  html += '<tr style="background:#f0fdf4;font-weight:bold;"><td colspan="3" style="border:1px solid #ccc;padding:10px;">المجموع</td>' +
+    '<td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalMonthly)) + ' د.ع</td>' +
+    '<td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalAnnual)) + ' د.ع</td></tr>';
+  html += '</tbody></table></div>';
+  if (typeof html2pdf !== 'undefined') {
+    var el = document.createElement('div'); el.innerHTML = html;
+    document.body.appendChild(el);
+    html2pdf().set({ margin: 10, filename: 'المذكرة_السنوية.pdf', jsPDF: { direction: 'rtl' } }).from(el).save().then(function() { document.body.removeChild(el); });
+    showToast('جاري تصدير المذكرة السنوية');
+  } else { showToast('تعذر تصدير PDF', true); }
+}
+
+// ========== CORPORATE TAX — CONTRACT TAX ==========
+var CONTRACT_TAX_RATES = {
+  construction: { name: 'مقاولات إنشائية', rate: 0.033 },
+  supply: { name: 'عقد توريد', rate: 0.033 },
+  services: { name: 'عقد خدمات', rate: 0.033 },
+  consulting: { name: 'عقد استشارات', rate: 0.07 },
+  transport: { name: 'عقد نقل', rate: 0.033 },
+  maintenance: { name: 'عقد صيانة', rate: 0.033 },
+  rent_equipment: { name: 'تأجير معدات', rate: 0.10 },
+  foreign: { name: 'عقد شركة أجنبية', rate: 0.07 }
+};
+
+function updateContractTaxRate() {
+  var type = document.getElementById('contractType').value;
+  var info = CONTRACT_TAX_RATES[type];
+  document.getElementById('contractTaxRateDisplay').value = info ? (info.rate * 100) + '%' : '';
+}
+
+function calculateContractTax() {
+  var type = document.getElementById('contractType').value;
+  var value = getVal('contractValue');
+  if (!type) { showToast('يرجى اختيار نوع العقد', true); return; }
+  if (!value) { showToast('يرجى إدخال قيمة العقد', true); return; }
+  var info = CONTRACT_TAX_RATES[type];
+  var tax = value * info.rate;
+  var signDate = document.getElementById('contractSignDate').value;
+  var endDate = document.getElementById('contractEndDate').value;
+  var duration = '-';
+  if (signDate && endDate) {
+    var d1 = new Date(signDate), d2 = new Date(endDate);
+    var months = (d2.getFullYear() - d1.getFullYear()) * 12 + d2.getMonth() - d1.getMonth();
+    duration = months + ' شهر';
+  }
+  setText('contractTypeResult', info.name);
+  setText('contractValueResult', formatNumber(value) + ' د.ع');
+  setText('contractRateResult', (info.rate * 100) + '٪');
+  setText('contractDurationResult', duration);
+  setText('contractTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
+  document.getElementById('contractTaxResult').style.display = 'block';
+  showToast('تم احتساب ضريبة العقد بنجاح');
+}
+
+function switchContractSubTab(event, tabId) {
+  event.target.closest('.tabs-container').querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.querySelectorAll('.contract-subtab').forEach(function(s) { s.classList.remove('active'); s.style.display = 'none'; });
+  var panel = document.getElementById(tabId);
+  if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
+}
+
+function addContractEmployeeRow() {
+  var tbody = document.querySelector('#contractEmployeeTable tbody');
+  var row = document.createElement('tr');
+  row.innerHTML = '<td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>' +
+    '<td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>' +
+    '<td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>' +
+    '<td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>' +
+    '<td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>' +
+    '<td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>' +
+    '<td class="emp-monthly-tax">٠ د.ع</td>' +
+    '<td class="emp-annual-tax">٠ د.ع</td>' +
+    '<td><button class="btn btn-sm btn-danger" onclick="removeContractEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>';
+  tbody.appendChild(row);
+}
+
+function removeContractEmployeeRow(btn) {
+  var tbody = btn.closest('tbody');
+  if (tbody.rows.length > 1) btn.closest('tr').remove();
+  else showToast('يجب الإبقاء على صف واحد على الأقل', true);
+}
+
+function calculateDeduction() {
+  var payment = getVal('deductionPayment');
+  var rate = parseFloat(document.getElementById('deductionRate').value) / 100;
+  if (!payment) { showToast('يرجى إدخال قيمة الدفعة', true); return; }
+  var deduction = payment * rate;
+  var net = payment - deduction;
+  setText('deductionPaymentResult', formatNumber(payment) + ' د.ع');
+  setText('deductionRateResult', (rate * 100) + '٪');
+  setText('deductionAmountResult', formatNumber(Math.round(deduction)) + ' د.ع');
+  setText('deductionNetResult', formatNumber(Math.round(net)) + ' د.ع');
+  document.getElementById('deductionResult').style.display = 'block';
+  showToast('تم احتساب الاستقطاع بنجاح');
 }
 
 // ========== SALARY TAX ==========
@@ -617,9 +833,9 @@ function updateLandDistricts() {
 function calculateLandTax() {
   var area = getVal('landArea');
   var price = getVal('landPrice');
-  if (!area || !price) { showToast('يرجى إدخال المساحة وسعر المتر', true); return; }
+  if (!area || !price) { showToast('يرجى إدخال عدد الأمتار وسعر المتر', true); return; }
   var totalValue = area * price;
-  var taxRate = 0.001;
+  var taxRate = 0.02; // 2% سنوياً
   var tax = totalValue * taxRate;
   var province = document.getElementById('landProvince');
   var district = document.getElementById('landDistrict');
@@ -628,6 +844,63 @@ function calculateLandTax() {
   setText('landPriceResult', formatNumber(price) + ' د.ع / م²');
   setText('landTotalValue', formatNumber(totalValue) + ' د.ع');
   setText('landTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
+  document.getElementById('landResultDetails').style.display = 'block';
+  showToast('تم احتساب ضريبة العرصة بنجاح');
+}
+
+// ========== LAND TAX EXEMPTIONS ==========
+function checkLandExemption(value) {
+  var resultDiv = document.getElementById('landExemptionResult');
+  var partialDiv = document.getElementById('landExemptionPartial');
+  partialDiv.style.display = 'none';
+
+  var exemptMessages = {
+    area_800: { exempt: false, msg: 'أول 800 متر مربع معفية من الضريبة. ما يزيد عن ذلك يخضع للضريبة بنسبة 2%.', showPartial: true },
+    over_15_years: { exempt: true, msg: 'العرصة المملوكة لمدة تزيد عن 15 سنة معفية من ضريبة العرصات بالكامل.' },
+    government: { exempt: true, msg: 'العرصات العائدة إلى الدوائر الرسمية أو شبه الرسمية معفية من ضريبة العرصات.' },
+    waqf: { exempt: true, msg: 'العرصات العائدة إلى الأوقاف العامة وغير المؤجرة معفية من ضريبة العرصات.' },
+    unions: { exempt: true, msg: 'العرصات العائدة إلى النقابات والجمعيات والمقابر معفية من ضريبة العرصات.' },
+    legal_block: { exempt: true, msg: 'العرصات التي يتعذر التصرف بها بسبب قانوني معفية من ضريبة العرصات.' },
+    public_use: { exempt: true, msg: 'العرصات المخصصة للأغراض والمنافع العامة معفية من ضريبة العرصات.' },
+    outside_limits: { exempt: true, msg: 'العرصات الواقعة خارج حدود أمانة بغداد ومراكز المحافظات والأقضية والنواحي لا تخضع لضريبة العرصات.' },
+    none: { exempt: false, msg: 'العرصة خاضعة لضريبة العرصات بالكامل بنسبة 2% سنوياً.' }
+  };
+
+  var info = exemptMessages[value];
+  if (!info) return;
+
+  var color = info.exempt ? '#059669' : (value === 'area_800' ? '#d97706' : '#dc2626');
+  var bg = info.exempt ? '#f0fdf4' : (value === 'area_800' ? '#fffbeb' : '#fef2f2');
+  var border = info.exempt ? '#bbf7d0' : (value === 'area_800' ? '#fde68a' : '#fecaca');
+  var icon = info.exempt ? 'fa-check-circle' : (value === 'area_800' ? 'fa-exclamation-triangle' : 'fa-times-circle');
+
+  resultDiv.style.display = 'block';
+  resultDiv.innerHTML = '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:10px;padding:20px;text-align:center;">' +
+    '<i class="fas ' + icon + '" style="font-size:36px;color:' + color + ';"></i>' +
+    '<h3 style="color:' + color + ';margin-top:10px;">' + (info.exempt ? 'معفي من الضريبة' : (value === 'area_800' ? 'إعفاء جزئي' : 'خاضع للضريبة')) + '</h3>' +
+    '<p style="color:' + color + ';margin-top:8px;">' + info.msg + '</p></div>';
+
+  if (info.showPartial) partialDiv.style.display = 'block';
+}
+
+function calculatePartialLandExemption() {
+  var area = getVal('landExemptArea');
+  var price = getVal('landExemptPrice');
+  if (!area || !price) { showToast('يرجى إدخال المساحة وسعر المتر', true); return; }
+  var exemptArea = Math.min(area, 800);
+  var taxableArea = Math.max(0, area - 800);
+  var taxableValue = taxableArea * price;
+  var tax = taxableValue * 0.02;
+
+  setText('partialTotalArea', formatNumber(area) + ' م²');
+  setText('partialExemptArea', formatNumber(exemptArea) + ' م² (معفية)');
+  setText('partialTaxableArea', formatNumber(taxableArea) + ' م²');
+  setText('partialPrice', formatNumber(price) + ' د.ع / م²');
+  setText('partialTaxableValue', formatNumber(taxableValue) + ' د.ع');
+  setText('partialTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
+  document.getElementById('landPartialResult').style.display = 'block';
+  showToast(taxableArea > 0 ? 'تم احتساب الضريبة على المساحة الزائدة عن 800 م²' : 'المساحة بالكامل معفية (أقل من 800 م²)');
+}
   document.getElementById('landResultDetails').style.display = 'block';
   showToast('تم احتساب ضريبة العرصة بنجاح');
 }
@@ -652,32 +925,26 @@ function nextLandStep(n) {
 function prevLandStep(n) { nextLandStep(n); }
 
 // ========== PROPERTY TAX ==========
-function handlePropertyOperationChange(value) {
-  document.getElementById('propSaleFields').style.display = value === 'sale' ? 'block' : 'none';
-  document.getElementById('propRentFields').style.display = value === 'rent' ? 'block' : 'none';
-}
-
 function calculatePropertyTax() {
-  var op = document.getElementById('propOperation').value;
-  var baseValue, taxRate, tax, opLabel;
-  if (op === 'sale') {
-    baseValue = getVal('propSalePrice');
-    taxRate = 0.03;
-    opLabel = 'بيع عقار';
-  } else {
-    var monthly = getVal('propRentAmount');
-    var duration = parseFloat(document.getElementById('propRentDuration').value) || 12;
-    baseValue = monthly * duration;
-    taxRate = 0.10;
-    opLabel = 'تأجير عقار';
-  }
-  if (!baseValue) { showToast('يرجى إدخال القيمة المالية', true); return; }
-  tax = baseValue * taxRate;
-  setText('propOpType', opLabel);
-  setText('propBaseValue', formatNumber(baseValue) + ' د.ع');
-  setText('propTaxRate', (taxRate * 100) + '٪');
+  var monthly = getVal('propRentAmount');
+  var duration = parseFloat(document.getElementById('propRentDuration').value) || 12;
+  if (!monthly) { showToast('يرجى إدخال قيمة الإيجار الشهرية', true); return; }
+  var annualRent = monthly * duration;
+  var taxRate = 0.10; // 10%
+  var tax = annualRent * taxRate;
+  var propTypeEl = document.getElementById('propType');
+  var propTypeText = propTypeEl.options[propTypeEl.selectedIndex].text;
+  var address = document.getElementById('propAddress').value || '-';
+
+  setText('propOpType', propTypeText);
+  setText('propLocationResult', address);
+  setText('propMonthlyRent', formatNumber(monthly) + ' د.ع');
+  setText('propMonths', duration + ' شهر');
+  setText('propBaseValue', formatNumber(annualRent) + ' د.ع');
   setText('propTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
   document.getElementById('propResultDetails').style.display = 'block';
+  showToast('تم احتساب ضريبة العقار بنجاح');
+}
   showToast('تم احتساب ضريبة العقار بنجاح');
 }
 
@@ -2286,6 +2553,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Check payment reminders
   setTimeout(checkPaymentReminders, 3000);
+
+// ============================================================
+//  FEATURE: CONTACT FORM (تواصل معنا)
+// ============================================================
+function submitContactForm() {
+  var name = document.getElementById('contactName').value.trim();
+  var phone = document.getElementById('contactPhone').value.trim();
+  var email = document.getElementById('contactEmail').value.trim();
+  var service = document.getElementById('contactService').value;
+  var details = document.getElementById('contactDetails').value.trim();
+  if (!name) { showToast('يرجى إدخال اسم الشركة أو المكلف', true); return; }
+  if (!phone) { showToast('يرجى إدخال رقم الهاتف', true); return; }
+  if (!service) { showToast('يرجى اختيار نوع الخدمة المطلوبة', true); return; }
+  // Save request locally
+  var requests = JSON.parse(localStorage.getItem('contactRequests') || '[]');
+  requests.push({ name: name, phone: phone, email: email, service: service, details: details, date: new Date().toISOString() });
+  localStorage.setItem('contactRequests', JSON.stringify(requests));
+  document.getElementById('contactSuccessMsg').style.display = 'block';
+  showToast('تم إرسال طلبك بنجاح! سنتواصل معك قريباً');
+  addAuditEntry('طلب تواصل', 'طلب إعداد حسابات ختامية من: ' + name);
+}
 
   // Log login
   addAuditEntry('تشغيل النظام', 'تم تحميل النظام بنجاح');
