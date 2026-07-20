@@ -870,56 +870,277 @@
             </div>
           </div>
 
-          <!-- ===== تاب ضريبة موظفي الشركة ===== -->
-          <div class="tab-panel" id="tab-corp-employees">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-users"></i> احتساب ضريبة موظفي الشركة (ضريبة رواتب الموظفين)</h3>
-                <button class="btn btn-sm btn-primary" onclick="addCompanyEmployeeRow()"><i class="fas fa-plus"></i> إضافة موظف</button>
+                    <!-- ===== تاب ضريبة موظفي الشركة ===== -->
+          <style>
+            .emp-modal-overlay { position: fixed; inset: 0; background: rgba(15,27,77,0.7); backdrop-filter: blur(5px); z-index: 9999; display: none; align-items: center; justify-content: center; }
+            .emp-modal-wrapper { background: #f8fafc; border-radius: 16px; width: 95%; max-width: 1000px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s ease; direction: rtl; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.1); }
+            .emp-modal-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 20px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+            .emp-modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+            .emp-modal-close { background: rgba(255,255,255,0.1); border: none; width: 36px; height: 36px; border-radius: 50%; color: #fff; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+            .emp-modal-close:hover { background: var(--danger); transform: rotate(90deg); }
+            .emp-modal-body { display: flex; flex: 1; overflow: hidden; }
+            
+            /* Sidebar Tabs */
+            .emp-modal-sidebar { width: 240px; background: #fff; padding: 20px 0; border-left: 1px solid var(--border-light); overflow-y: auto; }
+            .emp-step-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 20px; background: none; border: none; color: var(--text-secondary); text-align: right; cursor: pointer; font-family: inherit; font-size: 0.95rem; font-weight: 600; transition: all 0.2s; position: relative; border-right: 3px solid transparent; }
+            .emp-step-btn:hover { background: #f1f5f9; color: var(--primary); }
+            .emp-step-btn.active { color: var(--primary); background: #eff6ff; border-right-color: var(--primary); }
+            .emp-step-btn i { width: 24px; text-align: center; font-size: 1.1rem; }
+            
+            /* Content Area */
+            .emp-modal-content { flex: 1; padding: 30px; overflow-y: auto; background: #f8fafc; }
+            .emp-step-pane { display: none; animation: fadeIn 0.3s ease; }
+            .emp-step-pane.active { display: block; }
+            
+            .emp-form-card { background: #fff; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--border-light); }
+            .emp-form-card h3 { font-size: 1.05rem; color: var(--primary-dark); margin: 0 0 20px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+            .emp-form-card h3 i { color: var(--accent); }
+            
+            .emp-field { margin-bottom: 16px; }
+            .emp-field label { display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+            .emp-field input, .emp-field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; background: #fff; transition: all 0.2s; outline: none; color: var(--text-primary); }
+            .emp-field input:focus, .emp-field select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(15,27,77,0.1); }
+            
+            .emp-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .emp-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+            
+            .emp-modal-footer { background: #fff; padding: 16px 24px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+            .emp-modal-actions { display: flex; gap: 12px; }
+            
+            .emp-summary-box { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: 12px; padding: 24px; color: #fff; margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(15,27,77,0.2); }
+            .emp-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center; }
+            .emp-summary-item { background: rgba(255,255,255,0.1); padding: 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+            .emp-summary-item label { display: block; font-size: 0.85rem; opacity: 0.9; margin-bottom: 8px; font-weight: 500; }
+            .emp-summary-item strong { display: block; font-size: 1.4rem; font-weight: 800; color: var(--accent-light); }
+            
+            @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+          </style>
+
+          <div class="emp-modal-overlay" id="employeeExcelModal">
+            <div class="emp-modal-wrapper">
+              <div class="emp-modal-header">
+                <h2><i class="fas fa-user-edit"></i> الاستمارة الذكية لبيانات الموظف</h2>
+                <button class="emp-modal-close" onclick="closeEmployeeModal()"><i class="fas fa-times"></i></button>
               </div>
-              <div class="card-body">
-                <div class="info-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:20px;">
-                  <p style="color:#166534;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> أدخل بيانات كل موظف لاحتساب الضريبة. النتائج تُنقل تلقائياً إلى استمارة ض.د14 والمذكرة السنوية.</p>
+              <div class="emp-modal-body">
+                <!-- Sidebar -->
+                <div class="emp-modal-sidebar">
+                  <button class="emp-step-btn active" onclick="switchEmpStep(1)"><i class="fas fa-id-card"></i> 1. البيانات الشخصية</button>
+                  <button class="emp-step-btn" onclick="switchEmpStep(2)"><i class="fas fa-briefcase"></i> 2. الوظيفة والعنوان</button>
+                  <button class="emp-step-btn" onclick="switchEmpStep(3)"><i class="fas fa-users"></i> 3. العائلة والأولاد</button>
+                  <button class="emp-step-btn" onclick="switchEmpStep(4)"><i class="fas fa-money-check-alt"></i> 4. الدخل والتنزيلات</button>
+                  <button class="emp-step-btn" onclick="switchEmpStep(5)"><i class="fas fa-file-invoice-dollar"></i> 5. الملخص الضريبي</button>
                 </div>
-                <div class="table-container">
-                  <table id="companyEmployeeTable" style="min-width:900px;">
-                    <thead>
-                      <tr>
-                        <th>اسم الموظف</th>
-                        <th>الجنسية</th>
-                        <th>الجنس</th>
-                        <th>الراتب الشهري (د.ع)</th>
-                        <th>الحالة الزوجية</th>
-                        <th>عدد الأطفال</th>
-                        <th>الضريبة الشهرية</th>
-                        <th>الضريبة السنوية</th>
-                        <th>إجراء</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>
-                        <td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>
-                        <td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>
-                        <td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>
-                        <td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>
-                        <td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>
-                        <td class="emp-monthly-tax">٠ د.ع</td>
-                        <td class="emp-annual-tax">٠ د.ع</td>
-                        <td><button class="btn btn-sm btn-danger" onclick="removeCompanyEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                
+                <!-- Content -->
+                <div class="emp-modal-content">
+                  <input type="hidden" id="empModEditId" value="">
+                  
+                  <!-- Step 1 -->
+                  <div class="emp-step-pane active" id="empStep1">
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-user"></i> المعلومات الأساسية</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field" style="grid-column: 1 / -1;"><label>اسم الموظف الكامل</label><input type="text" id="empModName" placeholder="الاسم الثلاثي أو الرباعي"></div>
+                        <div class="emp-field"><label>رقم هوية الأحوال / البطاقة الوطنية</label><input type="text" id="empModCivilId" placeholder="رقم الهوية"></div>
+                        <div class="emp-field"><label>تاريخ الميلاد</label><input type="date" id="empModBirthDate"></div>
+                        <div class="emp-field"><label>الجنسية</label><select id="empModNat" onchange="calcEmpModalPreview()"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></div>
+                        <div class="emp-field"><label>الجنس</label><select id="empModGender"><option value="male">ذكر</option><option value="female">أنثى</option></select></div>
+                      </div>
+                    </div>
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-address-book"></i> معلومات التواصل</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>رقم الهاتف</label><input type="text" id="empModPhone" placeholder="07XXXXXXXXX"></div>
+                        <div class="emp-field"><label>البريد الإلكتروني</label><input type="email" id="empModEmail" placeholder="example@email.com"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Step 2 -->
+                  <div class="emp-step-pane" id="empStep2">
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-building"></i> بيانات جهة العمل</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>اسم صاحب العمل</label><input type="text" id="empModEmployerName" placeholder="اسم الشركة أو الدائرة"></div>
+                        <div class="emp-field"><label>الرقم التعريفي لصاحب العمل</label><input type="text" id="empModEmployerId" placeholder="إن وجد"></div>
+                        <div class="emp-field"><label>صاحب العمل الرئيسي؟</label><select id="empModMainEmployer"><option value="yes">نعم (يتم احتساب السماحات المباشرة)</option><option value="no">كلا (وظيفية ثانوية للاستقطاع)</option></select></div>
+                        <div class="emp-field"><label>قطاع العمل</label><select id="empModSec" onchange="calcEmpModalPreview()"><option value="government">عام / حكومي</option><option value="private">خاص</option></select></div>
+                        <div class="emp-field"><label>تاريخ المباشرة</label><input type="date" id="empModStartDate"></div>
+                        <div class="emp-field"><label>تاريخ الترك (إن وجد)</label><input type="date" id="empModEndDate"></div>
+                        <div class="emp-field" style="grid-column: 1 / -1;"><label>العنوان الوظيفي</label><input type="text" id="empModJobTitle" placeholder="مثال: محاسب، مهندس، الخ..."></div>
+                      </div>
+                    </div>
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-map-marked-alt"></i> عنوان سكن الموظف</h3>
+                      <div class="emp-grid-3">
+                        <div class="emp-field"><label>المحافظة</label><input type="text" id="empModProvince"></div>
+                        <div class="emp-field"><label>المدينة</label><input type="text" id="empModCity"></div>
+                        <div class="emp-field"><label>المحلة</label><input type="text" id="empModNeighborhood"></div>
+                        <div class="emp-field"><label>الشارع</label><input type="text" id="empModStreet"></div>
+                        <div class="emp-field"><label>رقم الدار</label><input type="text" id="empModHouseNo"></div>
+                        <div class="emp-field"><label>الإقامة</label><select id="empModRes" onchange="calcEmpModalPreview()"><option value="resident">مقيم في العراق</option><option value="nonresident">غير مقيم</option></select></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Step 3 -->
+                  <div class="emp-step-pane" id="empStep3">
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-ring"></i> الحالة الزوجية</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>الحالة</label>
+                          <select id="empModMarital" onchange="calcEmpModalPreview()">
+                            <option value="single">أعزب</option>
+                            <option value="married_housewife">متزوج (الزوج/ة ربة بيت أو بدون دخل)</option>
+                            <option value="married_working">متزوج (الزوج/ة منتسب أو يعمل)</option>
+                            <option value="widowed">أرمل</option>
+                            <option value="divorced">مطلق</option>
+                          </select>
+                        </div>
+                        <div class="emp-field"><label>عمر الموظف يتجاوز 63 سنة؟</label><select id="empMod63" onchange="calcEmpModalPreview()"><option value="no">كلا</option><option value="yes">نعم (يستحق سماح إضافي)</option></select></div>
+                      </div>
+                      <hr style="border:none; border-top:1px dashed var(--border-light); margin: 15px 0;">
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>اسم الزوج / الزوجة</label><input type="text" id="empModSpouseName"></div>
+                        <div class="emp-field"><label>رقم هوية الزوج/الزوجة</label><input type="text" id="empModSpouseCivilId"></div>
+                        <div class="emp-field"><label>تاريخ الزواج</label><input type="date" id="empModMarriageDate"></div>
+                        <div class="emp-field"><label>تاريخ الطلاق / الوفاة (إن وجد)</label><input type="date" id="empModDivorceDate"></div>
+                        <div class="emp-field"><label>هل الزوج/الزوجة عاجز كلياً عن العمل؟</label><select id="empModSpouseDisabled"><option value="no">كلا</option><option value="yes">نعم</option></select></div>
+                        <div class="emp-field"><label>جهة عمل الزوج(ة) الرئيسية</label><input type="text" id="empModSpouseEmpName" placeholder="إن وجد"></div>
+                      </div>
+                    </div>
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-child"></i> الأولاد المستحقون للسماح</h3>
+                      <div class="emp-field" style="max-width: 250px;"><label>عدد الأولاد المشمولين بالسماح القانوني</label><input type="number" id="empModChild" value="0" min="0" max="15" oninput="renderChildNameInputs(); calcEmpModalPreview();"></div>
+                      <div id="empModChildNamesContainer" style="display:none; padding-top:10px;">
+                        <label style="display:block; font-size:0.85rem; font-weight:700; color:var(--text-secondary); margin-bottom:10px;">أسماء الأولاد</label>
+                        <div id="empModChildNames" class="emp-grid-3"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Step 4 -->
+                  <div class="emp-step-pane" id="empStep4">
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-coins"></i> الدخل والرواتب</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>عدد أشهر العمل خلال السنة (1-12)</label><input type="number" id="empModMonths" value="12" min="1" max="12" oninput="calcEmpModalPreview()"></div>
+                        <div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input type="text" id="empModSalary" value="0" oninput="calcEmpModalPreview()"></div>
+                        <div class="emp-field"><label>جميع المخصصات الإضافية الخاضعة للضريبة (شهرياً)</label><input type="text" id="empModAllow" value="0" oninput="calcEmpModalPreview()"></div>
+                        <div class="emp-field"><label>مخصصات السكن والطعام والنقل النقدية (شهرياً)</label><input type="text" id="empModCashHous" value="0" oninput="calcEmpModalPreview()"></div>
+                        <div class="emp-field" style="grid-column: 1 / -1;"><label>السكن العيني الموفر من الشركة</label><select id="empModInKind" onchange="calcEmpModalPreview()"><option value="none">لا يوجد سكن عيني</option><option value="furnished">مؤثث (تضاف 20% من الراتب)</option><option value="unfurnished">غير مؤثث (تضاف 10% من الراتب)</option></select></div>
+                      </div>
+                    </div>
+                    <div class="emp-form-card">
+                      <h3><i class="fas fa-hand-holding-usd"></i> التنزيلات المسموحة (شهرياً)</h3>
+                      <div class="emp-grid-2">
+                        <div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input type="text" id="empModIns" value="0" oninput="calcEmpModalPreview()"></div>
+                        <div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input type="text" id="empModAlimony" value="0" oninput="calcEmpModalPreview()"></div>
+                      </div>
+                      <p style="font-size:0.8rem; color:var(--text-muted); margin:0;"><i class="fas fa-info-circle"></i> التوقيفات التقاعدية وإعفاء القطاع الخاص والسماحات الزوجية تحسب تلقائياً وفق القانون.</p>
+                    </div>
+                  </div>
+
+                  <!-- Step 5 -->
+                  <div class="emp-step-pane" id="empStep5">
+                    <div class="emp-summary-box">
+                      <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:12px; margin-bottom:20px; font-weight:700;"><i class="fas fa-chart-pie"></i> ملخص الحساب الضريبي السنوي المحتسب تلقائياً</h3>
+                      <div class="emp-summary-grid">
+                        <div class="emp-summary-item"><label>إجمالي الدخل الخاضع</label><strong id="livePreviewGross">0 د.ع</strong></div>
+                        <div class="emp-summary-item"><label>التنزيلات والسماحات</label><strong id="livePreviewDed">0 د.ع</strong></div>
+                        <div class="emp-summary-item"><label>الوعاء الضريبي (الصافي)</label><strong id="livePreviewTaxable">0 د.ع</strong></div>
+                        <div class="emp-summary-item" style="background:rgba(255,255,255,0.2);"><label>الضريبة السنوية المستحقة</label><strong id="livePreviewTax" style="color:#fff;">0 د.ع</strong></div>
+                      </div>
+                    </div>
+                    <div class="emp-form-card" style="text-align:center; padding: 40px 20px;">
+                      <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success); margin-bottom:15px;"></i>
+                      <h3 style="justify-content:center;">تم إكمال استمارة الموظف</h3>
+                      <p style="color:var(--text-secondary); font-size:0.95rem;">عند الضغط على حفظ أدناه سيتم تخزين البيانات الكترونياً ويمكنك بعدها تصدير الاستمارة ض.د/14 المطابقة للمواصفات الحكومية بضغطة زر واحدة.</p>
+                    </div>
+                  </div>
                 </div>
-                <div class="btn-group" style="margin-top:16px;">
-                  <button class="btn btn-primary" onclick="exportFormD14()"><i class="fas fa-file-alt"></i> تصدير استمارة ض.د14</button>
-                  <button class="btn btn-warning" onclick="exportAnnualMemo()"><i class="fas fa-file-invoice"></i> تصدير المذكرة السنوية</button>
+              </div>
+              <div class="emp-modal-footer">
+                <span id="empStepIndicator" style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">الخطوة ١ من ٥</span>
+                <div class="emp-modal-actions">
+                  <button class="btn btn-secondary" id="empPrevBtn" onclick="nextEmpStep(-1)" style="display:none;"><i class="fas fa-arrow-right"></i> السابق</button>
+                  <button class="btn btn-primary" id="empNextBtn" onclick="nextEmpStep(1)">التالي <i class="fas fa-arrow-left"></i></button>
+                  <button class="btn btn-success" id="empSaveBtn" onclick="saveEmployeeFromModal()" style="display:none;"><i class="fas fa-save"></i> حفظ الاستمارة</button>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- ===== تاب ضريبة عقود الشركة ===== -->
+          <!-- ===== تاب ضريبة موظفي الشركة (المحدّث بالكامل) ===== -->
+          <div class="tab-panel" id="tab-corp-employees">
+            <div class="card">
+              <div class="card-header">
+                <h3><i class="fas fa-users"></i> ضريبة الدخل لموظفي الشركة (وفق الإكسل)</h3>
+                <div class="btn-group">
+                  <button class="btn btn-sm btn-primary" onclick="openEmployeeModal()"><i class="fas fa-user-plus"></i> إضافة موظف</button>
+                  <button class="btn btn-sm btn-success" onclick="exportEmployeeTableToExcel()"><i class="fas fa-file-excel"></i> تصدير الجدول للطباعة</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="info-banner" style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1px solid #bbf7d0; border-radius:10px; padding:16px; margin-bottom:20px;">
+                  <p style="color:#166534; font-size:13px; margin:0;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>سجل إلكتروني متكامل:</strong> يمكنك إضافة كافة تفاصيل الموظف عبر نافذة سهلة الاستخدام (نافذة منبثقة) تحتوي على جميع حقول ومعادلات الإكسل بدقة 100%.</p>
+                </div>
+                <div class="table-container" style="overflow-x:auto;">
+                  <table class="data-table" id="newExcelEmployeeTable" style="width:100%; min-width:800px;">
+                    <thead>
+                      <tr>
+                        <th>ت</th>
+                        <th>اسم الموظف</th>
+                        <th>القطاع والحالة</th>
+                        <th>الدخل الإجمالي السنوي</th>
+                        <th>التنزيلات السنوية</th>
+                        <th>الدخل الخاضع للضريبة</th>
+                        <th>الضريبة الشهرية</th>
+                        <th>الضريبة السنوية</th>
+                        <th>إجراءات</th>
+                      </tr>
+                    </thead>
+                    <tbody id="empTableBody">
+                    </tbody>
+                    <tfoot>
+                      <tr>
+                        <td colspan="3" class="total-label" style="text-align:left; font-weight:bold;">الإجمالي لجميع الموظفين</td>
+                        <td id="tblTotGross" style="font-weight:bold;">0</td>
+                        <td id="tblTotDed" style="font-weight:bold;">0</td>
+                        <td id="tblTotTaxable" style="font-weight:bold; color:var(--danger)">0</td>
+                        <td>-</td>
+                        <td id="tblTotAnnual" style="font-weight:bold; color:var(--success); font-size:1.1rem;">0</td>
+                        <td></td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                </div>
+                
+                <div class="btn-group" style="margin-top:16px;">
+                  <button class="btn btn-primary" onclick="exportFormD14()"><i class="fas fa-file-alt"></i> تصدير استمارة ض.د14 للجميع</button>
+                  <button class="btn btn-warning" onclick="exportAnnualMemo()"><i class="fas fa-file-invoice"></i> تصدير المذكرة السنوية</button>
+                </div>
+
+                <div class="card" style="margin-top:20px; border:1px solid var(--border-light);">
+                  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+                    <h3><i class="fas fa-file-invoice"></i> معاينة استمارة ض.د/14</h3>
+                    <div class="btn-group">
+                      <button class="btn btn-sm btn-secondary" onclick="printCurrentEmployeeDD4A()"><i class="fas fa-print"></i> طباعة</button>
+                      <button class="btn btn-sm btn-success" onclick="exportCurrentEmployeeDD4APdf()"><i class="fas fa-file-pdf"></i> تنزيل PDF</button>
+                    </div>
+                  </div>
+                  <div class="card-body">
+                    <p id="dd4aPreviewHint" style="margin:0 0 12px; color:var(--text-secondary);">اضغط على زر "استمارة" بجانب أي موظف لعرض الاستمارة الرسمية هنا.</p>
+                    <div class="dd4a-form-container" id="dd4aPrintableArea" style="direction: rtl; background: #f3f4f6; padding: 8px; color: #000; display: none; border:0; border-radius:8px; overflow:auto;">
+                      <!-- Container content will be injected by JS before print -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="tab-panel" id="tab-corp-contracts">
             <div class="card">
               <div class="card-header"><h3><i class="fas fa-file-contract"></i> احتساب ضريبة عقود الشركة</h3></div>

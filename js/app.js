@@ -589,144 +589,780 @@ var SALARY_BRACKETS = [
   { limit: Infinity, rate: 0.15 }
 ];
 
-// ========== CORPORATE TAX — EMPLOYEE TAX ==========
-function calculateCompanyEmployeeTax(inputEl) {
-  var row = inputEl.closest('tr');
-  var salaryInput = row.querySelector('.emp-salary');
-  var maritalSelect = row.querySelector('.emp-marital');
-  var childrenInput = row.querySelector('.emp-children');
-  var monthly = parseArabicNumber(salaryInput.value);
-  var marital = maritalSelect.value;
-  var children = parseInt(childrenInput.value) || 0;
-  var annual = monthly * 12;
+// ========== CORPORATE TAX — EMPLOYEE TAX (EXCEL/MODAL) ==========
+var PAYROLL_ALLOWANCE_SINGLE = 2500000 / 12;
+var PAYROLL_ALLOWANCE_MARRIED_HOUSEWIFE = 4500000 / 12;
+var PAYROLL_ALLOWANCE_WIDOWED_DIVORCED = 3200000 / 12;
+var PAYROLL_ALLOWANCE_PER_CHILD = 200000 / 12;
+var PAYROLL_ALLOWANCE_OVER63 = 300000 / 12;
+var PAYROLL_INSURANCE_MONTHLY_CAP = 166667;
+var PAYROLL_RETIREMENT_BASE_CAP = 1750000;
+var PAYROLL_MONTHLY_BRACKETS = [
+  { limit: 20833, rate: 0.03 },
+  { limit: 41667, rate: 0.05 },
+  { limit: 83333, rate: 0.10 },
+  { limit: Infinity, rate: 0.15 }
+];
 
-  // Iraqi tax: annual exemption 5,000,000 + married bonus 1,000,000 + children 500,000 each
-  var exemption = SALARY_ANNUAL_EXEMPTION;
-  if (marital === 'married') exemption += 1000000;
-  exemption += children * 500000;
+var globalEmployees = [];
+var currentDd4aEmployeeId = null;
 
-  var taxable = annual - exemption;
-  if (taxable <= 0) {
-    row.querySelector('.emp-monthly-tax').textContent = '٠ د.ع (معفي)';
-    row.querySelector('.emp-annual-tax').textContent = '٠ د.ع (معفي)';
+function hydrateStoredEmployeeRecord(record) {
+  var base = Object.assign({}, record || {});
+  base.childNames = Array.isArray(base.childNames) ? base.childNames : [];
+  base.child = parseInt(base.child, 10) || 0;
+  base.months = Math.max(1, Math.min(12, parseInt(base.months, 10) || 12));
+  base.salary = Number(base.salary) || 0;
+  base.allow = Number(base.allow) || 0;
+  base.cashHous = Number(base.cashHous) || 0;
+  base.ins = Number(base.ins) || 0;
+  base.alimony = Number(base.alimony) || 0;
+  return Object.assign(base, doExcelMathForEmployee(base));
+}
+
+function loadStoredEmployees() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('companyEmployeesData') || '[]');
+    globalEmployees = Array.isArray(stored) ? stored.map(hydrateStoredEmployeeRecord) : [];
+  } catch (error) {
+    globalEmployees = [];
+  }
+}
+
+function saveStoredEmployees() {
+  try {
+    localStorage.setItem('companyEmployeesData', JSON.stringify(globalEmployees));
+  } catch (error) {}
+}
+
+loadStoredEmployees();
+
+function calculateMonthlyAllowance(nationality, residency, marital, children, over63) {
+  if (nationality === 'foreign') return 0;
+  if (residency === 'nonresident') return 0;
+  var allowance = PAYROLL_ALLOWANCE_SINGLE;
+  if (marital === 'married_housewife') allowance = PAYROLL_ALLOWANCE_MARRIED_HOUSEWIFE;
+  else if (marital === 'widowed' || marital === 'divorced') allowance = PAYROLL_ALLOWANCE_WIDOWED_DIVORCED;
+  allowance += Math.max(children, 0) * PAYROLL_ALLOWANCE_PER_CHILD;
+  if (over63) allowance += PAYROLL_ALLOWANCE_OVER63;
+  return allowance;
+}
+
+function calculateProgressiveTax(taxableAmount, brackets) {
+  if (taxableAmount <= 0) return 0;
+  var tax = 0;
+  var remaining = taxableAmount;
+  if (remaining > 83333) { tax += (remaining - 83333) * 0.15; remaining = 83333; }
+  if (remaining > 41667) { tax += (remaining - 41667) * 0.10; remaining = 41667; }
+  if (remaining > 20833) { tax += (remaining - 20833) * 0.05; remaining = 20833; }
+  if (remaining > 0) { tax += remaining * 0.03; }
+  return tax;
+}
+
+window.renderChildNameInputs = function(existingNames) {
+  existingNames = Array.isArray(existingNames) ? existingNames : [];
+  var count = parseInt(document.getElementById('empModChild').value, 10) || 0;
+  var container = document.getElementById('empModChildNamesContainer');
+  var namesDiv = document.getElementById('empModChildNames');
+  if (!container || !namesDiv) return;
+  if (count <= 0) {
+    container.style.display = 'none';
+    namesDiv.innerHTML = '';
     return;
   }
-  var tax = 0, prev = 0;
-  for (var i = 0; i < SALARY_BRACKETS.length; i++) {
-    var b = SALARY_BRACKETS[i];
-    var chunk = Math.min(taxable, b.limit) - prev;
-    if (chunk <= 0) break;
-    tax += chunk * b.rate;
-    prev = Math.min(taxable, b.limit);
-    if (prev >= taxable) break;
+  var currentNames = [];
+  for (var j = 0; j < 20; j++) {
+    var existingEl = document.getElementById('empModChildName_' + j);
+    if (existingEl) currentNames.push(existingEl.value);
   }
-  row.querySelector('.emp-monthly-tax').textContent = formatNumber(Math.round(tax / 12)) + ' د.ع';
-  row.querySelector('.emp-annual-tax').textContent = formatNumber(Math.round(tax)) + ' د.ع';
+  if (existingNames.length > 0) currentNames = existingNames;
+  container.style.display = 'block';
+  namesDiv.innerHTML = '';
+  for (var i = 0; i < count; i++) {
+    var value = currentNames[i] || '';
+    namesDiv.innerHTML += '<div class="form-group"><input type="text" id="empModChildName_' + i + '" class="table-input" placeholder="اسم الطفل ' + (i + 1) + '" value="' + value + '"></div>';
+  }
+};
+
+function getEmpModalInputs() {
+  var childCount = parseInt(document.getElementById('empModChild').value, 10) || 0;
+  var childNames = [];
+  for (var i = 0; i < childCount; i++) {
+    var childEl = document.getElementById('empModChildName_' + i);
+    childNames.push(childEl ? childEl.value : '');
+  }
+  return {
+    name: document.getElementById('empModName').value || 'موظف غير مسمى',
+    nat: document.getElementById('empModNat').value,
+    res: document.getElementById('empModRes').value,
+    gender: document.getElementById('empModGender').value,
+    birthDate: document.getElementById('empModBirthDate').value,
+    civilId: document.getElementById('empModCivilId').value,
+    phone: document.getElementById('empModPhone').value,
+    email: document.getElementById('empModEmail').value,
+    sec: document.getElementById('empModSec').value,
+    startDate: document.getElementById('empModStartDate').value,
+    endDate: document.getElementById('empModEndDate').value,
+    mainEmployer: document.getElementById('empModMainEmployer').value,
+    jobTitle: document.getElementById('empModJobTitle').value,
+    employerName: document.getElementById('empModEmployerName').value,
+    employerId: document.getElementById('empModEmployerId').value,
+    province: document.getElementById('empModProvince').value,
+    city: document.getElementById('empModCity').value,
+    neighborhood: document.getElementById('empModNeighborhood').value,
+    street: document.getElementById('empModStreet').value,
+    houseNo: document.getElementById('empModHouseNo').value,
+    marital: document.getElementById('empModMarital').value,
+    marriageDate: document.getElementById('empModMarriageDate').value,
+    spouseName: document.getElementById('empModSpouseName').value,
+    divorceDate: document.getElementById('empModDivorceDate').value,
+    spouseCivilId: document.getElementById('empModSpouseCivilId').value,
+    spouseDisabled: document.getElementById('empModSpouseDisabled').value,
+    spouseEmpName: document.getElementById('empModSpouseEmpName').value,
+    child: childCount,
+    childNames: childNames,
+    over63: document.getElementById('empMod63').value,
+    months: Math.max(1, Math.min(12, parseInt(document.getElementById('empModMonths').value, 10) || 12)),
+    salary: parseArabicNumber(document.getElementById('empModSalary').value) || 0,
+    allow: parseArabicNumber(document.getElementById('empModAllow').value) || 0,
+    cashHous: parseArabicNumber(document.getElementById('empModCashHous').value) || 0,
+    inKind: document.getElementById('empModInKind').value,
+    ins: parseArabicNumber(document.getElementById('empModIns').value) || 0,
+    alimony: parseArabicNumber(document.getElementById('empModAlimony').value) || 0
+  };
 }
+
+function doExcelMathForEmployee(inp) {
+  var monthlyAllowance = calculateMonthlyAllowance(inp.nat, inp.res, inp.marital, inp.child, inp.over63 === 'yes');
+  var inKindValue = inp.inKind === 'furnished' ? inp.salary * 0.20 : inp.inKind === 'unfurnished' ? inp.salary * 0.10 : 0;
+  var monthlyGross = inp.salary + inp.allow + inp.cashHous + inKindValue;
+  var privateExempt = inp.sec === 'private' ? Math.min(inp.cashHous, inp.salary * 0.30) : 0;
+  var retirement = Math.min(inp.salary, PAYROLL_RETIREMENT_BASE_CAP) * 0.05;
+  var insurance = Math.min(inp.ins, PAYROLL_INSURANCE_MONTHLY_CAP);
+  var totalMonthlyDeductions = privateExempt + retirement + insurance + inp.alimony + monthlyAllowance;
+  var monthlyTaxable = Math.max(0, monthlyGross - totalMonthlyDeductions);
+  var monthlyTax = calculateProgressiveTax(monthlyTaxable, PAYROLL_MONTHLY_BRACKETS);
+  return {
+    annualGross: monthlyGross * inp.months,
+    annualDed: totalMonthlyDeductions * inp.months,
+    annualTaxable: monthlyTaxable * inp.months,
+    annualTax: monthlyTax * inp.months,
+    monthlyTax: monthlyTax,
+    monthlyAllowance: monthlyAllowance,
+    retirement: retirement,
+    insurance: insurance,
+    privateExempt: privateExempt,
+    inKindValue: inKindValue
+  };
+}
+
+window.calcEmpModalPreview = function() {
+  if (!document.getElementById('empModName')) return null;
+  var employeeData = getEmpModalInputs();
+  var math = doExcelMathForEmployee(employeeData);
+  document.getElementById('livePreviewGross').textContent = formatNumber(Math.round(math.annualGross)) + ' د.ع';
+  document.getElementById('livePreviewDed').textContent = formatNumber(Math.round(math.annualDed)) + ' د.ع';
+  document.getElementById('livePreviewTaxable').textContent = formatNumber(Math.round(math.annualTaxable)) + ' د.ع';
+  document.getElementById('livePreviewTax').textContent = formatNumber(Math.round(math.annualTax)) + ' د.ع';
+  return math;
+};
+
+var currentEmpStep = 1;
+var totalEmpSteps = 5;
+
+window.switchEmpStep = function(step) {
+  currentEmpStep = step;
+  document.querySelectorAll('.emp-step-pane').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.emp-step-btn').forEach(function(b) { b.classList.remove('active'); });
+  
+  var activePane = document.getElementById('empStep' + step);
+  if (activePane) activePane.classList.add('active');
+  
+  var buttons = document.querySelectorAll('.emp-step-btn');
+  if (buttons[step - 1]) buttons[step - 1].classList.add('active');
+  
+  document.getElementById('empStepIndicator').textContent = 'الخطوة ' + step + ' من ' + totalEmpSteps;
+  
+  document.getElementById('empPrevBtn').style.display = step > 1 ? 'inline-block' : 'none';
+  if (step < totalEmpSteps) {
+    document.getElementById('empNextBtn').style.display = 'inline-block';
+    document.getElementById('empSaveBtn').style.display = 'none';
+  } else {
+    document.getElementById('empNextBtn').style.display = 'none';
+    document.getElementById('empSaveBtn').style.display = 'inline-block';
+    calcEmpModalPreview();
+  }
+};
+
+window.nextEmpStep = function(dir) {
+  var newStep = currentEmpStep + dir;
+  if (newStep >= 1 && newStep <= totalEmpSteps) {
+    switchEmpStep(newStep);
+  }
+};
+
+window.openEmployeeModal = function(editId) {
+  var modal = document.getElementById('employeeExcelModal');
+  if (!modal) return;
+  var employee = editId ? globalEmployees.find(function(item) { return item.id === editId; }) : null;
+  document.getElementById('empModEditId').value = employee ? employee.id : '';
+  document.getElementById('empModName').value = employee ? employee.name : '';
+  document.getElementById('empModNat').value = employee ? employee.nat : 'iraqi';
+  document.getElementById('empModRes').value = employee ? employee.res : 'resident';
+  document.getElementById('empModGender').value = employee ? employee.gender : 'male';
+  document.getElementById('empModBirthDate').value = employee ? employee.birthDate : '';
+  document.getElementById('empModCivilId').value = employee ? employee.civilId : '';
+  document.getElementById('empModPhone').value = employee ? employee.phone : '';
+  document.getElementById('empModEmail').value = employee ? employee.email : '';
+  document.getElementById('empModSec').value = employee ? employee.sec : 'government';
+  document.getElementById('empModStartDate').value = employee ? employee.startDate : '';
+  document.getElementById('empModEndDate').value = employee ? employee.endDate : '';
+  document.getElementById('empModMainEmployer').value = employee ? employee.mainEmployer : 'yes';
+  document.getElementById('empModJobTitle').value = employee ? employee.jobTitle : '';
+  document.getElementById('empModEmployerName').value = employee ? employee.employerName : '';
+  document.getElementById('empModEmployerId').value = employee ? employee.employerId : '';
+  document.getElementById('empModProvince').value = employee ? employee.province : '';
+  document.getElementById('empModCity').value = employee ? employee.city : '';
+  document.getElementById('empModNeighborhood').value = employee ? employee.neighborhood : '';
+  document.getElementById('empModStreet').value = employee ? employee.street : '';
+  document.getElementById('empModHouseNo').value = employee ? employee.houseNo : '';
+  document.getElementById('empModMarital').value = employee ? employee.marital : 'single';
+  document.getElementById('empModMarriageDate').value = employee ? employee.marriageDate : '';
+  document.getElementById('empModSpouseName').value = employee ? employee.spouseName : '';
+  document.getElementById('empModDivorceDate').value = employee ? employee.divorceDate : '';
+  document.getElementById('empModSpouseCivilId').value = employee ? employee.spouseCivilId : '';
+  document.getElementById('empModSpouseDisabled').value = employee ? employee.spouseDisabled : 'no';
+  document.getElementById('empModSpouseEmpName').value = employee ? employee.spouseEmpName : '';
+  document.getElementById('empModChild').value = employee ? employee.child : 0;
+  document.getElementById('empMod63').value = employee ? employee.over63 : 'no';
+  document.getElementById('empModMonths').value = employee ? employee.months : 12;
+  document.getElementById('empModSalary').value = employee ? employee.salary : 0;
+  document.getElementById('empModAllow').value = employee ? employee.allow : 0;
+  document.getElementById('empModCashHous').value = employee ? employee.cashHous : 0;
+  document.getElementById('empModInKind').value = employee ? employee.inKind : 'none';
+  document.getElementById('empModIns').value = employee ? employee.ins : 0;
+  document.getElementById('empModAlimony').value = employee ? employee.alimony : 0;
+  renderChildNameInputs(employee ? employee.childNames : []);
+  switchEmpStep(1);
+  modal.style.display = 'flex';
+  calcEmpModalPreview();
+};
+
+window.closeEmployeeModal = function() {
+  var modal = document.getElementById('employeeExcelModal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.saveEmployeeFromModal = function() {
+  var inputs = getEmpModalInputs();
+  var math = doExcelMathForEmployee(inputs);
+  var merged = Object.assign({}, inputs, math);
+  var editId = document.getElementById('empModEditId').value;
+  if (editId) {
+    merged.id = editId;
+    for (var i = 0; i < globalEmployees.length; i++) {
+      if (globalEmployees[i].id === editId) {
+        globalEmployees[i] = merged;
+        break;
+      }
+    }
+  } else {
+    merged.id = 'EMP_' + Date.now();
+    globalEmployees.push(merged);
+  }
+  saveStoredEmployees();
+  closeEmployeeModal();
+  renderEmployeeList();
+  showEmployeeDD4A(merged);
+  showToast('تم حفظ الموظف بنجاح');
+};
+
+window.removeExtEmployee = function(id) {
+  globalEmployees = globalEmployees.filter(function(item) { return item.id !== id; });
+  saveStoredEmployees();
+  renderEmployeeList();
+  showToast('تم حذف الموظف');
+};
+
+function buildEmployeeDD4AHtml(employee) {
+  var math = doExcelMathForEmployee(employee);
+  
+  function box(flag) {
+    return flag ? '<span style="display:inline-block;width:12px;height:12px;border:1px solid #000;text-align:center;line-height:12px;font-size:10px;margin-right:2px;position:relative;top:2px;">&#10003;</span>' : '<span style="display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:2px;position:relative;top:2px;"></span>';
+  }
+
+  function fmtLine(val, width) {
+    var v = val ? val : '&nbsp;';
+    return '<span style="display:inline-block; border-bottom:1px solid #000; padding:0 5px; min-width:' + (width || '100px') + '; text-align:center; font-weight:bold;">' + v + '</span>';
+  }
+
+  var childRows = '';
+  for (var i = 0; i < 6; i++) {
+    childRows += '<tr>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i + 1) + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;">' + ((employee.childNames && employee.childNames[i]) ? employee.childNames[i] : '') + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i < employee.child ? '—' : '') + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i < employee.child ? '—' : '') + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i < employee.child ? '—' : '') + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i < employee.child ? '—' : '') + '</td>' +
+      '<td style="border:1px solid #000;padding:4px;text-align:center;">' + (i < employee.child ? 'ج' : '') + '</td>' +
+      '</tr>';
+  }
+
+  var annualTaxable = Math.round(math.annualTaxable);
+  var taxableColumn = annualTaxable <= 250000 ? 'a' : annualTaxable <= 500000 ? 'b' : annualTaxable <= 1000000 ? 'c' : 'd';
+  var bracketStart = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 250000 : taxableColumn === 'c' ? 500000 : 1000000;
+  var bracketRate = taxableColumn === 'a' ? 0.03 : taxableColumn === 'b' ? 0.05 : taxableColumn === 'c' ? 0.10 : 0.15;
+  var baseTax = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 7500 : taxableColumn === 'c' ? 20000 : 70000;
+  var row3Amount = Math.max(0, annualTaxable - bracketStart);
+  var row5Amount = Math.round(row3Amount * bracketRate);
+  var row7Amount = Math.round(row5Amount + baseTax);
+
+  function bCell(key, value) { return taxableColumn === key ? formatNumber(value) : ''; }
+
+  var page1 = `
+    <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <div style="font-size:12px; line-height:1.4;">
+          رقم الاستمارة: 1<br>
+          السنة المالية: ${new Date().getFullYear()}<br>
+          الصفحة: 1
+        </div>
+        <div style="text-align:center; font-size:15px; flex-grow:1;">
+          <strong>الاستمارة ض. د / 14</strong><br>
+          خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر
+        </div>
+        <div style="font-size:12px; text-align:right; line-height:1.4;">
+          جمهورية العراق<br> وزارة المالية<br> الهيئة العامة للضرائب<br> قسم الاستقطاع المباشر
+        </div>
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="flex:2;">1- اسم المنتسب الكامل: ${fmtLine(employee.name, '200px')}</div>
+          <div style="flex:1;">تاريخ الميلاد: ${fmtLine(employee.birthDate, '100px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="flex:2;">رقم هوية الأحوال المدنية للمنتسب: ${fmtLine(employee.civilId, '150px')}</div>
+          <div style="flex:1;">الجنسية: ${fmtLine(employee.nat === 'iraqi' ? 'عراقي' : 'أجنبي', '100px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="flex:2.5;">عنوان سكن المنتسب: محافظة: ${fmtLine(employee.province, '100px')} مدينة: ${fmtLine(employee.city, '100px')}</div>
+          <div style="flex:1.5;">مقيم في العراق: نعم ${box(employee.res === 'resident')} كلا ${box(employee.res !== 'resident')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="flex:2.5;">محلة: ${fmtLine(employee.neighborhood, '60px')} شارع: ${fmtLine(employee.street, '60px')} رقم السكن: ${fmtLine(employee.houseNo, '60px')}</div>
+          <div style="flex:1.5;">الجنس: ذكر ${box(employee.gender === 'male')} أنثى ${box(employee.gender === 'female')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="flex:2.5;">هاتف: ${fmtLine(employee.phone, '150px')}</div>
+          <div style="flex:1.5;">بريد الكتروني: ${fmtLine(employee.email, '150px')}</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div>2- العنوان الوظيفي: ${fmtLine(employee.jobTitle, '150px')}</div>
+          <div>اليوم الاول لبدء العمل: ${fmtLine(employee.startDate, '100px')} الى ${fmtLine(employee.endDate, '100px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div>اسم صاحب العمل: ${fmtLine(employee.employerName, '250px')}</div>
+          <div>هل هو صاحب العمل الرئيسي؟ نعم ${box(employee.mainEmployer === 'yes')} كلا ${box(employee.mainEmployer !== 'yes')}</div>
+        </div>
+        <div style="margin-bottom:8px;">
+          الرقم التعريفي لصاحب العمل: ${fmtLine(employee.employerId, '150px')}
+        </div>
+        <div style="margin-bottom:8px;">
+          اذا كان المنتسب هو الزوجة: هل زوجك عاجز عن العمل وليس له دخل خاضع للضريبة؟ نعم ${box(employee.gender === 'female' && employee.spouseDisabled === 'yes')} كلا ${box(!(employee.gender === 'female' && employee.spouseDisabled === 'yes'))}
+        </div>
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <div style="margin-bottom:8px;">3- الحالة الاجتماعية: ${fmtLine(employee.marital === 'single' ? 'أعزب' : employee.marital === 'divorced' ? 'مطلق' : employee.marital === 'widowed' ? 'أرمل' : 'متزوج', '100px')}</div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="width:300px;">أ. اذا كان متزوجاً، تاريخ الزواج: ${fmtLine(employee.marriageDate, '100px')}</div>
+          <div>اسم الزوجة (الزوج): ${fmtLine(employee.spouseName, '150px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div style="width:300px;">ب. اذا كان مطلقاً، تاريخ الطلاق: ${fmtLine(employee.divorceDate, '100px')}</div>
+          <div>رقم هوية الأحوال المدنية للزوجة (الزوج): ${fmtLine(employee.spouseCivilId, '150px')}</div>
+        </div>
+        <div style="margin-bottom:8px;">
+          ج. اذا كان أرملاً، تاريخ وفاة الزوجة (الزوج): ${fmtLine('', '150px')}
+        </div>
+        <div style="margin-bottom:8px;">
+          د. هل الزوجة ربة بيت وليس لها دخل؟ نعم ${box(employee.marital === 'married_housewife')} كلا ${box(employee.marital !== 'married_housewife')} 
+          <span style="font-size:11px;">(اذا كان الجواب (نعم) انتقل الى الفقرة (4))</span>
+        </div>
+        <div style="display:flex; justify-content:space-around; margin:15px 0;">
+          <div style="text-align:center;">توقيع الزوج<br><br>التاريخ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+          <div style="text-align:center;">توقيع الزوجة<br><br>التاريخ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+        </div>
+        <div style="margin-bottom:8px;">
+          معلومات عن صاحب عمل الزوجة (الزوج) الرئيسي<br>
+          اسم صاحب العمل: ${fmtLine(employee.spouseEmpName, '200px')} 
+          &nbsp;&nbsp; الرقم التعريفي لصاحب العمل: ${fmtLine('', '150px')}
+        </div>
+      </div>
+
+      <div style="margin-bottom:15px;">
+        <div style="margin-bottom:4px;">4- معلومات حول الأولاد الذين يحق للمنتسب طلب السماح القانوني عنهم :</div>
+        <div style="font-size:10.5px; line-height:1.4; margin-bottom:8px;">
+          الأولاد المستحقون هم: أ) البنات غير المتزوجات دون سن 18 عاماً ، ب) البنات في سن 18 عاماً فما فوق من ذوات الدخول السنوية اقل من 200,000 دينار ، ج) الأبناء دون سن 18 عاماً ، د) الأبناء بين 19 - 25 (داخل) عاماً من ذوي الدخول السنوية دون 200,000 دينار والمستمرين على الدراسة في المرحلة الاعدادية او الجامعة او الدراسات العليا ، هـ) الأبناء غير القادرين على الكسب بسبب الإعاقة العقلية او الجسدية
+        </div>
+        <table style="width:100%; border-collapse:collapse; text-align:center; font-size:12px;" border="1">
+          <tr style="background:#f9f9f9;">
+            <th style="padding:4px;">ت</th>
+            <th style="padding:4px;">اسم الولد او البنت</th>
+            <th style="padding:4px;">الجنس</th>
+            <th style="padding:4px;">رقم هوية الأحوال المدنية</th>
+            <th style="padding:4px;">تاريخ الميلاد</th>
+            <th style="padding:4px;">الدخل السنوي المقدر (دينار)</th>
+            <th style="padding:4px;">سبب استحقاق السماح القانوني (أ،ب،ج،د،هـ)</th>
+          </tr>
+          ${childRows}
+        </table>
+        <div style="font-size:11px; margin-top:4px;">* استخدم استمارة ثانية في حالة اكثر من 6 أولاد.</div>
+        <div style="margin-top:15px;">
+          اني الموقع ادناه، اقر ان البيانات المسجلة في هذه الاستمارة صحيحة ودقيقة بحسب معلوماتي واتحمل المسئولية القانونية خلاف ذلك.
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+          <div>توقيع الموظف ________________________</div>
+          <div>التاريخ _______/_______/_____________</div>
+        </div>
+      </div>
+
+      <div style="border-top:2px solid #000; padding-top:10px; margin-top:15px; font-size:11px; line-height:1.6;">
+        <strong>ملاحظة</strong>
+        <ol style="margin:5px 0; padding-right:20px;">
+          <li>يجب ملئ هذه الاستمارة بنسختين.</li>
+          <li>عند عدم ملئ الجزء 3 او 4 بالكامل يحجب سماح الزوجة والاولاد.</li>
+          <li>عند حدوث تغير في الوضع الاجتماعي خلال السنة ، يبلغ المحاسب بذلك.</li>
+        </ol>
+        اذا كنت تعمل لدى اكثر من صاحب عمل ، فان صاحب العمل الرئيسي هو الذي تختاره لمنحك السماح القانوني وبقية التنزيلات ، بينما لا يحق ذلك لصاحب العمل الاخر ، ما عدا التوقيفات التقاعدية او حصة الضمان الاجتماعي فتنزل لدى كل صاحب عمل.<br>
+        ان دمج المدخولات يسمح به فقط في حالة كون احد الزوجين يملك دخلا سنويا اقل من 2,500,000 دينار وان يقدم طلب الدمج قبل 31 كانون الثاني من السنة المعنية في هذه الحالة يجب استقطاع الضريبة من راتب احد الزوجين ذو الدخل الاعلى ولا يتم استقطاع اي ضريبة من راتب الزوج الاخر.
+      </div>
+    </div>
+  `;
+
+  var page2 = `
+    <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
+      <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">الاستمارة ض. د / 14</div>
+      <div style="text-align:center; font-size:13px; margin-bottom:15px;">حساب ضريبة الدخل تملأ من قبل المحاسب (في نهاية السنة)</div>
+      
+      <table style="width:100%; border-collapse:collapse; font-size:13px;" border="1">
+        <tr>
+          <th style="padding:6px; width:75%;">الدخل</th>
+          <th style="padding:6px; width:25%; text-align:center;">دينار</th>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 أ) مجموع الرواتب والاجور المدفوعة خلال السنة</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(employee.salary * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 ب) مجموع المخصصات للملابس والسكن والإقامة والطعام والنقل والخطورة المدفوعة خلال السنة بالنسبة لمستخدمي القطاع الخاص واجمالي المخصصات المستلمة من قبل موظفي الدولة والقطاع العام والمختلط</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(employee.cashHous * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 ج) مجموع المخصصات والمزايا الأخرى الخاضعة للضريبة المدفوعة خلال السنة</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(employee.allow * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 د) مزايا عينية</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.inKindValue * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 هـ) مكافآت مدفوعة للمنتسب ومدخولات أخرى من صاحب العمل</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">0</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">1 و) مدخولات إضافية من الاولاد ومن دمج دخل الزوجة (الزوج) عند تحقق الشروط</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">0</td>
+        </tr>
+        <tr style="background:#f4f4f4;">
+          <td style="padding:6px; font-weight:bold;">(1) اجمالي الدخل</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.annualGross))}</td>
+        </tr>
+        <tr>
+          <td colspan="2" style="padding:6px; text-align:center; font-weight:bold; background:#eaeaea;">ينزل ما يلي</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">2 أ) مجموع السماح القانوني المستحق خلال السنة</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.monthlyAllowance * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">2 ب) التوقيفات التقاعدية والضمان الاجتماعي المدفوع خلال السنة</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.retirement * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">2 ج) التنزيلات الواردة في المادة (الثامنة) من قانون ضريبة الدخل رقم 113 لسنة 1982 *</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round((math.insurance + employee.alimony) * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">2 د) المبلغ من (1ب) بما لا يتجاوز 30 % من المبلغ في السطر (1 أ)</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.privateExempt * employee.months))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px;">2 و) المبالغ المعفاة اذا تم تضمينها في جزء الدخل (1) اعلاه</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">0</td>
+        </tr>
+        <tr style="background:#f4f4f4;">
+          <td style="padding:6px; font-weight:bold;">(2) اجمالي التنزيلات</td>
+          <td style="padding:6px; text-align:center; font-weight:bold;">${formatNumber(Math.round(math.annualDed))}</td>
+        </tr>
+        <tr style="background:#eef2ff;">
+          <td style="padding:8px 6px; font-weight:bold; font-size:14px;">(3) الدخل الخاضع للضريبة " السطر(1) ناقصا السطر(2) "</td>
+          <td style="padding:8px 6px; text-align:center; font-weight:bold; font-size:15px; color:#b91c1c;">${formatNumber(Math.round(math.annualTaxable))}</td>
+        </tr>
+        <tr>
+          <td style="padding:6px; font-weight:bold;">مقدار الضريبة</td>
+          <td style="padding:8px 6px; text-align:center; font-weight:bold; font-size:15px; color:#15803d;">${formatNumber(Math.round(math.annualTax))}</td>
+        </tr>
+      </table>
+
+      <div style="margin-top:15px; font-size:12px;">
+        <ul style="margin:0; padding-right:20px; line-height:1.6;">
+          <li>تذكر تفاصيل التنزيلات ومبالغها</li>
+          <li>اذا كانت الاستمارة تخص احد الزوجين ذو دخل سنوي اقل من 2500000 دينا ويتم دمج دخله مع دخل الزوج الاخر، يتم ارسال المعلومات من هذه الاستمارة الى صاحب العمل الرئيسي للزوج الاخر لغرض احتساب المبلغ الصحيح لضريبة الاستقطاع المباشر لتلك السنة.</li>
+          <li>اذا لم تكن صاحب العمل الرئيسي للمنتسب تحجب التنزيلات والسماحات القانونية المنصوص عليها في (2 أ) و (2 ج).</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:20px; font-weight:bold;">حساب ضريبة الدخل للسنة :</div>
+      <div style="margin-top:5px; font-size:12px;">
+        اذا كان الدخل الخاضع للضريبة من السطر (3) اعلاه :
+        <ul style="margin:5px 0; padding-right:20px; line-height:1.6;">
+          <li>لا يتجاوز 250,000 دينار، ادخله في السطر 1 من العمود أ من الجدول ادناه</li>
+          <li>اكثر من 250,000 ولا يتجاوز 500,000 دينار، ادخله في السطر 1 من العمود ب من الجدول ادناه</li>
+          <li>اكثر من 500,000 ولا يتجاوز 1,000,000 دينار، ادخله في السطر 1 من العمود ج من الجدول ادناه</li>
+          <li>اكثر من 1,000,000 ، ادخله في السطر 1 من العمود د من الجدول ادناه</li>
+        </ul>
+      </div>
+
+      <table style="width:90%; margin:15px auto; border-collapse:collapse; text-align:center; font-size:12px;" border="1">
+        <tr style="background:#f9f9f9;">
+          <th style="padding:4px; width:40px;"></th>
+          <th style="padding:4px;">أ</th>
+          <th style="padding:4px;">ب</th>
+          <th style="padding:4px;">ج</th>
+          <th style="padding:4px;">د</th>
+        </tr>
+        <tr>
+          <td style="padding:4px; font-weight:bold;">1</td>
+          <td style="padding:4px;">${bCell('a', annualTaxable)}</td>
+          <td style="padding:4px;">${bCell('b', annualTaxable)}</td>
+          <td style="padding:4px;">${bCell('c', annualTaxable)}</td>
+          <td style="padding:4px;">${bCell('d', annualTaxable)}</td>
+        </tr>
+        <tr style="color:#666;">
+          <td style="padding:4px;">2</td>
+          <td style="padding:4px;">صفر دينار</td>
+          <td style="padding:4px;">250,000</td>
+          <td style="padding:4px;">500,000</td>
+          <td style="padding:4px;">1,000,000</td>
+        </tr>
+        <tr>
+          <td style="padding:4px; font-weight:bold;">3</td>
+          <td style="padding:4px;">${bCell('a', row3Amount)}</td>
+          <td style="padding:4px;">${bCell('b', row3Amount)}</td>
+          <td style="padding:4px;">${bCell('c', row3Amount)}</td>
+          <td style="padding:4px;">${bCell('d', row3Amount)}</td>
+        </tr>
+        <tr style="color:#666;">
+          <td style="padding:4px;">4</td>
+          <td style="padding:4px;">%3</td>
+          <td style="padding:4px;">%5</td>
+          <td style="padding:4px;">%10</td>
+          <td style="padding:4px;">%15</td>
+        </tr>
+        <tr>
+          <td style="padding:4px; font-weight:bold;">5</td>
+          <td style="padding:4px;">${bCell('a', row5Amount)}</td>
+          <td style="padding:4px;">${bCell('b', row5Amount)}</td>
+          <td style="padding:4px;">${bCell('c', row5Amount)}</td>
+          <td style="padding:4px;">${bCell('d', row5Amount)}</td>
+        </tr>
+        <tr style="color:#666;">
+          <td style="padding:4px;">6</td>
+          <td style="padding:4px;">صفر دينار</td>
+          <td style="padding:4px;">7,500 دينار</td>
+          <td style="padding:4px;">20,000 دينار</td>
+          <td style="padding:4px;">70,000 دينار</td>
+        </tr>
+        <tr>
+          <td style="padding:4px; font-weight:bold;">7</td>
+          <td style="padding:4px; font-weight:bold;">${bCell('a', row7Amount)}</td>
+          <td style="padding:4px; font-weight:bold;">${bCell('b', row7Amount)}</td>
+          <td style="padding:4px; font-weight:bold;">${bCell('c', row7Amount)}</td>
+          <td style="padding:4px; font-weight:bold;">${bCell('d', row7Amount)}</td>
+        </tr>
+      </table>
+
+      <div style="display:flex; justify-content:space-between; margin-top:40px;">
+        <div style="text-align:center;">
+          توقيع المحاسب __________________ <br><br>
+          التاريخ &nbsp; &nbsp;/&nbsp; &nbsp;/&nbsp; &nbsp; &nbsp;
+        </div>
+        <div style="text-align:center;">
+          توقيع المدير __________________ <br><br>
+          التاريخ &nbsp; &nbsp;/&nbsp; &nbsp;/&nbsp; &nbsp; &nbsp;
+        </div>
+      </div>
+    </div>
+  `;
+
+  return page1 + page2;
+}
+function showEmployeeDD4A(employee) {
+  var printArea = document.getElementById('dd4aPrintableArea');
+  var hint = document.getElementById('dd4aPreviewHint');
+  if (!printArea) return;
+  printArea.innerHTML = buildEmployeeDD4AHtml(employee);
+  printArea.style.display = 'block';
+  if (hint) hint.style.display = 'none';
+  currentDd4aEmployeeId = employee.id;
+  printArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+window.printEmployeeDD4A = function(id) {
+  var employee = globalEmployees.find(function(item) { return item.id === id; });
+  if (!employee) {
+    showToast('تعذر العثور على بيانات الموظف', true);
+    return;
+  }
+  showEmployeeDD4A(employee);
+  showToast('تم عرض استمارة ض.د/14');
+};
+
+window.printCurrentEmployeeDD4A = function() {
+  if (!currentDd4aEmployeeId) {
+    showToast('اختر موظفاً أولاً من زر استمارة', true);
+    return;
+  }
+  window.print();
+};
+
+window.exportCurrentEmployeeDD4APdf = function() {
+  if (!currentDd4aEmployeeId) {
+    showToast('اختر موظفاً أولاً من زر استمارة', true);
+    return;
+  }
+  var employee = globalEmployees.find(function(item) { return item.id === currentDd4aEmployeeId; });
+  var printArea = document.getElementById('dd4aPrintableArea');
+  if (!employee || !printArea) {
+    showToast('تعذر تجهيز الاستمارة', true);
+    return;
+  }
+  if (typeof html2pdf === 'undefined') {
+    showToast('مكتبة PDF غير متاحة حالياً', true);
+    return;
+  }
+  html2pdf().set({ margin: 8, filename: 'استمارة_ض_د_14_' + (employee.name || 'employee') + '.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(printArea).save();
+};
+
+window.renderEmployeeList = function() {
+  var tbody = document.getElementById('empTableBody');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  var totalGross = 0;
+  var totalDed = 0;
+  var totalTaxable = 0;
+  var totalAnnual = 0;
+  globalEmployees.forEach(function(employee, index) {
+    totalGross += employee.annualGross;
+    totalDed += employee.annualDed;
+    totalTaxable += employee.annualTaxable;
+    totalAnnual += employee.annualTax;
+    var sectorLabel = employee.sec === 'private' ? 'خاص' : 'حكومي';
+    var row = document.createElement('tr');
+    row.innerHTML = '<td>' + (index + 1) + '</td>' +
+      '<td style="font-weight:bold;">' + employee.name + '</td>' +
+      '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span></td>' +
+      '<td>' + formatNumber(Math.round(employee.annualGross)) + '</td>' +
+      '<td>' + formatNumber(Math.round(employee.annualDed)) + '</td>' +
+      '<td style="color:#d9534f;font-weight:bold;">' + formatNumber(Math.round(employee.annualTaxable)) + '</td>' +
+      '<td>' + formatNumber(Math.round(employee.monthlyTax)) + '</td>' +
+      '<td style="color:#28a745;font-weight:bold;">' + formatNumber(Math.round(employee.annualTax)) + '</td>' +
+      '<td style="white-space:nowrap;">' +
+      '<button class="btn btn-sm btn-secondary" onclick="printEmployeeDD4A(\'' + employee.id + '\')"><i class="fas fa-file-invoice"></i> استمارة</button> ' +
+      '<button class="btn btn-sm btn-info" onclick="openEmployeeModal(\'' + employee.id + '\')"><i class="fas fa-edit"></i></button> ' +
+      '<button class="btn btn-sm btn-danger" onclick="removeExtEmployee(\'' + employee.id + '\')"><i class="fas fa-trash"></i></button>' +
+      '</td>';
+    tbody.appendChild(row);
+  });
+  setText('tblTotGross', formatNumber(Math.round(totalGross)));
+  setText('tblTotDed', formatNumber(Math.round(totalDed)));
+  setText('tblTotTaxable', formatNumber(Math.round(totalTaxable)));
+  setText('tblTotAnnual', formatNumber(Math.round(totalAnnual)) + ' د.ع');
+};
+
+window.exportEmployeeTableToExcel = function() {
+  if (typeof XLSX === 'undefined') {
+    showToast('مكتبة Excel غير متاحة حالياً', true);
+    return;
+  }
+  var table = document.getElementById('newExcelEmployeeTable');
+  if (!table) {
+    showToast('تعذر العثور على جدول الموظفين', true);
+    return;
+  }
+  var wb = XLSX.utils.table_to_book(table, { sheet: 'حسابات الموظفين' });
+  XLSX.writeFile(wb, 'employee_tax_results.xlsx');
+};
 
 function addCompanyEmployeeRow() {
-  var tbody = document.querySelector('#companyEmployeeTable tbody');
-  var row = document.createElement('tr');
-  row.innerHTML = '<td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>' +
-    '<td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>' +
-    '<td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>' +
-    '<td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>' +
-    '<td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>' +
-    '<td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>' +
-    '<td class="emp-monthly-tax">٠ د.ع</td>' +
-    '<td class="emp-annual-tax">٠ د.ع</td>' +
-    '<td><button class="btn btn-sm btn-danger" onclick="removeCompanyEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>';
-  tbody.appendChild(row);
+  openEmployeeModal();
 }
 
-function removeCompanyEmployeeRow(btn) {
-  var tbody = btn.closest('tbody');
-  if (tbody.rows.length > 1) btn.closest('tr').remove();
-  else showToast('يجب الإبقاء على صف واحد على الأقل', true);
-}
+function removeCompanyEmployeeRow() {}
 
 function exportFormD14() {
-  var rows = document.querySelectorAll('#companyEmployeeTable tbody tr');
-  var data = [];
-  rows.forEach(function(row, i) {
-    var name = row.querySelector('.emp-name').value || 'موظف ' + (i + 1);
-    var nationality = row.querySelector('.emp-nationality').value === 'iraqi' ? 'عراقي' : 'أجنبي';
-    var gender = row.querySelector('.emp-gender').value === 'male' ? 'ذكر' : 'أنثى';
-    var salary = row.querySelector('.emp-salary').value || '0';
-    var marital = row.querySelector('.emp-marital').value === 'married' ? 'متزوج' : 'أعزب';
-    var children = row.querySelector('.emp-children').value || '0';
-    var monthlyTax = row.querySelector('.emp-monthly-tax').textContent;
-    var annualTax = row.querySelector('.emp-annual-tax').textContent;
-    data.push({ name: name, nationality: nationality, gender: gender, salary: salary, marital: marital, children: children, monthlyTax: monthlyTax, annualTax: annualTax });
-  });
-  if (data.length === 0 || !data[0].salary || data[0].salary === '0') { showToast('يرجى إدخال بيانات الموظفين أولاً', true); return; }
-
-  var html = '<div style="direction:rtl;font-family:Tajawal,sans-serif;padding:30px;">' +
-    '<div style="text-align:center;margin-bottom:30px;"><h2>استمارة ض.د14</h2><p>كشف بالرواتب والأجور والمخصصات وضريبة الدخل المستقطعة</p></div>' +
-    '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#0f1b4d;color:#fff;">' +
-    '<th style="border:1px solid #333;padding:10px;">ت</th><th style="border:1px solid #333;padding:10px;">اسم الموظف</th>' +
-    '<th style="border:1px solid #333;padding:10px;">الجنسية</th><th style="border:1px solid #333;padding:10px;">الجنس</th>' +
-    '<th style="border:1px solid #333;padding:10px;">الراتب الشهري</th><th style="border:1px solid #333;padding:10px;">الحالة الزوجية</th>' +
-    '<th style="border:1px solid #333;padding:10px;">عدد الأطفال</th><th style="border:1px solid #333;padding:10px;">الضريبة الشهرية</th>' +
-    '<th style="border:1px solid #333;padding:10px;">الضريبة السنوية</th></tr></thead><tbody>';
-  data.forEach(function(d, i) {
-    html += '<tr><td style="border:1px solid #ccc;padding:8px;text-align:center;">' + (i + 1) + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;">' + d.name + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.nationality + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.gender + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.salary + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.marital + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.children + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.monthlyTax + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.annualTax + '</td></tr>';
-  });
-  html += '</tbody></table></div>';
-  if (typeof html2pdf !== 'undefined') {
-    var el = document.createElement('div'); el.innerHTML = html;
-    document.body.appendChild(el);
-    html2pdf().set({ margin: 10, filename: 'استمارة_ض_د14.pdf', jsPDF: { direction: 'rtl' } }).from(el).save().then(function() { document.body.removeChild(el); });
-    showToast('جاري تصدير استمارة ض.د14');
-  } else { showToast('تعذر تصدير PDF', true); }
+  if (!globalEmployees.length) {
+    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
+    return;
+  }
+  if (typeof html2pdf === 'undefined') {
+    showToast('مكتبة PDF غير متاحة حالياً', true);
+    return;
+  }
+  var wrapper = document.createElement('div');
+  wrapper.style.direction = 'rtl';
+  wrapper.style.background = '#fff';
+  wrapper.style.padding = '20px';
+  wrapper.innerHTML = globalEmployees.map(function(employee) { return buildEmployeeDD4AHtml(employee); }).join('<div style="page-break-after:always;"></div>');
+  document.body.appendChild(wrapper);
+  html2pdf().set({ margin: 8, filename: 'استمارة_ض_د14.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(wrapper).save().then(function() { document.body.removeChild(wrapper); });
 }
 
 function exportAnnualMemo() {
-  var rows = document.querySelectorAll('#companyEmployeeTable tbody tr');
-  var data = [];
-  var totalMonthly = 0, totalAnnual = 0;
-  rows.forEach(function(row, i) {
-    var name = row.querySelector('.emp-name').value || 'موظف ' + (i + 1);
-    var salary = row.querySelector('.emp-salary').value || '0';
-    var monthlyTax = row.querySelector('.emp-monthly-tax').textContent;
-    var annualTax = row.querySelector('.emp-annual-tax').textContent;
-    data.push({ name: name, salary: salary, monthlyTax: monthlyTax, annualTax: annualTax });
-    totalMonthly += parseArabicNumber(row.querySelector('.emp-monthly-tax').textContent);
-    totalAnnual += parseArabicNumber(row.querySelector('.emp-annual-tax').textContent);
-  });
-  if (data.length === 0 || !data[0].salary || data[0].salary === '0') { showToast('يرجى إدخال بيانات الموظفين أولاً', true); return; }
-
+  if (!globalEmployees.length) {
+    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
+    return;
+  }
+  if (typeof html2pdf === 'undefined') {
+    showToast('مكتبة PDF غير متاحة حالياً', true);
+    return;
+  }
+  var totalMonthly = 0;
+  var totalAnnual = 0;
   var html = '<div style="direction:rtl;font-family:Tajawal,sans-serif;padding:30px;">' +
     '<div style="text-align:center;margin-bottom:30px;"><h2>المذكرة السنوية</h2><p>ملخص ضريبة رواتب الموظفين للسنة المالية</p></div>' +
     '<table style="width:100%;border-collapse:collapse;"><thead><tr style="background:#065f46;color:#fff;">' +
-    '<th style="border:1px solid #333;padding:10px;">ت</th><th style="border:1px solid #333;padding:10px;">اسم الموظف</th>' +
-    '<th style="border:1px solid #333;padding:10px;">الراتب الشهري</th><th style="border:1px solid #333;padding:10px;">الضريبة الشهرية</th>' +
-    '<th style="border:1px solid #333;padding:10px;">الضريبة السنوية</th></tr></thead><tbody>';
-  data.forEach(function(d, i) {
-    html += '<tr><td style="border:1px solid #ccc;padding:8px;text-align:center;">' + (i + 1) + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;">' + d.name + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.salary + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.monthlyTax + '</td>' +
-      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + d.annualTax + '</td></tr>';
+    '<th style="border:1px solid #333;padding:10px;">ت</th><th style="border:1px solid #333;padding:10px;">اسم الموظف</th><th style="border:1px solid #333;padding:10px;">الراتب الشهري</th><th style="border:1px solid #333;padding:10px;">الضريبة الشهرية</th><th style="border:1px solid #333;padding:10px;">الضريبة السنوية</th></tr></thead><tbody>';
+  globalEmployees.forEach(function(employee, index) {
+    totalMonthly += employee.monthlyTax;
+    totalAnnual += employee.annualTax;
+    html += '<tr><td style="border:1px solid #ccc;padding:8px;text-align:center;">' + (index + 1) + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;">' + employee.name + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + formatNumber(Math.round(employee.salary)) + '</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + formatNumber(Math.round(employee.monthlyTax)) + ' د.ع</td>' +
+      '<td style="border:1px solid #ccc;padding:8px;text-align:center;">' + formatNumber(Math.round(employee.annualTax)) + ' د.ع</td></tr>';
   });
-  html += '<tr style="background:#f0fdf4;font-weight:bold;"><td colspan="3" style="border:1px solid #ccc;padding:10px;">المجموع</td>' +
-    '<td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalMonthly)) + ' د.ع</td>' +
-    '<td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalAnnual)) + ' د.ع</td></tr>';
-  html += '</tbody></table></div>';
-  if (typeof html2pdf !== 'undefined') {
-    var el = document.createElement('div'); el.innerHTML = html;
-    document.body.appendChild(el);
-    html2pdf().set({ margin: 10, filename: 'المذكرة_السنوية.pdf', jsPDF: { direction: 'rtl' } }).from(el).save().then(function() { document.body.removeChild(el); });
-    showToast('جاري تصدير المذكرة السنوية');
-  } else { showToast('تعذر تصدير PDF', true); }
+  html += '<tr style="background:#f0fdf4;font-weight:bold;"><td colspan="3" style="border:1px solid #ccc;padding:10px;">المجموع</td><td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalMonthly)) + ' د.ع</td><td style="border:1px solid #ccc;padding:10px;text-align:center;">' + formatNumber(Math.round(totalAnnual)) + ' د.ع</td></tr></tbody></table></div>';
+  var memoEl = document.createElement('div');
+  memoEl.innerHTML = html;
+  document.body.appendChild(memoEl);
+  html2pdf().set({ margin: 10, filename: 'المذكرة_السنوية.pdf', jsPDF: { direction: 'rtl' } }).from(memoEl).save().then(function() { document.body.removeChild(memoEl); });
 }
 
 // ========== CORPORATE TAX — CONTRACT TAX ==========
@@ -2536,6 +3172,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Check saved session
   checkSession();
+
+  // Restore saved company employees
+  renderEmployeeList();
 
   // Set today's date
   var today = new Date();
