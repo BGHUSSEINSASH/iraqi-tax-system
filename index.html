@@ -1294,54 +1294,80 @@
 
           <!-- احتساب ضريبة العرصة -->
           <div class="card">
-            <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> احتساب ضريبة العرصات</h3></div>
+            <div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> نموذج متعدد الخطوات لحساب ضريبة العرصات</h3></div>
             <div class="card-body">
               <div class="info-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:20px;">
-                <p style="color:#166534;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> سعر متر العرصة × عدد المترات = سعر العرصة الكلي × 2% = ضريبة العرصة السنوية</p>
+                <p style="color:#166534;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> اتبع الخطوات أدناه لتحديد موقفك من الإعفاءات واحتساب الضريبة وفقاً للقانون.</p>
               </div>
-              <div class="form-grid">
-                <div class="form-group"><label>المحافظة</label>
-                  <select id="landProvince" onchange="updateLandDistricts()">
-                    <option value="">اختر المحافظة</option>
-                    <option value="baghdad">بغداد</option>
-                    <option value="basra">البصرة</option>
-                    <option value="nineveh">نينوى</option>
-                    <option value="erbil">أربيل</option>
-                    <option value="najaf">النجف</option>
-                    <option value="karbala">كربلاء</option>
-                    <option value="kirkuk">كركوك</option>
-                    <option value="sulaymaniyah">السليمانية</option>
-                    <option value="dhiqar">ذي قار</option>
-                    <option value="babel">بابل</option>
-                    <option value="diyala">ديالى</option>
-                    <option value="anbar">الأنبار</option>
-                    <option value="wasit">واسط</option>
-                    <option value="maysan">ميسان</option>
-                    <option value="muthanna">المثنى</option>
-                    <option value="qadisiyyah">القادسية</option>
-                    <option value="saladin">صلاح الدين</option>
-                    <option value="duhok">دهوك</option>
+
+              <!-- الخطوة 1 -->
+              <div class="form-card" id="landStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-list-alt"></i> الخطوة 1: فحص الإعفاء التام</h4>
+                <div class="form-group">
+                  <label style="font-weight:bold;">هل تنطبق إحدى الحالات التالية على العرصة؟</label>
+                  <select id="landExemptionCode" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="handleLandStep1()">
+                    <option value="" disabled selected>-- يرجى الاختيار --</option>
+                    <option value="1">مضى على تملكها أكثر من 15 سنة.</option>
+                    <option value="2">عائدة لدائرة رسمية أو شبه رسمية.</option>
+                    <option value="3">عائدة لمديرية الأوقاف العامة (وغير مؤجرة).</option>
+                    <option value="4">مخصصة لمحلات العبادة، المدارس، الجمعيات، النقابات، المعاهد الخيرية، أو المقابر.</option>
+                    <option value="5">عائدة لحكومة أجنبية (بشرط المقابلة بالمثل).</option>
+                    <option value="6">يتعذر التصرف بها أو إفرازها بسبب مانع قانوني.</option>
+                    <option value="7">مخصصة لمنافع عامة (بموافقة مجلس الوزراء).</option>
+                    <option value="8">عائدة ليتيم فقير الحال (لم يبلغ سن الرشد).</option>
+                    <option value="9">واقعة في حي الزوراء (مباعة من الحكومة ولم تمر 5 سنوات على التسجيل).</option>
+                    <option value="none">لا تنطبق عليّ أي من هذه الحالات.</option>
                   </select>
                 </div>
-                <div class="form-group"><label>القضاء/الناحية</label>
-                  <select id="landDistrict"><option value="">اختر المحافظة أولاً</option></select>
+              </div>
+
+              <!-- الخطوة 2 -->
+              <div class="form-card" id="landStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-child"></i> الخطوة 2: فحص حالة القاصر</h4>
+                <div class="form-group">
+                  <label style="font-weight:bold;">هل العرصة أو الحصة مسجلة باسم قاصر؟</label>
+                  <select id="landIsMinor" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="handleLandStep2()">
+                    <option value="" disabled selected>-- يرجى الاختيار --</option>
+                    <option value="yes">نعم</option>
+                    <option value="no">لا</option>
+                  </select>
                 </div>
-                <div class="form-group"><label>عدد الأمتار للعرصة (متر مربع)</label><input type="text" id="landArea" placeholder="٠"></div>
-                <div class="form-group"><label>سعر المتر (د.ع)</label><input type="text" id="landPrice" placeholder="أدخل سعر المتر"></div>
               </div>
-              <div class="btn-group" style="margin-top:16px;">
-                <button class="btn btn-primary" onclick="calculateLandTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+
+              <!-- الخطوة 3 -->
+              <div class="form-card" id="landStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: none;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-chart-area"></i> الخطوة 3: إدخال المساحة والقيمة</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label style="font-weight:bold;">المساحة الكلية للعرصة (بالمتر المربع)</label>
+                    <input type="number" id="landTotalArea" min="1" placeholder="أدخل المساحة بالمتر المربع" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">القيمة المقدرة الكلية للعرصة (بالدينار)</label>
+                    <input type="text" id="landTotalValue" placeholder="أدخل القيمة الكلية بالدينار" oninput="this.value = formatInputNumber(this.value)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                </div>
               </div>
-              <div class="result-box" id="landResultBox" style="margin-top:20px;">
+
+              <div class="btn-group" id="landCalculateBtnGroup" style="margin-top:20px; display:none;">
+                <button class="btn btn-primary" onclick="calculateNewLandTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+              </div>
+
+              <div class="result-box" id="landNewResultBox" style="margin-top:20px; display:none;">
                 <div class="result-icon"><i class="fas fa-map"></i></div>
-                <h2>نتيجة ضريبة العرصة</h2>
-                <div class="result-details" id="landResultDetails" style="display:none;">
-                  <div class="result-row"><span>الموقع:</span><strong id="landLocation">-</strong></div>
-                  <div class="result-row"><span>عدد الأمتار:</span><strong id="landAreaResult">-</strong></div>
-                  <div class="result-row"><span>سعر المتر:</span><strong id="landPriceResult">-</strong></div>
-                  <div class="result-row"><span>سعر العرصة الكلي:</span><strong id="landTotalValue">-</strong></div>
-                  <div class="result-row"><span>نسبة الضريبة:</span><strong>٢٪ سنوياً</strong></div>
-                  <div class="result-row total"><span>ضريبة العرصة السنوية:</span><strong id="landTaxDue">-</strong></div>
+                <h2>التقرير الضريبي التفصيلي للعرصة</h2>
+                <div class="info-banner" id="landExemptMessage" style="display:none; background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin:20px 0;">
+                  <p style="color:#1e40af;font-size:15px;text-align:center;margin:0;font-weight:bold;"><i class="fas fa-medal" style="margin-left:6px;"></i> <span id="landExemptText">العرصة معفاة من الضريبة بالكامل</span></p>
+                </div>
+                <div class="result-details" id="landNewResultDetails" style="display:none;">
+                  <div class="result-row"><span>المساحة الكلية المدخلة:</span><strong id="landResTotalArea">-</strong></div>
+                  <div class="result-row"><span>القيمة الكلية المدخلة:</span><strong id="landResTotalValue">-</strong></div>
+                  <div class="result-row"><span>قيمة المتر الواحد المقدرة:</span><strong id="landResMeterValue">-</strong></div>
+                  <div class="result-row"><span>موقف القاصر / الإعفاء الجزئي:</span><strong id="landResExemptStatus">-</strong></div>
+                  <div class="result-row"><span>المساحة الخاضعة للضريبة:</span><strong id="landResTaxableArea" style="color:var(--danger);">-</strong></div>
+                  <div class="result-row"><span>القيمة الخاضعة للضريبة (الوعاء الضريبي):</span><strong id="landResTaxableValue" style="color:var(--danger);">-</strong></div>
+                  <div class="result-row"><span>نسبة الضريبة (حسب المادة 3):</span><strong>٢٪ سنوياً</strong></div>
+                  <div class="result-row total"><span>مبلغ الضريبة المستحق الدفع:</span><strong id="landResFinalTax">-</strong></div>
                 </div>
               </div>
             </div>
@@ -1447,53 +1473,154 @@
               </div>
               <div class="section-hero-text">
                 <h2>ضريبة العقار</h2>
-                <p>احتساب ضريبة العقار المؤجر بنسبة 10% من قيمة الإيجار السنوية</p>
+                <p>احتساب ضريبة العقار وفقاً لأحكام القانون رقم 162 لسنة 1959 وتعديلاته</p>
               </div>
             </div>
           </div>
+
           <div class="card">
-            <div class="card-header"><h3><i class="fas fa-home"></i> احتساب ضريبة العقار المؤجر</h3></div>
+            <div class="card-header"><h3><i class="fas fa-home"></i> نموذج متعدد الخطوات لحساب ضريبة العقار</h3></div>
             <div class="card-body">
-              <div class="info-banner" style="background:linear-gradient(135deg,#fff7ed,#fed7aa);border:1px solid #fdba74;border-radius:10px;padding:16px;margin-bottom:20px;">
-                <p style="color:#9a3412;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> قيمة الإيجار الشهرية × عدد الأشهر المؤجرة = الإيجار السنوي × 10% = ضريبة العقار</p>
+              <div class="info-banner" style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <p style="color:#c2410c;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> اتبع الخطوات أدناه لتصفية حالات المنفعة العامة والسكن العائلي والإعفاءات المؤقتة وصولاً للاحتساب المالي الدقيق.</p>
               </div>
-              <div class="form-grid">
-                <div class="form-group"><label>نوع العقار</label>
-                  <select id="propType">
-                    <option value="house">دار سكن</option>
-                    <option value="apartment">شقة</option>
-                    <option value="shop">محل تجاري</option>
-                    <option value="building">بناية</option>
-                    <option value="office">مكتب</option>
-                    <option value="warehouse">مخزن</option>
+
+              <!-- الخطوة 1 -->
+              <div class="form-card" id="propStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-building"></i> الخطوة 1: فحص إعفاءات مؤسسات الدولة والنفع العام</h4>
+                <div class="form-group">
+                  <label style="font-weight:bold;">ما هي صفة أو عائدية العقار؟</label>
+                  <select id="propExemptType1" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="handlePropStep1()">
+                    <option value="" disabled selected>-- يرجى الاختيار --</option>
+                    <option value="state">عقار عائد للحكومة، أمانة بغداد، البلديات، أو المصالح والمؤسسات العامة غير المستغلة.</option>
+                    <option value="awqaf">عقار عائد لمديرية الأوقاف العامة.</option>
+                    <option value="religious">عقار مخصص لإقامة الشعائر الدينية (غير مؤجر) أو سكن القائمين عليها.</option>
+                    <option value="charity">عقار تملكه طوائف دينية أو هيئات خيرية وتستخدمه كمدارس، مستشفيات، مياتم، أو دور عجزة.</option>
+                    <option value="foreign">عقار تملكه دولة أجنبية كسكن لدبلوماسييها أو دوائر رسمية (بشرط المقابلة بالمثل).</option>
+                    <option value="ngo">عقار تملكه أحزاب، نقابات، جمعيات نفع عام، أو أندية رياضية (ومستغل لنشاطها حصراً).</option>
+                    <option value="donated">عقار متبرع بمنفعته للدوائر الرسمية والمؤسسات الخيرية (ومشغول من قبلها).</option>
+                    <option value="commercial">عقار مستغل لنشاط اقتصادي ومملوك لصاحبه الخاضع لضريبة الدخل.</option>
+                    <option value="agri">عقار معد لحفظ الحاصلات الزراعية أو سكن الزراع والعمال داخل المزرعة (غير مؤجر).</option>
+                    <option value="none">لا تنطبق أي من هذه الحالات (عقار للأفراد أو الشركات العادية).</option>
                   </select>
                 </div>
-                <div class="form-group"><label>موقع العقار</label><input type="text" id="propAddress" placeholder="المحافظة / المنطقة / الشارع"></div>
-                <div class="form-group"><label>قيمة الإيجار الشهرية (د.ع)</label><input type="text" id="propRentAmount" placeholder="٠"></div>
-                <div class="form-group"><label>عدد الأشهر المؤجر فيها العقار</label><input type="number" id="propRentDuration" value="12" min="1" max="12"></div>
               </div>
-              <div class="btn-group" style="margin-top:16px;">
-                <button class="btn btn-primary" onclick="calculatePropertyTax()"><i class="fas fa-calculator"></i> احتساب ضريبة العقار</button>
+
+              <!-- الخطوة 2 -->
+              <div class="form-card" id="propStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-user-friends"></i> الخطوة 2: فحص الإعفاءات السكنية (للأفراد)</h4>
+                <div class="form-group">
+                  <label style="font-weight:bold;">ما هي طبيعة إشغال العقار؟</label>
+                  <select id="propExemptType2" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="handlePropStep2()">
+                    <option value="" disabled selected>-- يرجى الاختيار --</option>
+                    <option value="owner">دار سكن أو شقة يسكنها المالك نفسه.</option>
+                    <option value="parents_children">دار سكن أو شقة يشغلها والدا المالك، أو أولاده المتزوجون (أو الأرامل/المطلقات مع أولاد)، بشرط أن لا يملك الشاغل عقاراً مستقلاً.</option>
+                    <option value="company_housing">عقار تم إنشاؤه من قبل الدولة أو الشركات لتمليكه لمنتسبيهم بموجب عقد بيع.</option>
+                    <option value="none">مؤجر لجهة أخرى أو لا ينطبق أي مما سبق.</option>
+                  </select>
+                </div>
               </div>
-              <div class="result-box" id="propResultBox" style="margin-top:20px;">
+
+              <!-- الخطوة 3 -->
+              <div class="form-card" id="propStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-clock"></i> الخطوة 3: فحص الإعفاءات المؤقتة وحالة العقار</h4>
+                
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label style="font-weight:bold;">هل العقار (أو الطابق) مشيد حديثاً؟</label>
+                    <select id="propIsNew" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="togglePropNewDate()">
+                      <option value="" disabled selected>-- يرجى الاختيار --</option>
+                      <option value="yes">نعم</option>
+                      <option value="no">لا</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="propNewDateGroup" style="display:none;">
+                    <label style="font-weight:bold;">تاريخ إكمال التشييد</label>
+                    <input type="date" id="propNewDate" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="handlePropStep3()">
+                  </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 15px;">
+                  <div class="form-group">
+                    <label style="font-weight:bold;">هل العقار خالٍ من الشواغل بتأكيد ورقي للمالية؟</label>
+                    <select id="propIsEmpty" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="togglePropEmptyMonths()">
+                      <option value="" disabled selected>-- يرجى الاختيار --</option>
+                      <option value="yes">نعم</option>
+                      <option value="no">لا</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="propEmptyMonthsGroup" style="display:none;">
+                    <label style="font-weight:bold;">مدة الخلو (بالأشهر)</label>
+                    <input type="number" id="propEmptyMonths" min="1" max="12" placeholder="أشهر الخلو المثبتة" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" oninput="handlePropStep3()">
+                  </div>
+                </div>
+              </div>
+
+              <!-- الخطوة 4 -->
+              <div class="form-card" id="propStep4" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: none;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-file-invoice-dollar"></i> الخطوة 4: إدخال الإيراد المالي والغرامات</h4>
+                <div class="form-group" style="margin-bottom:15px;">
+                  <label style="font-weight:bold;">الإيراد السنوي للعقار (بدل الإيجار الفعلي أو المقدر - دينار)</label>
+                  <input type="text" id="propAnnualRent" placeholder="٠" oninput="this.value = formatInputNumber(this.value)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                </div>
+                
+                <h5 style="color: var(--text-secondary); margin-bottom: 10px;"><i class="fas fa-gavel"></i> الغرامات والمخالفات (اختياري)</h5>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label style="font-size:0.85rem;font-weight:bold;"><input type="checkbox" id="propPenDelay"> تأخير الدفع عن السنة المالية</label>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.85rem;font-weight:bold;"><input type="checkbox" id="propPenFalseInfo"> إخفاء / تقديم معلومات غير صحيحة للسلطة المالية</label>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.85rem;font-weight:bold;"><input type="checkbox" id="propPenFakeEmpty"> ادعاء خلو العقار بشكل وهمي (كذب بالإخلاء)</label>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-size:0.85rem;font-weight:bold;"><input type="checkbox" id="propPenUseChange"> عدم الإخبار عن تغيير الاستعمال لغرض غير معفي</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="btn-group" id="propCalculateBtnGroup" style="margin-top:20px; display:none;">
+                <button class="btn btn-primary" onclick="calculateNewPropertyTax()"><i class="fas fa-calculator"></i> احتساب الضريبة والأسانيد</button>
+              </div>
+
+              <div class="result-box" id="propNewResultBox" style="margin-top:20px; display:none;">
                 <div class="result-icon"><i class="fas fa-home"></i></div>
-                <h2>نتيجة ضريبة العقار</h2>
-                <div class="result-details" id="propResultDetails" style="display:none;">
-                  <div class="result-row"><span>نوع العقار:</span><strong id="propOpType">-</strong></div>
-                  <div class="result-row"><span>موقع العقار:</span><strong id="propLocationResult">-</strong></div>
-                  <div class="result-row"><span>الإيجار الشهري:</span><strong id="propMonthlyRent">-</strong></div>
-                  <div class="result-row"><span>عدد الأشهر:</span><strong id="propMonths">-</strong></div>
-                  <div class="result-row"><span>قيمة الإيجار السنوية:</span><strong id="propBaseValue">-</strong></div>
-                  <div class="result-row"><span>نسبة الضريبة:</span><strong id="propTaxRate">١٠٪</strong></div>
-                  <div class="result-row total"><span>ضريبة العقار المستحقة:</span><strong id="propTaxDue">-</strong></div>
+                <h2>النتيجة والسند القانوني وفق قانون رقم 162 لسنة 1959</h2>
+                
+                <div class="info-banner" id="propExemptMessage" style="display:none; background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin:20px 0;">
+                  <p style="color:#1e40af;font-size:15px;margin:0;font-weight:bold;"><i class="fas fa-medal" style="margin-left:6px;"></i> صفر دينار (العقار معفى من الضريبة).</p>
+                  <p id="propExemptText" style="color:#1e40af;font-size:13px;margin:10px 0 0 0;line-height:1.6;"></p>
+                </div>
+
+                <div class="result-details" id="propNewResultDetails" style="display:none;">
+                  <div class="result-row"><span>الإيراد السنوي المدخل:</span><strong id="propResRent">-</strong></div>
+                  <div class="result-row"><span>كيف تم الحساب:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="propResRentText">-</strong></div>
+                  
+                  <div class="result-row"><span>تنزيل مصاريف الصيانة (10%):</span><strong id="propResMaint">-</strong></div>
+                  <div class="result-row"><span>كيف تم الحساب:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="propResMaintText">-</strong></div>
+                  
+                  <div class="result-row" id="propRowEmptyWrap" style="display:none;"><span>خصم فترة الخلو:</span><strong id="propResEmpty">-</strong></div>
+                  <div class="result-row" id="propRowEmptyTextWrap" style="display:none;"><span>كيف تم الحساب:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="propResEmptyText">-</strong></div>
+
+                  <div class="result-row"><span>الإيراد الخاضع للضريبة:</span><strong id="propResTaxable" style="color:var(--danger);">-</strong></div>
+                  
+                  <div class="result-row"><span>احتساب الضريبة الأساسية (10%):</span><strong id="propResBaseTax">-</strong></div>
+                  <div class="result-row"><span>كيف تم الحساب:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="propResBaseTaxText">-</strong></div>
+
+                  <div id="propPenaltiesSection" style="display:none;background:#fef2f2;padding:10px;border-radius:10px;margin-bottom:15px;border:1px solid #fecaca;">
+                    <h5 style="color:#dc2626;margin:0 0 10px;">الغرامات الإضافية</h5>
+                    <div id="propPenRows"></div>
+                  </div>
+
+                  <div class="result-row total"><span>الضريبة النهائية المستحقة:</span><strong id="propResFinalTax">-</strong></div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-
-        <!-- ==================== PROFESSION TAX ==================== -->
+<!-- ==================== PROFESSION TAX ==================== -->
         <section class="page-section" id="page-profession">
           <div class="section-hero" style="--hero-c1:#5b21b6;--hero-c2:#7c3aed;" data-aos="fade-down">
             <div class="section-hero-bg">

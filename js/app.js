@@ -1501,148 +1501,376 @@ Object.keys(ALL_PROVINCES).forEach(function(k) {
 });
 
 
-function updateLandDistricts() {
-  var province = document.getElementById('landProvince').value;
-  var distSelect = document.getElementById('landDistrict');
-  distSelect.innerHTML = '<option value="">اختر القضاء/الناحية</option>';
-  if (province && LAND_DISTRICTS[province]) {
-    LAND_DISTRICTS[province].forEach(function(d) {
-      distSelect.innerHTML += '<option value="' + d + '">' + d + '</option>';
-    });
+function updateLandDistricts() {}
+
+function formatInputNumber(val) {
+  if(!val) return '';
+  var num = val.replace(/[^0-9٠-٩۰-۹]/g, '');
+  if(!num) return '';
+  var parsed = parseArabicNumber(num);
+  return formatNumber(parsed);
+}
+
+function handleLandStep1() {
+  var step1 = document.getElementById('landExemptionCode').value;
+  var step2 = document.getElementById('landStep2');
+  var step3 = document.getElementById('landStep3');
+  var btn = document.getElementById('landCalculateBtnGroup');
+  var resBox = document.getElementById('landNewResultBox');
+  
+  // reset down tree
+  document.getElementById('landIsMinor').value = "";
+  document.getElementById('landTotalArea').value = "";
+  document.getElementById('landTotalValue').value = "";
+  step2.style.display = 'none';
+  step3.style.display = 'none';
+  btn.style.display = 'none';
+  resBox.style.display = 'none';
+
+  if (!step1) return;
+
+  if (step1 === 'none') {
+    // Proceed to Step 2
+    step2.style.display = 'block';
+  } else {
+    // Total exemption directly
+    btn.style.display = 'block';
   }
 }
 
-function calculateLandTax() {
-  var area = getVal('landArea');
-  var price = getVal('landPrice');
-  if (!area || !price) { showToast('يرجى إدخال عدد الأمتار وسعر المتر', true); return; }
-  var totalValue = area * price;
-  var taxRate = 0.02; // 2% سنوياً
-  var tax = totalValue * taxRate;
-  var province = document.getElementById('landProvince');
-  var district = document.getElementById('landDistrict');
-  setText('landLocation', (province.options[province.selectedIndex].text || '-') + ' - ' + (district.value || '-'));
-  setText('landAreaResult', formatNumber(area) + ' م²');
-  setText('landPriceResult', formatNumber(price) + ' د.ع / م²');
-  setText('landTotalValue', formatNumber(totalValue) + ' د.ع');
-  setText('landTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
-  document.getElementById('landResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة العرصة بنجاح');
-}
+function handleLandStep2() {
+  var step2 = document.getElementById('landIsMinor').value;
+  var step3 = document.getElementById('landStep3');
+  var btn = document.getElementById('landCalculateBtnGroup');
+  var resBox = document.getElementById('landNewResultBox');
 
-// ========== LAND TAX EXEMPTIONS ==========
-function checkLandExemption(value) {
-  var resultDiv = document.getElementById('landExemptionResult');
-  var partialDiv = document.getElementById('landExemptionPartial');
-  partialDiv.style.display = 'none';
+  // reset down tree
+  document.getElementById('landTotalArea').value = "";
+  document.getElementById('landTotalValue').value = "";
+  step3.style.display = 'none';
+  btn.style.display = 'none';
+  resBox.style.display = 'none';
 
-  var exemptMessages = {
-    area_800: { exempt: false, msg: 'أول 800 متر مربع معفية من الضريبة. ما يزيد عن ذلك يخضع للضريبة بنسبة 2%.', showPartial: true },
-    over_15_years: { exempt: true, msg: 'العرصة المملوكة لمدة تزيد عن 15 سنة معفية من ضريبة العرصات بالكامل.' },
-    government: { exempt: true, msg: 'العرصات العائدة إلى الدوائر الرسمية أو شبه الرسمية معفية من ضريبة العرصات.' },
-    waqf: { exempt: true, msg: 'العرصات العائدة إلى الأوقاف العامة وغير المؤجرة معفية من ضريبة العرصات.' },
-    unions: { exempt: true, msg: 'العرصات العائدة إلى النقابات والجمعيات والمقابر معفية من ضريبة العرصات.' },
-    legal_block: { exempt: true, msg: 'العرصات التي يتعذر التصرف بها بسبب قانوني معفية من ضريبة العرصات.' },
-    public_use: { exempt: true, msg: 'العرصات المخصصة للأغراض والمنافع العامة معفية من ضريبة العرصات.' },
-    outside_limits: { exempt: true, msg: 'العرصات الواقعة خارج حدود أمانة بغداد ومراكز المحافظات والأقضية والنواحي لا تخضع لضريبة العرصات.' },
-    none: { exempt: false, msg: 'العرصة خاضعة لضريبة العرصات بالكامل بنسبة 2% سنوياً.' }
-  };
-
-  var info = exemptMessages[value];
-  if (!info) return;
-
-  var color = info.exempt ? '#059669' : (value === 'area_800' ? '#d97706' : '#dc2626');
-  var bg = info.exempt ? '#f0fdf4' : (value === 'area_800' ? '#fffbeb' : '#fef2f2');
-  var border = info.exempt ? '#bbf7d0' : (value === 'area_800' ? '#fde68a' : '#fecaca');
-  var icon = info.exempt ? 'fa-check-circle' : (value === 'area_800' ? 'fa-exclamation-triangle' : 'fa-times-circle');
-
-  resultDiv.style.display = 'block';
-  resultDiv.innerHTML = '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:10px;padding:20px;text-align:center;">' +
-    '<i class="fas ' + icon + '" style="font-size:36px;color:' + color + ';"></i>' +
-    '<h3 style="color:' + color + ';margin-top:10px;">' + (info.exempt ? 'معفي من الضريبة' : (value === 'area_800' ? 'إعفاء جزئي' : 'خاضع للضريبة')) + '</h3>' +
-    '<p style="color:' + color + ';margin-top:8px;">' + info.msg + '</p></div>';
-
-  if (info.showPartial) partialDiv.style.display = 'block';
-}
-
-function calculatePartialLandExemption() {
-  var area = getVal('landExemptArea');
-  var price = getVal('landExemptPrice');
-  if (!area || !price) { showToast('يرجى إدخال المساحة وسعر المتر', true); return; }
-  var exemptArea = Math.min(area, 800);
-  var taxableArea = Math.max(0, area - 800);
-  var taxableValue = taxableArea * price;
-  var tax = taxableValue * 0.02;
-
-  setText('partialTotalArea', formatNumber(area) + ' م²');
-  setText('partialExemptArea', formatNumber(exemptArea) + ' م² (معفية)');
-  setText('partialTaxableArea', formatNumber(taxableArea) + ' م²');
-  setText('partialPrice', formatNumber(price) + ' د.ع / م²');
-  setText('partialTaxableValue', formatNumber(taxableValue) + ' د.ع');
-  setText('partialTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
-  document.getElementById('landPartialResult').style.display = 'block';
-  showToast(taxableArea > 0 ? 'تم احتساب الضريبة على المساحة الزائدة عن 800 م²' : 'المساحة بالكامل معفية (أقل من 800 م²)');
-}
-
-// ========== LAND WIZARD ==========
-function nextLandStep(n) {
-  if (n === 3) { calculateLandTax(); }
-  var dots = document.querySelectorAll('#page-land .wizard-dot');
-  var lines = document.querySelectorAll('#page-land .wizard-line');
-  for (var i = 0; i < dots.length; i++) {
-    dots[i].classList.remove('active', 'done');
-    if (i < n - 1) dots[i].classList.add('done');
-    if (i === n - 1) dots[i].classList.add('active');
+  if (step2) {
+    step3.style.display = 'block';
+    btn.style.display = 'block';
   }
-  for (var j = 0; j < lines.length; j++) {
-    lines[j].classList.toggle('done', j < n - 1);
-  }
-  document.querySelectorAll('#page-land .wizard-card').forEach(function(c) { c.classList.remove('active'); });
-  var step = document.getElementById('land-step-' + n);
-  if (step) step.classList.add('active');
-}
-function prevLandStep(n) { nextLandStep(n); }
-
-// ========== PROPERTY TAX ==========
-function calculatePropertyTax() {
-  var monthly = getVal('propRentAmount');
-  var duration = parseFloat(document.getElementById('propRentDuration').value) || 12;
-  if (!monthly) { showToast('يرجى إدخال قيمة الإيجار الشهرية', true); return; }
-  var annualRent = monthly * duration;
-  var taxRate = 0.10; // 10%
-  var tax = annualRent * taxRate;
-  var propTypeEl = document.getElementById('propType');
-  var propTypeText = propTypeEl.options[propTypeEl.selectedIndex].text;
-  var address = document.getElementById('propAddress').value || '-';
-
-  setText('propOpType', propTypeText);
-  setText('propLocationResult', address);
-  setText('propMonthlyRent', formatNumber(monthly) + ' د.ع');
-  setText('propMonths', duration + ' شهر');
-  setText('propBaseValue', formatNumber(annualRent) + ' د.ع');
-  setText('propTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
-  document.getElementById('propResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة العقار بنجاح');
 }
 
-// Property wizard
-function nextPropStep(n) {
-  if (n === 4) { calculatePropertyTax(); }
-  var dots = document.querySelectorAll('#page-property .wizard-dot');
-  var lines = document.querySelectorAll('#page-property .wizard-line');
-  for (var i = 0; i < dots.length; i++) {
-    dots[i].classList.remove('active', 'done');
-    if (i < n - 1) dots[i].classList.add('done');
-    if (i === n - 1) dots[i].classList.add('active');
+function calculateNewLandTax() {
+  var step1 = document.getElementById('landExemptionCode').value;
+  var resBox = document.getElementById('landNewResultBox');
+  var resDetails = document.getElementById('landNewResultDetails');
+  var exemptMsg = document.getElementById('landExemptMessage');
+  var exemptText = document.getElementById('landExemptText');
+  
+  if (!step1) {
+    showToast('يرجى تحديد حالة الإعفاء من الخطوة الأولى', true);
+    return;
   }
-  for (var j = 0; j < lines.length; j++) {
-    lines[j].classList.toggle('done', j < n - 1);
+
+  resBox.style.display = 'block';
+
+  // المرحلة الأولى: التحقق من الإعفاء الكلي
+  if (step1 !== 'none') {
+    resDetails.style.display = 'none';
+    exemptMsg.style.display = 'block';
+    exemptText.textContent = "العرصة معفاة من الضريبة بالكامل؛ لتطابقها مع أحد شروط الإعفاء التام.";
+    showToast('العرصة معفاة بالكامل');
+    return;
   }
-  document.querySelectorAll('#page-property .wizard-card').forEach(function(c) { c.classList.remove('active'); });
-  var step = document.getElementById('prop-step-' + n);
-  if (step) step.classList.add('active');
+
+  // Not strictly exempt, must check minor and numbers
+  var isMinor = document.getElementById('landIsMinor').value;
+  var totalArea = parseFloat(document.getElementById('landTotalArea').value);
+  var totalValue = parseArabicNumber(document.getElementById('landTotalValue').value);
+
+  if (!isMinor) {
+    showToast('يرجى الإجابة على سؤال القاصر', true);
+    return;
+  }
+  if (isNaN(totalArea) || totalArea <= 0 || isNaN(totalValue) || totalValue <= 0) {
+    showToast('يرجى إدخال المساحة الكلية والقيمة الكلية بأرقام صحيحة أكبر من صفر', true);
+    return;
+  }
+
+  var taxableArea = 0;
+  var statusMsg = "";
+
+  // المرحلة الثانية والثالثة
+  if (isMinor === 'yes') {
+    taxableArea = totalArea;
+    statusMsg = "المالك قاصر؛ لا يوجد إعفاء جزئي للمساحة (800 متر)، تخضع كامل المساحة للضريبة.";
+  } else {
+    if (totalArea <= 800) {
+      // معفى بالكامل
+      resDetails.style.display = 'none';
+      exemptMsg.style.display = 'block';
+      exemptText.textContent = "العرصة معفاة من الضريبة بالكامل ضمن السماح القانوني للمساحة (800 متر مربع فما دون).";
+      showToast('العرصة معفاة بالكامل');
+      return;
+    } else {
+      taxableArea = totalArea - 800;
+      statusMsg = "المالك بالغ؛ تم خصم الإعفاء الجزئي (800 م²). المساحة المتبقية خاضعة للضريبة.";
+    }
+  }
+
+  // الحساب المالي
+  var meterValue = totalValue / totalArea;
+  var taxableValue = meterValue * taxableArea;
+  var finalTax = taxableValue * 0.02; // نسبة 2%
+
+  exemptMsg.style.display = 'none';
+  resDetails.style.display = 'block';
+
+  setText('landResTotalArea', formatNumber(totalArea) + ' م²');
+  setText('landResTotalValue', formatNumber(Math.round(totalValue)) + ' د.ع');
+  setText('landResMeterValue', formatNumber(Math.round(meterValue)) + ' د.ع / م²');
+  setText('landResExemptStatus', statusMsg);
+  setText('landResTaxableArea', formatNumber(taxableArea) + ' م²');
+  setText('landResTaxableValue', formatNumber(Math.round(taxableValue)) + ' د.ع');
+  setText('landResFinalTax', formatNumber(Math.round(finalTax)) + ' د.ع');
+
+  showToast('تم احتساب الضريبة بنجاح');
+  
+  if (document.getElementById('dd4aPrintableArea')) {
+      // Note: we can add audit or other saves if necessary, 
+      // but not specifically requested for land just yet.
+  }
 }
-function prevPropStep(n) { nextPropStep(n); }
+
+// ========== PROPERTY TAX (ضريبة العقار) ==========
+function handlePropStep1() {
+  var s1 = document.getElementById('propExemptType1').value;
+  var s2 = document.getElementById('propStep2');
+  var s3 = document.getElementById('propStep3');
+  var s4 = document.getElementById('propStep4');
+  var btn = document.getElementById('propCalculateBtnGroup');
+  var resBox = document.getElementById('propNewResultBox');
+
+  // reset down
+  document.getElementById('propExemptType2').value = "";
+  document.getElementById('propIsNew').value = "";
+  document.getElementById('propNewDate').value = "";
+  document.getElementById('propIsEmpty').value = "";
+  document.getElementById('propEmptyMonths').value = "";
+  s2.style.display = 'none';
+  s3.style.display = 'none';
+  s4.style.display = 'none';
+  btn.style.display = 'none';
+  resBox.style.display = 'none';
+
+  if (!s1) return;
+
+  if (s1 === 'none') {
+    s2.style.display = 'block';
+  } else {
+    btn.style.display = 'block';
+  }
+}
+
+function handlePropStep2() {
+  var s2 = document.getElementById('propExemptType2').value;
+  var s3 = document.getElementById('propStep3');
+  var s4 = document.getElementById('propStep4');
+  var btn = document.getElementById('propCalculateBtnGroup');
+  var resBox = document.getElementById('propNewResultBox');
+
+  document.getElementById('propIsNew').value = "";
+  document.getElementById('propNewDate').value = "";
+  document.getElementById('propIsEmpty').value = "";
+  document.getElementById('propEmptyMonths').value = "";
+  s3.style.display = 'none';
+  s4.style.display = 'none';
+  btn.style.display = 'none';
+  resBox.style.display = 'none';
+
+  if (!s2) return;
+
+  if (s2 === 'none') {
+    s3.style.display = 'block';
+  } else {
+    btn.style.display = 'block';
+  }
+}
+
+function togglePropNewDate() {
+  var val = document.getElementById('propIsNew').value;
+  document.getElementById('propNewDateGroup').style.display = val === 'yes' ? 'block' : 'none';
+  handlePropStep3();
+}
+
+function togglePropEmptyMonths() {
+  var val = document.getElementById('propIsEmpty').value;
+  document.getElementById('propEmptyMonthsGroup').style.display = val === 'yes' ? 'block' : 'none';
+  handlePropStep3();
+}
+
+function handlePropStep3() {
+  var isNew = document.getElementById('propIsNew').value;
+  var isEmp = document.getElementById('propIsEmpty').value;
+  var s4 = document.getElementById('propStep4');
+  var btn = document.getElementById('propCalculateBtnGroup');
+  var resBox = document.getElementById('propNewResultBox');
+
+  resBox.style.display = 'none';
+
+  if (!isNew || !isEmp) {
+    s4.style.display = 'none';
+    btn.style.display = 'none';
+    return;
+  }
+
+  // Check if fully exempt due to "New" within 5 years
+  if (isNew === 'yes') {
+    var d = document.getElementById('propNewDate').value;
+    if (d) {
+      var dDate = new Date(d);
+      var now = new Date();
+      var diffTime = Math.abs(now - dDate);
+      var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays <= (5 * 365)) {
+        s4.style.display = 'none';
+        btn.style.display = 'block';
+        return;
+      }
+    } else {
+      s4.style.display = 'none';
+      btn.style.display = 'none';
+      return;
+    }
+  }
+
+  s4.style.display = 'block';
+  btn.style.display = 'block';
+}
+
+function calculateNewPropertyTax() {
+  var s1 = document.getElementById('propExemptType1').value;
+  var resBox = document.getElementById('propNewResultBox');
+  var resDetails = document.getElementById('propNewResultDetails');
+  var exemptMsg = document.getElementById('propExemptMessage');
+  var exemptText = document.getElementById('propExemptText');
+  
+  resBox.style.display = 'block';
+
+  // Step 1 check
+  if (s1 !== 'none') {
+    resDetails.style.display = 'none';
+    exemptMsg.style.display = 'block';
+    exemptText.textContent = "تم إعفاء هذا العقار بالكامل بناءً على صفته أو منفعته العامة المنتجاة، وذلك استناداً إلى أحكام (المادة الثالثة) من قانون ضريبة العقار رقم 162 لسنة 1959 وتعديلاته التي تنص على إعفاء دور الدولة والأوقاف والنفع العام.";
+    showToast('العقار معفى بالكامل');
+    return;
+  }
+
+  // Step 2 check
+  var s2 = document.getElementById('propExemptType2').value;
+  if (s2 !== 'none') {
+    resDetails.style.display = 'none';
+    exemptMsg.style.display = 'block';
+    exemptText.textContent = "تم إعفاء هذا العقار بالكامل لأنه يمثل (دار سكن للعائلة)، وذلك استناداً إلى أحكام (المادة الرابعة - الفقرتين 1 و 2) من قانون ضريبة العقار رقم 162 لسنة 1959 وتعديلاته، والتي تنص على إعفاء دار السكن والشقة التي يسكنها المالك أو أقاربه من الدرجة الأولى.";
+    showToast('العقار معفى كدار سكن');
+    return;
+  }
+
+  // Step 3 check (New Building)
+  var isNew = document.getElementById('propIsNew').value;
+  if (isNew === 'yes') {
+    var d = document.getElementById('propNewDate').value;
+    var dDate = new Date(d);
+    var now = new Date();
+    var diffTime = Math.abs(now - dDate);
+    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays <= (5 * 365)) {
+      resDetails.style.display = 'none';
+      exemptMsg.style.display = 'block';
+      exemptText.textContent = "تم إعفاء هذا العقار بالكامل لأنهُ عقار مشيد حديثاً لم تمضِ على إتمامه 5 سنوات، استناداً إلى أحكام (المادة الرابعة - الفقرة 3) من القانون.";
+      showToast('العقار معفى كمشيد حديثاً');
+      return;
+    }
+  }
+
+  // Base Calculation
+  var rent = parseArabicNumber(document.getElementById('propAnnualRent').value);
+  if (isNaN(rent) || rent <= 0) {
+    showToast('يرجى إدخال الإيراد السنوي رقمياً', true);
+    return;
+  }
+
+  var isEmp = document.getElementById('propIsEmpty').value;
+  var empMonths = parseInt(document.getElementById('propEmptyMonths').value) || 0;
+  
+  var maint = rent * 0.10;
+  var taxable = rent - maint;
+  
+  var emptyDeduction = 0;
+  var emptyMsg = "";
+  if (isEmp === 'yes' && empMonths >= 3) {
+    emptyDeduction = (taxable / 12) * empMonths;
+    taxable = taxable - emptyDeduction;
+    emptyMsg = "تم خصم نسبة من الوعاء تعادل مدة الخلو ("+empMonths+" أشهر)، استناداً إلى أحكام (المادة الرابعة - الفقرة 5-أ).";
+    document.getElementById('propRowEmptyWrap').style.display = 'block';
+    document.getElementById('propRowEmptyTextWrap').style.display = 'block';
+    setText('propResEmpty', formatNumber(Math.round(emptyDeduction)) + ' د.ع');
+    setText('propResEmptyText', emptyMsg);
+  } else {
+    document.getElementById('propRowEmptyWrap').style.display = 'none';
+    document.getElementById('propRowEmptyTextWrap').style.display = 'none';
+  }
+
+  var baseTax = taxable * 0.10;
+  var finalTax = baseTax;
+
+  exemptMsg.style.display = 'none';
+  resDetails.style.display = 'block';
+
+  setText('propResRent', formatNumber(rent) + ' د.ع');
+  setText('propResRentText', "قيمة الإيراد السنوي المدخلة");
+  
+  setText('propResMaint', formatNumber(Math.round(maint)) + ' د.ع');
+  setText('propResMaintText', "تم استقطاع مبلغ كنسبة اندثار وصيانة، استناداً لأحكام (المادة الثانية - الفقرة 2).");
+  
+  setText('propResTaxable', formatNumber(Math.round(taxable)) + ' د.ع');
+  
+  setText('propResBaseTax', formatNumber(Math.round(baseTax)) + ' د.ع');
+  setText('propResBaseTaxText', "تم ضرب الإيراد الخاضع للضريبة بنسبة 10%، استناداً لأحكام (المادة الثانية - الفقرة 1).");
+
+  // Penalties
+  var penSection = document.getElementById('propPenaltiesSection');
+  var penRows = document.getElementById('propPenRows');
+  penRows.innerHTML = '';
+  var hasPen = false;
+
+  if (document.getElementById('propPenDelay').checked) {
+    var p = baseTax * 0.10;
+    finalTax += p;
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>غرامة تأخير:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 22 - الفقرة 1-أ).</div>';
+    hasPen = true;
+  }
+  if (document.getElementById('propPenFalseInfo').checked) {
+    var p = baseTax * 0.10;
+    finalTax += p;
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>إخفاء معلومات:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 7 - الفقرة 2).</div>';
+    hasPen = true;
+  }
+  if (document.getElementById('propPenFakeEmpty').checked) {
+    var p = baseTax * 2; // مثلي الضريبة
+    finalTax += p;
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>خلو وهمي:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام الغرامات (مثلي الضريبة المتهربة).</div>';
+    hasPen = true;
+  }
+  if (document.getElementById('propPenUseChange').checked) {
+    var p = baseTax * 1; // مثل الضريبة
+    finalTax += p;
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>تغيير استعمال:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) بسبب عدم الإخبار عن زوال شرط الإعفاء.</div>';
+    hasPen = true;
+  }
+
+  penSection.style.display = hasPen ? 'block' : 'none';
+  setText('propResFinalTax', formatNumber(Math.round(finalTax)) + ' د.ع');
+
+  showToast('تم إتمام الحساب وتوثيق الأسانيد بنجاح');
+}
 
 // ========== PROFESSION TAX ==========
 function toggleProfIncomeMethod(method) {
