@@ -1872,47 +1872,189 @@ function calculateNewPropertyTax() {
   showToast('تم إتمام الحساب وتوثيق الأسانيد بنجاح');
 }
 
-// ========== PROFESSION TAX ==========
-function toggleProfIncomeMethod(method) {
-  var label = document.getElementById('profIncomeLabel');
-  label.textContent = method === 'monthly' ? 'الدخل الشهري (د.ع)' : 'الدخل السنوي (د.ع)';
-  document.getElementById('profIncome').dataset.method = method;
-}
+// ========== PROFESSION/INCOME TAX (ضريبة الاستقطاع المباشر) ==========
+function calculateProfTax() {
+  var resBox = document.getElementById('profResultBox');
+  
+  // 1. Demographics & Allowances
+  var isResident = document.getElementById('profRes').value === 'resident';
+  var is63 = document.getElementById('profAge63').value === 'yes';
+  var marital = document.getElementById('profMarital').value;
+  var children = parseInt(document.getElementById('profChildren').value) || 0;
+  
+  // 2. Financials
+  var salary = parseArabicNumber(document.getElementById('profBaseSalary').value) || 0;
+  var allowances = parseArabicNumber(document.getElementById('profAllowances').value) || 0;
+  var houseKindStr = document.getElementById('profHouseKind').value;
+  var houseKindRate = parseFloat(houseKindStr) || 0;
+  var foodKindVal = parseArabicNumber(document.getElementById('profFoodKindVal').value) || 0;
+  
+  // 3. Deductions
+  var socialSec = parseArabicNumber(document.getElementById('profSocialSec').value) || 0;
+  var lifeIns = parseArabicNumber(document.getElementById('profLifeIns').value) || 0;
+  var alimony = parseArabicNumber(document.getElementById('profAlimony').value) || 0;
+  
+  // 5. Admin Penalties
+  var delayDays = parseInt(document.getElementById('profDelayDays').value) || 0;
 
-function calculateProfessionTax() {
-  var income = getVal('profIncome');
-  var expenses = getVal('profExpenses');
-  var method = document.getElementById('profIncome').dataset.method || 'annual';
-  if (method === 'monthly') { income *= 12; expenses *= 12; }
-  var net = income - expenses;
-  if (net <= 0) { showToast('صافي الدخل سالب أو صفر', true); return; }
-  var tax = calculateIncomeTax(net);
-  setText('profNetIncome', formatNumber(net) + ' د.ع');
-  setText('profAfterExempt', formatNumber(Math.max(0, net - SALARY_ANNUAL_EXEMPTION)) + ' د.ع');
-  setText('profTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
-  document.getElementById('profResultDetails').style.display = 'block';
-  showToast('تم احتساب ضريبة المهنة بنجاح');
-}
-
-// Profession wizard
-function nextProfStep(n) {
-  if (n === 4) { calculateProfessionTax(); }
-  var dots = document.querySelectorAll('#page-profession .wizard-dot');
-  var lines = document.querySelectorAll('#page-profession .wizard-line');
-  for (var i = 0; i < dots.length; i++) {
-    dots[i].classList.remove('active', 'done');
-    if (i < n - 1) dots[i].classList.add('done');
-    if (i === n - 1) dots[i].classList.add('active');
+  if (salary <= 0) {
+    resBox.style.display = 'none';
+    return;
   }
-  for (var j = 0; j < lines.length; j++) {
-    lines[j].classList.toggle('done', j < n - 1);
-  }
-  document.querySelectorAll('#page-profession .wizard-card').forEach(function(c) { c.classList.remove('active'); });
-  var step = document.getElementById('prof-step-' + n);
-  if (step) step.classList.add('active');
-}
-function prevProfStep(n) { nextProfStep(n); }
 
+  // --- Step 1 calculations ---
+  var houseBenefit = 0;
+  // hotel edge case
+  if (houseKindStr === '0.20_hotel') { houseBenefit = salary * 0.20; }
+  else { houseBenefit = salary * houseKindRate; }
+
+  // Food benefit: min of 10% salary or actual cost
+  var maxFoodVal = salary * 0.10;
+  var foodBenefit = (foodKindVal > 0 && foodKindVal < maxFoodVal) ? foodKindVal : (foodKindVal > 0 ? maxFoodVal : 0);
+  
+  var totalBenefits = houseBenefit + foodBenefit;
+  var grossIncome = salary + allowances + totalBenefits;
+
+  // --- Step 2: 30% Exemption rule for cash allowances + benefits ---
+  // Note: PRD mentions "المخصصات النقدية (سكن، نقل، طعام...)" rule of 30%.
+  // Total additions (allowances)
+  var totalAdditions = allowances + totalBenefits;
+  var limit30 = salary * 0.30;
+  var exemptAdditions = 0;
+  var taxableAdditions = 0;
+  var exempt30Reason = "";
+  
+  if (totalAdditions <= limit30) {
+    exemptAdditions = totalAdditions;
+    taxableAdditions = 0;
+    exempt30Reason = "مجموع المخصصات والمنافع ("+formatNumber(Math.round(totalAdditions))+") أقل أو يساوي 30% من الراتب الاسمي ("+formatNumber(limit30)+"). تعفى المخصصات بالكامل.";
+  } else {
+    exemptAdditions = limit30;
+    taxableAdditions = totalAdditions - limit30;
+    exempt30Reason = "مجموع المخصصات والمنافع ("+formatNumber(Math.round(totalAdditions))+") تجاوز 30% من الراتب ("+formatNumber(limit30)+"). يعفى سقف الـ 30%، والباقي ("+formatNumber(Math.round(taxableAdditions))+") يضاف للوعاء الضريبي.";
+  }
+
+  // Revised Income after 30% exemption
+  var revisedGross = salary + taxableAdditions;
+
+  // --- Step 3: Legal Deductions ---
+  var totalDeductions = socialSec + lifeIns + alimony;
+  var netAfterDeductions = Math.max(0, revisedGross - totalDeductions);
+
+  // --- Step 4: Social Statutory Allowances (per month) ---
+  var statAllowance = 0;
+  var statAllowanceReason = "";
+  
+  if (isResident) {
+    if (marital === 'single' || marital === 'married_spouse_income') {
+      statAllowance = 208333; // ~ 2,500,000 / 12
+      statAllowanceReason = "أعزب / مطلّق / أرمل أو متزوج (وزوجته تحاسب مستقلاً): 2,500,000 د.ع سنوياً.";
+    } else if (marital === 'married_spouse_no_income') {
+      statAllowance = 375000; // ~ 4,500,000 / 12
+      statAllowanceReason = "متزوج (وزوجته ربة بيت): 4,500,000 د.ع سنوياً.";
+    } else if (marital === 'married_female_disabled_husband') {
+      statAllowance = 416667; // ~ 5,000,000 / 12
+      statAllowanceReason = "متزوجة (زوجها عاجز): 5,000,000 د.ع سنوياً.";
+    } else if (marital === 'widow_divorced') {
+      statAllowance = 266667; // ~ 3,200,000 / 12
+      statAllowanceReason = "أرملة/مطلقة مستقلة: 3,200,000 د.ع سنوياً.";
+    }
+    
+    // Extensions
+    var childAllowance = 0;
+    // Child allowance is 200k annual = 16667 monthly
+    // According to PRD: for widows, divorced, or housewives.
+    // Assuming normally added for typical cases.
+    if (children > 0 && (marital === 'married_spouse_no_income' || marital === 'widow_divorced')) {
+      childAllowance = children * 16667; 
+      statAllowance += childAllowance;
+      statAllowanceReason += " إضافة " + formatNumber(Math.round(childAllowance)) + " عن الأولاد.";
+    }
+
+    if (is63) {
+      statAllowance += 25000; // ~ 300,000 / 12
+      statAllowanceReason += " إضافة 300,000 د.ع سنوي لإكمال سن 63.";
+    }
+    
+  } else {
+    statAllowanceReason = "غير مقيم: لا يُشمل السن، أو الزوجية، أو الأولاد بأي سماح.";
+  }
+
+  // Calculate Net Taxable Base
+  var taxableIncome = Math.max(0, netAfterDeductions - statAllowance);
+
+  // --- Step 5: Tax Brackets Calculation ---
+  var t = taxableIncome;
+  var b1Tax = 0; var b2Tax = 0; var b3Tax = 0; var b4Tax = 0;
+  
+  if (t > 83333) { b4Tax = (t - 83333) * 0.15; t = 83333; }
+  if (t > 41667) { b3Tax = (t - 41667) * 0.10; t = 41667; }
+  if (t > 20833) { b2Tax = (t - 20833) * 0.05; t = 20833; }
+  if (t > 0)     { b1Tax = t * 0.03;          }
+  
+  var baseTaxAmount = b1Tax + b2Tax + b3Tax + b4Tax;
+
+  // --- Step 6: Employer Penalties ---
+  var finalTaxAmount = baseTaxAmount;
+  var penaltyHtml = '';
+  var hasPenalties = false;
+
+  if (delayDays >= 21) {
+    hasPenalties = true;
+    var periods = Math.floor(delayDays / 21);
+    var rate = periods === 1 ? 0.05 : 0.10;
+    var penAmnt = baseTaxAmount * rate;
+    finalTaxAmount += penAmnt;
+    penaltyHtml += '<div style="margin-bottom:6px;"><strong>تأخير ('+delayDays+' يوم):</strong> غرامة ' + (rate*100) + '% بمبلغ <strong>'+formatNumber(Math.round(penAmnt))+' د.ع</strong>. استناداً لأحكام (المادة 10 - سادساً).</div>';
+    
+    // Add fake simple interest assuming 4% for demo (M10-8th)
+    var interestAmnt = baseTaxAmount * (delayDays / 365) * 0.04;
+    finalTaxAmount += interestAmnt;
+    penaltyHtml += '<div style="margin-bottom:6px;"><strong>فوائد تأخيرية مصرفية:</strong> مبلغ <strong>'+formatNumber(Math.round(interestAmnt))+' د.ع</strong>. استناداً لأحكام (المادة 10 - ثامناً).</div>';
+  }
+
+  // -------------------------------------------------------------
+  // RENDER UI
+  resBox.style.display = 'block';
+
+  setText('profResGross', formatNumber(Math.round(grossIncome)) + ' د.ع');
+  setText('profResGrossLegal', 'المادة (2) - رابعاً (المخصصات النقدية)، والمادة (2) - ثانياً وثالثاً (المنافع العينية للسكن والطعام).');
+  
+  setText('profResExempt30', formatNumber(Math.round(exemptAdditions)) + ' د.ع (المعفى)');
+  setText('profResExempt30Legal', exempt30Reason + ' المادة (6) - ثالث عشر.');
+
+  setText('profResDeductions', formatNumber(Math.round(totalDeductions)) + ' د.ع');
+  var dedRea = [];
+  if(socialSec>0) dedRea.push('المادة (3) عاشراً للتقاعد/الضمان');
+  if(lifeIns>0) dedRea.push('المادة (3) للتأمين');
+  if(alimony>0) dedRea.push('القانون للنفقة الشرعية');
+  setText('profResDeductionsLegal', (dedRea.length ? dedRea.join(' و ') : 'لا يوجد استقطاعات.') );
+
+  setText('profResAllowances', formatNumber(Math.round(statAllowance)) + ' د.ع');
+  setText('profResAllowancesLegal', statAllowanceReason + ' المادة (5) - أولاً.');
+
+  setText('profResTaxable', formatNumber(Math.round(taxableIncome)) + ' د.ع');
+
+  var bracketsOut = '<ul style="margin:0;padding-right:20px;list-style:decimal;">';
+  bracketsOut += '<li>الشريحة الأولى (لغاية 20,833) نسبة 3%: <strong>' + formatNumber(Math.round(b1Tax)) + ' د.ع</strong></li>';
+  bracketsOut += '<li>الشريحة الثانية (إلى 41,667) نسبة 5%: <strong>' + formatNumber(Math.round(b2Tax)) + ' د.ع</strong></li>';
+  bracketsOut += '<li>الشريحة الثالثة (إلى 83,333) نسبة 10%: <strong>' + formatNumber(Math.round(b3Tax)) + ' د.ع</strong></li>';
+  bracketsOut += '<li>الشريحة الرابعة (أكثر من 83,333) نسبة 15%: <strong>' + formatNumber(Math.round(b4Tax)) + ' د.ع</strong></li>';
+  bracketsOut += '<li>إجمالي الضريبة الأساسية قبل الغرامات: <strong><span style="color:var(--success);">' + formatNumber(Math.round(baseTaxAmount)) + ' د.ع</span></strong></li>';
+  bracketsOut += '</ul>';
+  document.getElementById('profBracketsHtml').innerHTML = bracketsOut;
+
+  var penSec = document.getElementById('profPenaltiesSection');
+  if (hasPenalties) {
+    penSec.style.display = 'block';
+    document.getElementById('profPenHtml').innerHTML = penaltyHtml;
+  } else {
+    penSec.style.display = 'none';
+  }
+
+  setText('profResFinalTax', formatNumber(Math.round(finalTaxAmount)) + ' د.ع');
+
+}
 // ========== SALES TAX ==========
 var salesEntries = [];
 var salesCounter = 0;

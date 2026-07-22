@@ -1632,90 +1632,166 @@
             <div class="section-hero-content">
               <div class="section-hero-icon-3d">
                 <div class="hero-icon-ring"></div>
-                <i class="fas fa-user-tie"></i>
+                <i class="fas fa-file-invoice-dollar"></i>
               </div>
               <div class="section-hero-text">
-                <h2>ضريبة المهنة</h2>
-                <p>احتساب ضريبة المحامين والأطباء والتجار</p>
+                <h2>ضريبة الدخل (الاستقطاع المباشر)</h2>
+                <p>الاحتساب الذكي لضريبة الدخل الشخصي والمهني مع الأسانيد القانونية</p>
               </div>
             </div>
           </div>
+
           <div class="card">
-            <div class="card-header"><h3><i class="fas fa-user-tie"></i> احتساب ضريبة المهنة</h3></div>
+            <div class="card-header"><h3><i class="fas fa-calculator"></i> نموذج احتساب الضريبة والأسانيد (PRD)</h3></div>
             <div class="card-body">
-              <div class="wizard-progress">
-                <div class="wizard-dot active">١</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٢</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٣</div><div class="wizard-line"></div>
-                <div class="wizard-dot">٤</div>
-              </div>
-              <div class="wizard-labels"><span>المهنة</span><span>الدخل</span><span>المستندات</span><span>النتيجة</span></div>
-
-              <div class="wizard-card active" id="prof-step-1">
-                <h3><i class="fas fa-briefcase"></i> نوع المهنة</h3>
-                <div class="chips-group">
-                  <button class="chip active" onclick="selectChip(this,'profType','doctor')">طبيب</button>
-                  <button class="chip" onclick="selectChip(this,'profType','lawyer')">محامي</button>
-                  <button class="chip" onclick="selectChip(this,'profType','engineer')">مهندس</button>
-                  <button class="chip" onclick="selectChip(this,'profType','merchant')">تاجر</button>
-                  <button class="chip" onclick="selectChip(this,'profType','contractor')">مقاول</button>
-                  <button class="chip" onclick="selectChip(this,'profType','other')">أخرى</button>
-                </div>
-                <input type="hidden" id="profType" value="doctor">
-                <div class="form-grid" style="margin-top:20px;">
-                  <div class="form-group"><label>الاسم الكامل</label><input type="text" id="profName" placeholder="أدخل الاسم"></div>
-                  <div class="form-group"><label>رقم الهوية</label><input type="text" id="profId" placeholder="رقم الهوية الوطنية"></div>
-                </div>
-                <div class="btn-group"><button class="btn btn-primary" onclick="nextProfStep(2)">التالي <i class="fas fa-arrow-left"></i></button></div>
+              <div class="info-banner" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;border-radius:10px;padding:16px;margin-bottom:20px;">
+                <p style="color:#5b21b6;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> أدخل التنزيلات والسماحات والمخصصات لاحتساب الوعاء الضريبي والشرائح التصاعدية.</p>
               </div>
 
-              <div class="wizard-card" id="prof-step-2">
-                <h3><i class="fas fa-coins"></i> تفاصيل الدخل</h3>
-                <div class="chips-group" style="margin-bottom:20px;">
-                  <button class="chip active" onclick="toggleProfIncomeMethod('annual')">سنوي</button>
-                  <button class="chip" onclick="toggleProfIncomeMethod('monthly')">شهري</button>
-                </div>
+              <!-- Section 1: Demographic and Social Data -->
+              <div class="form-card" id="profStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-user"></i> القسم 1: البيانات الاجتماعية والسماحات</h4>
                 <div class="form-grid">
-                  <div class="form-group"><label id="profIncomeLabel">الدخل السنوي (د.ع)</label><input type="text" id="profIncome" placeholder="٠"></div>
-                  <div class="form-group"><label>المصروفات المهنية (د.ع)</label><input type="text" id="profExpenses" placeholder="٠"></div>
-                </div>
-                <div class="btn-group">
-                  <button class="btn btn-ghost" onclick="prevProfStep(1)"><i class="fas fa-arrow-right"></i> السابق</button>
-                  <button class="btn btn-primary" onclick="nextProfStep(3)">التالي <i class="fas fa-arrow-left"></i></button>
-                </div>
-              </div>
-
-              <div class="wizard-card" id="prof-step-3">
-                <h3><i class="fas fa-file-alt"></i> المستندات</h3>
-                <div class="checklist">
-                  <label class="checkbox-label"><input type="checkbox"><span>إجازة مزاولة المهنة</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>هوية الأحوال المدنية</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>بيان الدخل السنوي</span></label>
-                  <label class="checkbox-label"><input type="checkbox"><span>إيصالات المصروفات</span></label>
-                </div>
-                <div class="btn-group">
-                  <button class="btn btn-ghost" onclick="prevProfStep(2)"><i class="fas fa-arrow-right"></i> السابق</button>
-                  <button class="btn btn-primary" onclick="nextProfStep(4)">احتساب <i class="fas fa-calculator"></i></button>
-                </div>
-              </div>
-
-              <div class="wizard-card" id="prof-step-4">
-                <div class="result-box" id="profResultBox">
-                  <div class="result-icon"><i class="fas fa-user-tie"></i></div>
-                  <h2>نتيجة ضريبة المهنة</h2>
-                  <div class="result-details" id="profResultDetails" style="display:none;">
-                    <div class="result-row"><span>الدخل الصافي:</span><strong id="profNetIncome">-</strong></div>
-                    <div class="result-row"><span>بعد الإعفاء:</span><strong id="profAfterExempt">-</strong></div>
-                    <div class="result-row total"><span>الضريبة المستحقة:</span><strong id="profTaxDue">-</strong></div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">هل الإقامة في العراق؟ (غير المقيم لا يُشمل بالسماح)</label>
+                    <select id="profRes" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="calculateProfTax()">
+                      <option value="resident" selected>مقيم</option>
+                      <option value="nonresident">غير مقيم</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">العمر تجاوز 63 عاماً؟</label>
+                    <select id="profAge63" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="calculateProfTax()">
+                      <option value="no" selected>لا</option>
+                      <option value="yes">نعم (يضاف 25,000 د.ع)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">الحالة الاجتماعية للموظف/المكلف</label>
+                    <select id="profMarital" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="calculateProfTax()">
+                      <option value="single" selected>أعزب / مطلّق / أرمل</option>
+                      <option value="married_spouse_no_income">متزوج (الزوج/ة ربة بيت أو دُمج دخلها)</option>
+                      <option value="married_spouse_income">متزوج (الزوج/ة يحاسب ضريبياً مستقلاً)</option>
+                      <option value="married_female_disabled_husband">مرأة متزوجة (زوجها عاجز كلياً وليس له مورد)</option>
+                      <option value="widow_divorced">أرملة أو مطلقة (مستقلة)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">عدد الأولاد (المستحقين للسماح)</label>
+                    <input type="number" id="profChildren" value="0" min="0" oninput="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
                   </div>
                 </div>
-                <div class="btn-group" style="margin-top:20px;"><button class="btn btn-ghost" onclick="prevProfStep(3)"><i class="fas fa-arrow-right"></i> تعديل</button></div>
               </div>
+
+              <!-- Section 2: Financials (Income) -->
+              <div class="form-card" id="profStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-coins"></i> القسم 2: الدخل والمخصصات</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label style="font-weight:bold;">الراتب الاسمي أو الأجر الأساسي (شهرياً)</label>
+                    <input type="text" id="profBaseSalary" placeholder="٠" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">إجمالي المخصصات النقدية الخاضعة (شهرياً)</label>
+                    <input type="text" id="profAllowances" placeholder="٠" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">المنافع العينية (السكن)</label>
+                    <select id="profHouseKind" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" onchange="calculateProfTax()">
+                      <option value="0" selected>بدون منفعة سكن عيني</option>
+                      <option value="0.15">سكن غير مؤثث (يضاف 15% من الراتب)</option>
+                      <option value="0.20">سكن مؤثث (يضاف 20% من الراتب)</option>
+                      <option value="0.10">سكن مشترك (يضاف 10% من الراتب)</option>
+                      <option value="0.20_hotel">فندق (يضاف 20% من الراتب)</option>
+                      <option value="0.05">كرفانات (يضاف 5% من الراتب)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">المنافع العينية (الطعام)</label>
+                    <input type="text" id="profFoodKindVal" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                    <small style="color:var(--text-muted);display:block;margin-top:4px;">سيحسب النظام 10% من الراتب أو الكلفة الفعلية أيهما أقل تلقائياً.</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 3: Legal Deductions -->
+              <div class="form-card" id="profStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-hand-holding-usd"></i> القسم 3: الاستقطاعات القانونية</h4>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label style="font-weight:bold;">التوقيفات التقاعدية / اشتراك الضمان (شهرياً)</label>
+                    <input type="text" id="profSocialSec" placeholder="٠" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">أقساط التأمين المعتمدة (شهرياً)</label>
+                    <input type="text" id="profLifeIns" placeholder="٠" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight:bold;">النفقة الشرعية المحكوم بها (شهرياً)</label>
+                    <input type="text" id="profAlimony" placeholder="٠" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 5: Admin Penalties -->
+              <div class="form-card" id="profStep5" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px;">
+                <h4 style="color: var(--danger); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-gavel"></i> القسم 5: غرامات الشركات (اختياري لمدير العمل)</h4>
+                <div class="form-group" style="margin-bottom:15px;">
+                  <label style="font-weight:bold;">تأخير توريد الضريبة للجهة المالية (أيام)</label>
+                  <input type="number" id="profDelayDays" value="0" min="0" oninput="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                </div>
+                <!-- Optional: Interest rate -->
+                <div class="form-group" style="display:none;">
+                  <label style="font-weight:bold;">نسبة الفائدة المصرفية (سنوياً)</label>
+                  <input type="number" id="profInterestRate" value="0.04" step="0.01" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+                </div>
+              </div>
+
+              <div class="result-box" id="profResultBox" style="margin-top:20px; display:none;">
+                <div class="result-icon"><i class="fas fa-receipt"></i></div>
+                <h2>التقرير الضريبي التفصيلي المرفق بالأسانيد القانونية</h2>
+                <div class="result-details" id="profResultDetails" style="display:block;">
+                  
+                  <!-- Breakdowns -->
+                  <div class="result-row"><span>الدخل الكلي الخاضع:</span><strong id="profResGross">-</strong></div>
+                  <div class="result-row"><span>السند القانوني:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="profResGrossLegal">-</strong></div>
+
+                  <!-- 30% Exemption -->
+                  <div class="result-row" style="margin-top:10px;"><span>تصفية المخصصات (قاعدة الإعفاء 30%):</span><strong id="profResExempt30">-</strong></div>
+                  <div class="result-row"><span>السند القانوني والتوضيح:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="profResExempt30Legal">-</strong></div>
+
+                  <!-- Deductions -->
+                  <div class="result-row" style="margin-top:10px;"><span>التنزيلات القانونية للاستقطاعات:</span><strong id="profResDeductions">-</strong></div>
+                  <div class="result-row"><span>السند القانوني للتنزيلات:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="profResDeductionsLegal">-</strong></div>
+
+                  <!-- Statutory Allowances -->
+                  <div class="result-row" style="margin-top:10px;"><span>إجمالي السماح القانوني الممنوح:</span><strong id="profResAllowances">-</strong></div>
+                  <div class="result-row"><span>السند القانوني للسماحات:</span><strong style="color:var(--text-secondary);font-size:0.85rem;" id="profResAllowancesLegal">-</strong></div>
+
+                  <!-- Taxable Base -->
+                  <div class="result-row" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"><span>الدخل الصافي الخاضع للضريبة:</span><strong id="profResTaxable" style="color:var(--danger);">-</strong></div>
+
+                  <!-- Progressive Brackets Breakdown -->
+                  <div style="background:#fef2f2;padding:15px;border-radius:10px;margin-top:15px;border:1px solid #fecaca;">
+                    <h5 style="color:#dc2626;margin:0 0 10px;">توزيع الشرائح الضريبية (على الأساس الشهري)</h5>
+                    <div id="profBracketsHtml" style="font-size:13px;line-height:1.6;"></div>
+                    <div style="font-size:12px;color:var(--text-secondary);margin-top:8px;">السند القانوني: المادة (8) - ثانياً.</div>
+                  </div>
+
+                  <!-- Delay penalties -->
+                  <div id="profPenaltiesSection" style="display:none;background:#fffbeb;padding:15px;border-radius:10px;margin-top:15px;border:1px solid #fde68a;">
+                    <h5 style="color:#92400e;margin:0 0 10px;">غرامات التوريد المتأخر (حساب أصحاب العمل)</h5>
+                    <div id="profPenHtml" style="font-size:13px;line-height:1.6;"></div>
+                  </div>
+
+                  <div class="result-row total" style="margin-top:15px;"><span>الضريبة الاستقطاعية النهائية (شهرياً):</span><strong id="profResFinalTax">-</strong></div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
-
-        <!-- ==================== SALES TAX ==================== -->
+<!-- ==================== SALES TAX ==================== -->
         <section class="page-section" id="page-sales">
           <div class="section-hero" style="--hero-c1:#991b1b;--hero-c2:#dc2626;" data-aos="fade-down">
             <div class="section-hero-bg">
