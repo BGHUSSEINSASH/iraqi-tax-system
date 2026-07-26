@@ -834,36 +834,76 @@
               </div>
             </div>
           </div>
-          <div class="tabs-container">
-            <button class="tab active" onclick="switchTab(event,'tab-corp-profits')">ضريبة أرباح الشركة</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-employees')">ضريبة موظفي الشركة</button>
-            <button class="tab" onclick="switchTab(event,'tab-corp-contracts')">ضريبة عقود الشركة</button>
+          <div class="tabs-container stylish-tabs" style="margin-bottom: 25px; display: flex; gap: 10px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); justify-content: center;">
+            <button class="tab active" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;" onclick="switchTab(event,'tab-corp-profits')"><i class="fas fa-chart-line"></i> ضريبة أرباح الشركة</button>
+            <button class="tab" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;" onclick="switchTab(event,'tab-corp-employees')"><i class="fas fa-users"></i> ضريبة موظفي الشركة</button>
+            <button class="tab" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;" onclick="switchTab(event,'tab-corp-contracts')"><i class="fas fa-file-contract"></i> ضريبة عقود الشركة</button>
           </div>
 
           <!-- ===== تاب ضريبة أرباح الشركة ===== -->
-          <div class="tab-panel active" id="tab-corp-profits">
-            <div class="card">
-              <div class="card-header"><h3><i class="fas fa-chart-line"></i> احتساب ضريبة أرباح الشركة</h3></div>
-              <div class="card-body">
-                <div class="info-banner" style="background:linear-gradient(135deg,#eef2ff,#e0e7ff);border:1px solid #c7d2fe;border-radius:10px;padding:16px;margin-bottom:20px;">
-                  <p style="color:#3730a3;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> <strong>المعادلة:</strong> أرباح الشركة − مصاريف الشركة = الربح الصافي × 15% = ضريبة إيراد الشركة</p>
+          <div class="tab-panel active animate-in" id="tab-corp-profits">
+            <div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+              <div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-chart-pie" style="color: var(--accent);"></i> احتساب ضريبة أرباح الشركات</h3>
+              </div>
+              <div class="card-body" style="padding: 30px;">
+                <div class="info-banner" style="background: linear-gradient(to right, #eff6ff, #dbeafe); border-right: 4px solid #3b82f6; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px; d-flex; align-items: center; gap: 15px;">
+                  <i class="fas fa-lightbulb" style="color: #2563eb; font-size: 1.5rem; margin-left: 10px;"></i>
+                  <div>
+                    <strong style="color: #1e3a8a; font-size: 1rem; display: block; margin-bottom: 5px;">كيفية الاحتساب قانونياً:</strong>
+                    <p style="color: #1e40af; font-size: 0.95rem; margin: 0; line-height: 1.6;">(إجمالي إيرادات وأرباح الشركة <strong>−</strong> المصاريف المقبولة ضريبياً) <strong>=</strong> الربح الصافي الخاضع للضريبة <strong>×</strong> ١٥٪ نسبة الضريبة المقطوعة.</p>
+                  </div>
                 </div>
-                <div class="form-grid">
-                  <div class="form-group"><label>اسم الشركة</label><input type="text" id="corpName" placeholder="أدخل اسم الشركة"></div>
-                  <div class="form-group"><label>رقم التسجيل الضريبي</label><input type="text" id="corpTaxId" placeholder="أدخل رقم التسجيل"></div>
-                  <div class="form-group"><label>إيراد الشركة (أرباح الشركة) (د.ع)</label><input type="text" id="corpRevenue" placeholder="٠"></div>
-                  <div class="form-group"><label>مصاريف الشركة (د.ع)</label><input type="text" id="corpExpenses" placeholder="٠"></div>
+                
+                <div class="form-grid" style="gap: 20px;">
+                  <div class="form-group">
+                    <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-building" style="color: var(--text-muted); margin-left: 5px;"></i> اسم الشركة</label>
+                    <input type="text" id="corpName" placeholder="مثال: شركة الأفق الخصيب" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; transition: border-color 0.3s; width: 100%; box-sizing: border-box;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-hashtag" style="color: var(--text-muted); margin-left: 5px;"></i> رقم التسجيل الضريبي</label>
+                    <input type="text" id="corpTaxId" placeholder="مثال: ١٠٠٢٩٤٨" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; transition: border-color 0.3s; width: 100%; box-sizing: border-box;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-money-bill-wave" style="color: var(--success); margin-left: 5px;"></i> إجمالي إيرادات الشركة (د.ع)</label>
+                    <input type="text" id="corpRevenue" placeholder="أدخل الإيراد السنوي الكامل" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;">
+                  </div>
+                  <div class="form-group">
+                    <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-file-invoice-dollar" style="color: var(--danger); margin-left: 5px;"></i> إجمالي المصاريف والمندثرات (د.ع)</label>
+                    <input type="text" id="corpExpenses" placeholder="أدخل الخصومات المقبولة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;">
+                  </div>
                 </div>
-                <div class="btn-group" style="margin-top:16px;">
-                  <button class="btn btn-primary" onclick="calculateCorporateProfitTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+
+                <div style="margin-top: 30px; text-align: left;">
+                  <button class="btn btn-primary" onclick="calculateCorporateProfitTax()" style="padding: 14px 30px; font-size: 1.1rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(26,41,128,0.3);"><i class="fas fa-calculator" style="margin-left: 8px;"></i> استخراج النتيجة</button>
                 </div>
-                <div class="result-box" id="corpProfitResultBox" style="margin-top:20px;display:none;">
-                  <div class="result-details" style="display:block;">
-                    <div class="result-row"><span>إيراد الشركة:</span><strong id="corpProfitRevenue">-</strong></div>
-                    <div class="result-row"><span>مصاريف الشركة:</span><strong id="corpProfitExpenses">-</strong></div>
-                    <div class="result-row"><span>الربح الصافي:</span><strong id="corpProfitNet">-</strong></div>
-                    <div class="result-row"><span>نسبة الضريبة:</span><strong>١٥٪</strong></div>
-                    <div class="result-row total"><span>ضريبة إيراد الشركة:</span><strong id="corpProfitTaxDue">-</strong></div>
+
+                <div class="result-box animate-in" id="corpProfitResultBox" style="margin-top:30px; display:none; background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                  <div style="background: var(--bg-secondary); padding: 15px 25px; border-bottom: 2px dashed var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                    <h4 style="margin: 0; font-size: 1.1rem; color: var(--primary);"><i class="fas fa-receipt"></i> كشف احتساب الضريبة</h4>
+                    <span style="background: rgba(37,99,235,0.1); color: #2563eb; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">رسمي</span>
+                  </div>
+                  <div style="padding: 25px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+                      <span style="color: var(--text-secondary);">الإيرادات الكلية:</span>
+                      <strong id="corpProfitRevenue" style="color: var(--text-primary);">٠ د.ع</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+                      <span style="color: var(--text-secondary);">خصم المصاريف:</span>
+                      <strong id="corpProfitExpenses" style="color: var(--danger);">٠ د.ع</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem; padding-bottom: 12px; border-bottom: 1px solid var(--border-light);">
+                      <span style="color: var(--text-secondary);">الربح الصافي:</span>
+                      <strong id="corpProfitNet" style="color: var(--primary);">٠ د.ع</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 1.05rem;">
+                      <span style="color: var(--text-secondary);">النسبة الضريبية المطبقة:</span>
+                      <strong style="background: var(--primary-light); color: #fff; padding: 2px 10px; border-radius: 12px;">١٥٪</strong>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+                      <span style="font-size: 1.1rem; font-weight: 700;">الضريبة المستحقة (نهائي):</span>
+                      <strong id="corpProfitTaxDue" style="font-size: 1.6rem; font-weight: 900;">٠ د.ع</strong>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1008,6 +1048,9 @@
                         <div class="emp-field"><label>تاريخ الطلاق / الوفاة (إن وجد)</label><input type="date" id="empModDivorceDate"></div>
                         <div class="emp-field"><label>هل الزوج/الزوجة عاجز كلياً عن العمل؟</label><select id="empModSpouseDisabled"><option value="no">كلا</option><option value="yes">نعم</option></select></div>
                         <div class="emp-field"><label>جهة عمل الزوج(ة) الرئيسية</label><input type="text" id="empModSpouseEmpName" placeholder="إن وجد"></div>
+                        <div class="emp-field"><label>هل الزوج(ة) منتسب (يعمل)؟</label><select id="empModSpouseEmployed"><option value="no">كلا</option><option value="yes">نعم</option></select></div>
+                        <div class="emp-field"><label>طلب دمج المدخولات مع الزوج(ة)؟</label><select id="empModIncomeMerge"><option value="no">كلا</option><option value="yes">نعم</option></select></div>
+                        <div class="emp-field"><label>الرقم التعريفي لصاحب عمل الزوج(ة)</label><input type="text" id="empModSpouseEmpId" placeholder="إن وجد"></div>
                       </div>
                     </div>
                     <div class="emp-form-card">
@@ -1073,22 +1116,31 @@
           </div>
 
           <!-- ===== تاب ضريبة موظفي الشركة (المحدّث بالكامل) ===== -->
-          <div class="tab-panel" id="tab-corp-employees">
-            <div class="card">
-              <div class="card-header">
-                <h3><i class="fas fa-users"></i> ضريبة الدخل لموظفي الشركة (وفق الإكسل)</h3>
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-primary" onclick="openEmployeeModal()"><i class="fas fa-user-plus"></i> إضافة موظف</button>
-                  <button class="btn btn-sm btn-success" onclick="exportEmployeeTableToExcel()"><i class="fas fa-file-excel"></i> تصدير الجدول للطباعة</button>
+          <div class="tab-panel animate-in" id="tab-corp-employees">
+            <div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+              <div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 15px; align-items: center;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-users" style="color: var(--accent);"></i> ضريبة الدخل لموظفي الشركة (سجل الإكسل)</h3>
+                <div class="btn-group" style="gap: 8px;">
+                  <button class="btn btn-sm btn-primary" onclick="openEmployeeModal()" style="border-radius: 20px; font-weight: 700; padding: 6px 16px; background: var(--accent); color: #fff; border: none; box-shadow: 0 2px 8px rgba(212,160,23,0.4);"><i class="fas fa-user-plus"></i> إضافة موظف</button>
+                  <button class="btn btn-sm btn-success" onclick="exportEmployeeTableToExcel()" style="border-radius: 20px; font-weight: 700; padding: 6px 16px;"><i class="fas fa-file-excel"></i> تصدير مختصر</button>
+                  <button class="btn btn-sm" style="border-radius: 20px; background:#eab308; color:#fff; border:none; font-weight: 700; padding: 6px 16px; box-shadow: 0 2px 8px rgba(234,179,8,0.4);" onclick="exportD14Excel()"><i class="fas fa-file-export"></i> إكسل ض.د/14</button>
+                  <button class="btn btn-sm" style="border-radius: 20px; background:#7c3aed; color:#fff; border:none; font-weight: 700; padding: 6px 16px;" onclick="exportAnnualStatement()"><i class="fas fa-table"></i> كشف سنوي</button>
+                  <button class="btn btn-sm" style="border-radius: 20px; background:#0f1b4d; color:#fff; border:none; font-weight: 700; padding: 6px 16px;" onclick="printComprehensiveEmployeeReport()"><i class="fas fa-print"></i> برونت السجل الشامل</button>
+                  <button class="btn btn-sm" style="border-radius: 20px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.3); font-weight: 700; padding: 6px 16px;" onclick="document.getElementById('importAnnualStatementFile').click()"><i class="fas fa-file-import"></i> استيراد</button>
+                  <input type="file" id="importAnnualStatementFile" accept=".xlsx,.xls" style="display:none;" onchange="importAnnualStatement(this)">
                 </div>
               </div>
-              <div class="card-body">
-                <div class="info-banner" style="background:linear-gradient(135deg, #f0fdf4, #dcfce7); border:1px solid #bbf7d0; border-radius:10px; padding:16px; margin-bottom:20px;">
-                  <p style="color:#166534; font-size:13px; margin:0;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>سجل إلكتروني متكامل:</strong> يمكنك إضافة كافة تفاصيل الموظف عبر نافذة سهلة الاستخدام (نافذة منبثقة) تحتوي على جميع حقول ومعادلات الإكسل بدقة 100%.</p>
+              <div class="card-body" style="padding: 25px;">
+                <div class="info-banner" style="background: linear-gradient(to right, #ecfdf5, #d1fae5); border-right: 4px solid #10b981; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
+                  <i class="fas fa-shield-check" style="color: #059669; font-size: 1.5rem; margin-left: 10px;"></i>
+                  <div>
+                    <strong style="color: #064e3b; font-size: 1rem; display: block; margin-bottom: 5px;">سجل الموظفين الذكي (مطابق لقانون الضريبة العراقي):</strong>
+                    <p style="color: #065f46; font-size: 0.95rem; margin: 0; line-height: 1.6;">جميع المدخلات ترتبط مباشرة بالمعادلات الرياضية المتعمدة قانونياً. يتم استخراج الاستمارات الرسمية بصيغ جاهزة للطباعة والتسليم للهيئة العامة للضرائب.</p>
+                  </div>
                 </div>
-                <div class="table-container" style="overflow-x:auto;">
-                  <table class="data-table" id="newExcelEmployeeTable" style="width:100%; min-width:800px;">
-                    <thead>
+                <div class="table-container" style="overflow-x:auto; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--border-light);">
+                  <table class="data-table" id="newExcelEmployeeTable" style="width:100%; min-width:800px; border-collapse: separate; border-spacing: 0;">
+                    <thead style="background: var(--bg-secondary);">
                       <tr>
                         <th>ت</th>
                         <th>اسم الموظف</th>
@@ -1117,17 +1169,17 @@
                   </table>
                 </div>
                 
-                <div class="btn-group" style="margin-top:16px;">
-                  <button class="btn btn-primary" onclick="exportFormD14()"><i class="fas fa-file-alt"></i> تصدير استمارة ض.د14 للجميع</button>
-                  <button class="btn btn-warning" onclick="exportAnnualMemo()"><i class="fas fa-file-invoice"></i> تصدير المذكرة السنوية</button>
+                <div class="btn-group" style="margin-top: 25px; display: flex; gap: 10px;">
+                  <button class="btn btn-primary" onclick="exportFormD14()" style="border-radius: 12px; font-weight: 700; padding: 12px 24px; box-shadow: 0 4px 12px rgba(26,41,128,0.3);"><i class="fas fa-file-pdf"></i> استمارة ض.د14 للجميع (PDF)</button>
+                  <button class="btn btn-warning" onclick="exportAnnualMemo()" style="border-radius: 12px; font-weight: 700; padding: 12px 24px; color: #fff; box-shadow: 0 4px 12px rgba(234,179,8,0.3);"><i class="fas fa-file-invoice-dollar"></i> تصدير المذكرة السنوية (PDF)</button>
                 </div>
 
-                <div class="card" style="margin-top:20px; border:1px solid var(--border-light);">
-                  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-                    <h3><i class="fas fa-file-invoice"></i> معاينة استمارة ض.د/14</h3>
-                    <div class="btn-group">
-                      <button class="btn btn-sm btn-secondary" onclick="printCurrentEmployeeDD4A()"><i class="fas fa-print"></i> طباعة</button>
-                      <button class="btn btn-sm btn-success" onclick="exportCurrentEmployeeDD4APdf()"><i class="fas fa-file-pdf"></i> تنزيل PDF</button>
+                <div class="card" style="margin-top: 30px; border: 1px solid var(--border-light); box-shadow: 0 5px 15px rgba(0,0,0,0.03); border-radius: 16px; overflow: hidden;">
+                  <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; background: var(--bg-secondary); border-bottom: 2px dashed var(--border-light); padding: 15px 24px;">
+                    <h3 style="margin: 0; font-size: 1.1rem; color: var(--primary);"><i class="fas fa-file-invoice"></i> استمارة (ض.د/14) للموظف المختار</h3>
+                    <div class="btn-group" style="gap: 8px;">
+                      <button class="btn btn-sm btn-secondary" onclick="printCurrentEmployeeDD4A()" style="border-radius: 20px; font-weight: 600;"><i class="fas fa-print"></i> طباعة فورية</button>
+                      <button class="btn btn-sm btn-success" onclick="exportCurrentEmployeeDD4APdf()" style="border-radius: 20px; font-weight: 600;"><i class="fas fa-download"></i> حفظ PDF</button>
                     </div>
                   </div>
                   <div class="card-body">
@@ -1139,53 +1191,112 @@
                 </div>
               </div>
             </div>
+
+            <!-- ===== قسم معاينة الكشف السنوي ===== -->
+            <div class="card animate-in" style="margin-top: 30px; border: none; box-shadow: 0 8px 25px rgba(124,58,237,0.15); border-radius: 16px;">
+              <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+                <h3 style="color:#fff; margin: 0; font-size: 1.2rem;"><i class="fas fa-table" style="color: #c4b5fd;"></i> معاينة الكشف السنوي الشامل — (ض.د/14)</h3>
+                <div class="btn-group" style="gap: 10px;">
+                  <button class="btn btn-sm" style="background:#fff; color:#7c3aed; border:none; border-radius: 20px; font-weight: 700; padding: 6px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" onclick="renderAnnualStatementPreview()"><i class="fas fa-sync-alt"></i> توليد / تحديث الكشف</button>
+                  <button class="btn btn-sm" style="background:#dcfce7; color:#166534; border:none; border-radius: 20px; font-weight: 700; padding: 6px 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);" onclick="printAnnualStatement()"><i class="fas fa-print"></i> طباعة الكشف</button>
+                </div>
+              </div>
+              <div class="card-body" style="overflow:auto; padding: 25px;">
+                <p id="annualStatementHint" style="margin:0 0 15px; color:var(--text-secondary); font-size: 1rem; text-align: center; padding: 20px; background: var(--bg-secondary); border-radius: 12px; border: 1px dashed var(--border);">اضغط على <strong>"تحديث المخرجات"</strong> لعرض الجدول الموحد والمطابق للمواصفات الحكومية بناءً على المدخلات.</p>
+                <div id="annualStatementPreview" style="direction:rtl; background:#fff; display:none; border: 1px solid var(--border-light); border-radius: 8px; padding: 15px;"></div>
+              </div>
+            </div>
           </div>
 
-          <div class="tab-panel" id="tab-corp-contracts">
-            <div class="card">
-              <div class="card-header"><h3><i class="fas fa-file-contract"></i> احتساب ضريبة عقود الشركة</h3></div>
-              <div class="card-body">
-                <div class="tabs-container" style="margin-bottom:20px;">
-                  <button class="tab active" onclick="switchContractSubTab(event,'subtab-contract-tax')">ضريبة العقد</button>
-                  <button class="tab" onclick="switchContractSubTab(event,'subtab-contract-employees')">ضريبة موظفي العقد</button>
-                  <button class="tab" onclick="switchContractSubTab(event,'subtab-contract-deductions')">استقطاع الأمانات الضريبية</button>
+          <div class="tab-panel animate-in" id="tab-corp-contracts">
+            <div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+              <div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-file-signature" style="color: var(--accent);"></i> احتساب ضريبة عقود الشركات</h3>
+              </div>
+              <div class="card-body" style="padding: 25px;">
+                <div class="tabs-container stylish-tabs" style="margin-bottom: 25px; display: flex; gap: 10px; background: #fff; padding: 8px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); justify-content: center;">
+                  <button class="tab active" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;" onclick="switchContractSubTab(event,'subtab-contract-tax')"><i class="fas fa-file-contract"></i> ضريبة العقد</button>
+                  <button class="tab" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;" onclick="switchContractSubTab(event,'subtab-contract-employees')"><i class="fas fa-hard-hat"></i> ضريبة موظفي العقد</button>
+                  <button class="tab" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;" onclick="switchContractSubTab(event,'subtab-contract-deductions')"><i class="fas fa-hand-holding-usd"></i> استقطاع الأمانات الضريبية</button>
                 </div>
 
                 <!-- ضريبة العقد -->
-                <div class="contract-subtab active" id="subtab-contract-tax">
-                  <div class="info-banner" style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:10px;padding:16px;margin-bottom:20px;">
-                    <p style="color:#92400e;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> أدخل بيانات العقد وسيتم احتساب الضريبة حسب نوع العقد والنسبة المقررة.</p>
+                <div class="contract-subtab active animate-in" id="subtab-contract-tax">
+                  <div class="info-banner" style="background: linear-gradient(to right, #fffbeb, #fef3c7); border-right: 4px solid #f59e0b; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
+                    <i class="fas fa-file-contract" style="color: #d97706; font-size: 1.5rem; margin-left: 10px;"></i>
+                    <div>
+                      <strong style="color: #92400e; font-size: 1rem; display: block; margin-bottom: 5px;">ضريبة عقود المقاولات والتجهيز:</strong>
+                      <p style="color: #b45309; font-size: 0.95rem; margin: 0; line-height: 1.6;">تُحتسب الضريبة بناءً على نوع العقد والنسب القانونية المحددة (مثال: العقود الإنشائية ٣.٣٪، الاستشارات ٧٪).</p>
+                    </div>
                   </div>
-                  <div class="form-grid">
-                    <div class="form-group"><label>اسم الشركة / المقاول</label><input type="text" id="contractCompany" placeholder="اسم الشركة"></div>
-                    <div class="form-group"><label>نوع العقد</label>
-                      <select id="contractType" onchange="updateContractTaxRate()">
-                        <option value="">اختر نوع العقد</option>
-                        <option value="construction">مقاولات إنشائية (3.3%)</option>
-                        <option value="supply">عقد توريد (3.3%)</option>
-                        <option value="services">عقد خدمات (3.3%)</option>
-                        <option value="consulting">عقد استشارات (7%)</option>
-                        <option value="transport">عقد نقل (3.3%)</option>
-                        <option value="maintenance">عقد صيانة (3.3%)</option>
-                        <option value="rent_equipment">تأجير معدات (10%)</option>
-                        <option value="foreign">عقد شركة أجنبية (7%)</option>
+                  
+                  <div class="form-grid" style="gap: 20px;">
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-industry" style="color: var(--text-muted); margin-left: 5px;"></i> اسم الشركة / المقاول</label>
+                      <input type="text" id="contractCompany" placeholder="أدخل اسم الجهة المتعاقدة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-list-alt" style="color: var(--text-muted); margin-left: 5px;"></i> نوع العقد</label>
+                      <select id="contractType" onchange="updateContractTaxRate()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;">
+                        <option value="">اختر التصنيف القانوني للعقد</option>
+                        <option value="construction">مقاولات إنشائية (٣.٣٪)</option>
+                        <option value="supply">عقد تجهيز/توريد (٣.٣٪)</option>
+                        <option value="services">عقد تقديم خدمات (٣.٣٪)</option>
+                        <option value="consulting">عقد استشارات (٧٪)</option>
+                        <option value="transport">عقد نقل (٣.٣٪)</option>
+                        <option value="maintenance">عقد صيانة (٣.٣٪)</option>
+                        <option value="rent_equipment">تأجير آليات ومعدات (١٠٪)</option>
+                        <option value="foreign">عقد شركة أجنبية (٧٪)</option>
                       </select>
                     </div>
-                    <div class="form-group"><label>قيمة العقد (د.ع)</label><input type="text" id="contractValue" placeholder="٠"></div>
-                    <div class="form-group"><label>تاريخ التوقيع</label><input type="date" id="contractSignDate"></div>
-                    <div class="form-group"><label>تاريخ الانتهاء</label><input type="date" id="contractEndDate"></div>
-                    <div class="form-group"><label>نسبة الضريبة</label><input type="text" id="contractTaxRateDisplay" readonly placeholder="يُحدد حسب نوع العقد"></div>
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-money-check-alt" style="color: var(--success); margin-left: 5px;"></i> إجمالي قيمة العقد (د.ع)</label>
+                      <input type="text" id="contractValue" placeholder="مثال: ١٥,٠٠٠,٠٠٠" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; font-weight: 700; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-calendar-alt" style="color: var(--text-muted); margin-left: 5px;"></i> تاريخ توقيع العقد</label>
+                      <input type="date" id="contractSignDate" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-calendar-check" style="color: var(--text-muted); margin-left: 5px;"></i> تاريخ الانتهاء المتوقع</label>
+                      <input type="date" id="contractEndDate" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group">
+                      <label style="font-weight: 700;"><i class="fas fa-percent" style="color: var(--text-muted); margin-left: 5px;"></i> النسبة الضريبية المقررة</label>
+                      <input type="text" id="contractTaxRateDisplay" readonly placeholder="تُحدد تلقائياً حسب نوع العقد" style="border: 2px solid transparent; background: var(--bg-secondary); border-radius: 10px; padding: 12px 16px; font-size: 1rem; font-weight: 700; color: var(--primary); width: 100%; box-sizing: border-box;">
+                    </div>
                   </div>
-                  <div class="btn-group" style="margin-top:16px;">
-                    <button class="btn btn-primary" onclick="calculateContractTax()"><i class="fas fa-calculator"></i> احتساب ضريبة العقد</button>
+
+                  <div style="margin-top: 30px; text-align: left;">
+                    <button class="btn btn-primary" onclick="calculateContractTax()" style="padding: 14px 30px; font-size: 1.1rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(26,41,128,0.3);"><i class="fas fa-calculator" style="margin-left: 8px;"></i> استخراج ضريبة العقد</button>
                   </div>
-                  <div class="result-box" id="contractTaxResult" style="margin-top:20px;display:none;">
-                    <div class="result-details" style="display:block;">
-                      <div class="result-row"><span>نوع العقد:</span><strong id="contractTypeResult">-</strong></div>
-                      <div class="result-row"><span>قيمة العقد:</span><strong id="contractValueResult">-</strong></div>
-                      <div class="result-row"><span>نسبة الضريبة:</span><strong id="contractRateResult">-</strong></div>
-                      <div class="result-row"><span>مدة العقد:</span><strong id="contractDurationResult">-</strong></div>
-                      <div class="result-row total"><span>ضريبة العقد:</span><strong id="contractTaxDue">-</strong></div>
+
+                  <div class="result-box animate-in" id="contractTaxResult" style="margin-top:30px; display:none; background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <div style="background: var(--bg-secondary); padding: 15px 25px; border-bottom: 2px dashed var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                      <h4 style="margin: 0; font-size: 1.1rem; color: var(--primary);"><i class="fas fa-receipt"></i> نتيجة الاحتساب</h4>
+                      <span style="background: rgba(37,99,235,0.1); color: #2563eb; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">رسمي</span>
+                    </div>
+                    <div style="padding: 25px;">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+                        <span style="color: var(--text-secondary);">نوع وتصنيف العقد:</span>
+                        <strong id="contractTypeResult" style="color: var(--text-primary);">-</strong>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+                        <span style="color: var(--text-secondary);">قيمة العقد الكلية:</span>
+                        <strong id="contractValueResult" style="color: var(--text-primary);">-</strong>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+                        <span style="color: var(--text-secondary);">النسبة الضريبية:</span>
+                        <strong id="contractRateResult" style="background: var(--primary-light); color: #fff; padding: 2px 10px; border-radius: 12px;">-</strong>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 1.05rem; padding-bottom: 12px; border-bottom: 1px solid var(--border-light);">
+                        <span style="color: var(--text-secondary);">مدة وكفاءة العقد:</span>
+                        <strong id="contractDurationResult" style="color: var(--text-primary);">-</strong>
+                      </div>
+                      <div style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+                        <span style="font-size: 1.1rem; font-weight: 700;">ضريبة العقد (إجمالي):</span>
+                        <strong id="contractTaxDue" style="font-size: 1.6rem; font-weight: 900;">-</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
