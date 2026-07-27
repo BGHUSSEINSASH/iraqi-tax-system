@@ -566,15 +566,23 @@ function selectChip(chip, inputId, value) {
 function calculateCorporateProfitTax() {
   var revenue = getVal('corpRevenue');
   var expenses = getVal('corpExpenses');
+  var activity = document.getElementById('corpActivity') ? document.getElementById('corpActivity').value : 'other';
+  
   if (!revenue) { showToast('يرجى إدخال إيراد الشركة', true); return; }
-  var netProfit = revenue - expenses;
+  var netProfit = revenue - (expenses || 0);
   if (netProfit <= 0) { showToast('الربح الصافي سالب أو صفر، لا توجد ضريبة مستحقة', true); return; }
-  var rate = 0.15;
+  
+  var rate = activity === 'oil' ? 0.35 : 0.15;
   var tax = netProfit * rate;
 
   setText('corpProfitRevenue', formatNumber(revenue) + ' د.ع');
-  setText('corpProfitExpenses', formatNumber(expenses) + ' د.ع');
+  setText('corpProfitExpenses', formatNumber(expenses || 0) + ' د.ع');
   setText('corpProfitNet', formatNumber(netProfit) + ' د.ع');
+  
+  // Set rate visually in HTML
+  var rateElement = document.getElementById('corpProfitResultBox').querySelector('strong[style*="background: var(--primary-light)"]');
+  if(rateElement) rateElement.textContent = (rate * 100) + '٪';
+  
   setText('corpProfitTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
   document.getElementById('corpProfitResultBox').style.display = 'block';
   showToast('تم احتساب ضريبة أرباح الشركة بنجاح');
@@ -605,6 +613,8 @@ var PAYROLL_MONTHLY_BRACKETS = [
 ];
 
 var globalEmployees = [];
+var contractEmployees = [];
+var currentEmpType = "company";
 var currentDd4aEmployeeId = null;
 
 function hydrateStoredEmployeeRecord(record) {
@@ -624,17 +634,19 @@ function loadStoredEmployees() {
   try {
     var stored = JSON.parse(localStorage.getItem('companyEmployeesData') || '[]');
     globalEmployees = Array.isArray(stored) ? stored.map(hydrateStoredEmployeeRecord) : [];
-  } catch (error) {
+    var storedCont = JSON.parse(localStorage.getItem('contractEmployeesData') || '[]');
+    contractEmployees = Array.isArray(storedCont) ? storedCont.map(hydrateStoredEmployeeRecord) : [];
+  } catch (e) {
     globalEmployees = [];
+    contractEmployees = [];
   }
 }
-
 function saveStoredEmployees() {
   try {
     localStorage.setItem('companyEmployeesData', JSON.stringify(globalEmployees));
-  } catch (error) {}
+    localStorage.setItem('contractEmployeesData', JSON.stringify(contractEmployees));
+  } catch (e) { console.error('Error saving', e); }
 }
-
 loadStoredEmployees();
 
 function calculateMonthlyAllowance(nationality, residency, marital, children, over63) {
@@ -804,10 +816,13 @@ window.nextEmpStep = function(dir) {
   }
 };
 
-window.openEmployeeModal = function(editId) {
+window.openEmployeeModal = function(editId, type) {
+  currentEmpType = type || 'company';
   var modal = document.getElementById('employeeExcelModal');
   if (!modal) return;
-  var employee = editId ? globalEmployees.find(function(item) { return item.id === editId; }) : null;
+  var targetArray = currentEmpType === 'contract' ? contractEmployees : globalEmployees;
+  var employee = editId ? targetArray.find(function(item) { return item.id === editId; }) : null;
+
   document.getElementById('empModEditId').value = employee ? employee.id : '';
   document.getElementById('empModName').value = employee ? employee.name : '';
   document.getElementById('empModNat').value = employee ? employee.nat : 'iraqi';
@@ -864,24 +879,32 @@ window.saveEmployeeFromModal = function() {
   var math = doExcelMathForEmployee(inputs);
   var merged = Object.assign({}, inputs, math);
   var editId = document.getElementById('empModEditId').value;
+  var targetArray = currentEmpType === 'contract' ? contractEmployees : globalEmployees;
+  
   if (editId) {
     merged.id = editId;
-    for (var i = 0; i < globalEmployees.length; i++) {
-      if (globalEmployees[i].id === editId) {
-        globalEmployees[i] = merged;
+    for (var i = 0; i < targetArray.length; i++) {
+      if (targetArray[i].id === editId) {
+        targetArray[i] = merged;
         break;
       }
     }
   } else {
     merged.id = 'EMP_' + Date.now();
-    globalEmployees.push(merged);
+    targetArray.push(merged);
   }
+  
   saveStoredEmployees();
   closeEmployeeModal();
-  renderEmployeeList();
+  if (currentEmpType === 'contract') {
+    renderContractEmployeeList();
+  } else {
+    renderEmployeeList();
+  }
   showEmployeeDD4A(merged);
-  showToast('تم حفظ الموظف بنجاح');
-};
+  showToast('تم الحفظ بنجاح');
+}
+;
 
 window.removeExtEmployee = function(id) {
   globalEmployees = globalEmployees.filter(function(item) { return item.id !== id; });
@@ -4257,6 +4280,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Restore saved company employees
   renderEmployeeList();
+  if (typeof renderContractEmployeeList === "function") renderContractEmployeeList();
 
   // Set today's date
   var today = new Date();
