@@ -1092,7 +1092,25 @@ function buildEmployeeDD4AHtml(employee) {
       </div>
 
 
+      
       <div style="margin-bottom:15px;">
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div>1- اسم المنتسب الثلاثي واللقب: ${fmtLine(employee.name, '250px')}</div>
+          <div>الجنسية: ${fmtLine(employee.nat === 'iraqi' ? 'عراقي' : 'أجنبي', '80px')}</div>
+          <div>الجنس: ${fmtLine(employee.gender === 'male' ? 'ذكر' : 'أنثى', '50px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div>محل الاقامة الدائم: ${fmtLine((employee.province || '') + ' ' + (employee.city || ''), '200px')}</div>
+          <div>محلة: ${fmtLine(employee.neighborhood, '50px')}</div>
+          <div>زقاق: ${fmtLine(employee.street, '50px')}</div>
+          <div>دار: ${fmtLine(employee.houseNo, '50px')}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <div>تاريخ الولادة: ${fmtLine(employee.birthDate, '100px')}</div>
+          <div>رقم هوية الاحوال المدنية أو البطاقة الوطنية: ${fmtLine(employee.civilId, '150px')}</div>
+        </div>
+      </div>
+<div style="margin-bottom:15px;">
         <div style="display:flex; gap:10px; margin-bottom:8px;">
           <div>2- العنوان الوظيفي: ${fmtLine(employee.jobTitle, '150px')}</div>
           <div>اليوم الاول لبدء العمل: ${fmtLine(employee.startDate, '100px')} الى ${fmtLine(employee.endDate, '100px')}</div>
