@@ -1084,7 +1084,7 @@ function buildEmployeeDD4AHtml(employee) {
   function bCell(key, value) { return taxableColumn === key ? formatNumber(Math.round(value)) : ''; }
 
   var page1 = `
-    <div class="page-break" style="width:210mm; height:296.5mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
+    <div class="page-break" style="width:210mm; height:296mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
       <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
         <div style="font-size:12px; line-height:1.4;">رقم الاستمارة: 1<br>السنة المالية: ${new Date().getFullYear()}<br>الصفحة: 1</div>
         <div style="text-align:center; font-size:16px; flex-grow:1;"><strong>الاستمارة ض. د / 14</strong><br>خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</div>
@@ -1203,7 +1203,7 @@ function buildEmployeeDD4AHtml(employee) {
   `;
 
   var page2 = `
-    <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
+    <div class="page-break" style="width:210mm; height:296mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
       <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">الاستمارة ض. د / 14</div>
       ${settlementDisplay}
       <div style="text-align:center; font-size:11px; margin-bottom:5px; color:#666; font-weight:bold;">${mathStr}</div>
@@ -4739,3 +4739,35 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 });
+
+
+window.exportBlankExcel = function() {
+  if (typeof XLSX === 'undefined') {
+    showToast('المكتبة غير متوفرة', true);
+    return;
+  }
+  var ws_data = [
+    [
+      "اسم الموظف الثلاثي واللقب", "الجنسية", "الاقامة", "الجنس", "تاريخ الميلاد", "رقم هوية الاحوال", "رقم الهاتف", "البريد الالكتروني",
+      "القطاع", "تاريخ المباشرة", "تاريخ الانتهاء", "صاحب العمل الرئيسي؟", "العنوان الوظيفي", "اسم صاحب العمل", "الرقم التعريفي لصاحب العمل",
+      "المحافظة", "المدينة", "الزقاق", "الشارع", "رقم الدار",
+      "الحالة الزوجية", "تاريخ الزواج", "اسم الزوجة/الزوج", "تاريخ الطلاق", "رقم هوية الزوجة", "الزوجة عاجزة؟",
+      "صاحب عمل الزوجة", "الزوجة تعمل؟", "دمج المدخولات؟", "رقم صاحب عمل الزوجة",
+      "عدد الاولاد المستحقين", "هل تجاوز 63؟", "عدد الاشهر",
+      "الراتب الأساسي", "المخصصات الخاضعة كلياً (M)", "مخصصات السكن والطعام النقدية (N)", "السكن العيني", "قسط التأمين على الحياة", "أقساط النفقة الشرعية"
+    ],
+    [
+      "محمد علي", "iraqi", "resident", "male", "1990-01-01", "123456", "0770000000", "test@test.com",
+      "private", "2020-01-01", "", "yes", "مهندس", "الشركة الهندسية", "999",
+      "بغداد", "المنصور", "1", "2", "3",
+      "single", "", "", "", "", "no",
+      "", "no", "no", "",
+      "0", "no", "12",
+      "1000000", "200000", "150000", "none", "0", "0"
+    ]
+  ];
+  var ws = XLSX.utils.aoa_to_sheet(ws_data);
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Template");
+  XLSX.writeFile(wb, "Employee_Import_Template.xlsx");
+};
