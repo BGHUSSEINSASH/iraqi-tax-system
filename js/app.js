@@ -1051,13 +1051,15 @@ function buildEmployeeDD4AHtml(employee) {
   function bCell(key, value) { return taxableColumn === key ? formatNumber(value) : ''; }
 
   var page1 = `
-    <div class="page-break">
-      <div style="display:flex; justify-content:space-between; margin-bottom:10px; align-items:flex-start; border-bottom: 2px solid #000; padding-bottom: 10px;">
-        <div style="font-size:12px; line-height:1.6; font-weight:bold;">رقم الاستمارة: 1<br>السنة المالية: ${new Date().getFullYear()}<br>الصفحة: 1</div>
-        <div style="text-align:center; font-size:17px; flex-grow:1; font-weight:900;">الاستمارة ض. د / 14<br><span style="font-size:14px; font-weight:normal;">خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</span></div>
-        <div style="font-size:12px; text-align:left; line-height:1.6; font-weight:bold;">جمهورية العراق<br> وزارة المالية<br> الهيئة العامة للضرائب</div>
+    <div class="page-break" style="width:210mm; height:296.5mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
+        <div style="font-size:12px; line-height:1.4;">رقم الاستمارة: 1<br>السنة المالية: ${new Date().getFullYear()}<br>الصفحة: 1</div>
+        <div style="text-align:center; font-size:16px; flex-grow:1;"><strong>الاستمارة ض. د / 14</strong><br>خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</div>
+        <div style="font-size:12px; text-align:right; line-height:1.4;">جمهورية العراق<br> وزارة المالية<br> الهيئة العامة للضرائب</div>
       </div>
-<div style="margin-bottom:10px;">
+
+
+      <div style="margin-bottom:15px;">
         <div style="display:flex; gap:10px; margin-bottom:8px;">
           <div>2- العنوان الوظيفي: ${fmtLine(employee.jobTitle, '150px')}</div>
           <div>اليوم الاول لبدء العمل: ${fmtLine(employee.startDate, '100px')} الى ${fmtLine(employee.endDate, '100px')}</div>
@@ -1074,7 +1076,7 @@ function buildEmployeeDD4AHtml(employee) {
         </div>
       </div>
 
-      <div style="margin-bottom:10px;">
+      <div style="margin-bottom:15px;">
         <div style="margin-bottom:8px;">3- الحالة الاجتماعية: ${fmtLine(employee.marital === 'single' ? 'أعزب' : employee.marital === 'divorced' ? 'مطلق' : employee.marital === 'widowed' ? 'أرمل' : 'متزوج', '100px')}</div>
         <div style="display:flex; gap:10px; margin-bottom:8px;">
           <div style="width:300px;">أ. اذا كان متزوجاً، تاريخ الزواج: ${fmtLine(employee.marriageDate, '100px')}</div>
@@ -1109,9 +1111,9 @@ function buildEmployeeDD4AHtml(employee) {
         </div>
       </div>
 
-      <div style="margin-bottom:10px;">
+      <div style="margin-bottom:15px;">
         <div style="margin-bottom:4px;">4- معلومات حول الأولاد الذين يحق للمنتسب طلب السماح القانوني عنهم :</div>
-        <div style="font-size:11px; line-height:1.4; margin-bottom:8px;">
+        <div style="font-size:10.5px; line-height:1.4; margin-bottom:8px;">
           الأولاد المستحقون هم: أ) البنات غير المتزوجات دون سن 18 عاماً ، ب) البنات في سن 18 عاماً فما فوق من ذوات الدخول السنوية اقل من 200,000 دينار ، ج) الأبناء دون سن 18 عاماً ، د) الأبناء بين 19 - 25 (داخل) عاماً من ذوي الدخول السنوية دون 200,000 دينار والمستمرين على الدراسة في المرحلة الاعدادية او الجامعة او الدراسات العليا ، هـ) الأبناء غير القادرين على الكسب بسبب الإعاقة العقلية او الجسدية
         </div>
         <table style="width:100%; border-collapse:collapse; text-align:center; font-size:12px;" border="1">
@@ -1150,11 +1152,11 @@ function buildEmployeeDD4AHtml(employee) {
   `;
 
   var page2 = `
-    <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:12px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
+    <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
       <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">الاستمارة ض. د / 14</div>
-      <div style="text-align:center; font-size:12px; margin-bottom:10px;">حساب ضريبة الدخل تُملأ من قبل المحاسب (في نهاية السنة)</div>
+      <div style="text-align:center; font-size:13px; margin-bottom:15px;">حساب ضريبة الدخل تُملأ من قبل المحاسب (في نهاية السنة)</div>
       
-      <table style="width:100%; border-collapse:collapse; font-size:12px;" border="1">
+      <table style="width:100%; border-collapse:collapse; font-size:13px;" border="1">
         <tr>
           <th style="padding:6px; width:75%;">الدخل</th>
           <th style="padding:6px; width:25%; text-align:center;">دينار</th>
@@ -1358,27 +1360,13 @@ window.printSpecificEmployeeDD4A = function(empId, type) {
       <title>طباعة استمارة ض.د/14 للموظف</title>
       <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
       <style>
-        body { margin: 0; padding: 0; background: #eaedf2; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .page-break {
-          width: 210mm;
-          height: 296mm;
-          background: #fff;
-          margin: 10mm 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          padding: 12mm 15mm;
-          box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
-          page-break-after: always;
-          direction: rtl;
-        }
+        body { margin: 0; padding: 0; background: #fff; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
-          body { background: transparent; display: block; margin: 0; padding: 0; }
-          .page-break { margin: 0; box-shadow: none; border: none; page-break-after: always; height: 297mm; }
+          body { background: white; margin: 0; padding: 0; }
+          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; }
         }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 5px; }
+        .page-break { box-sizing: border-box; }
       </style>
     </head>
     <body onload="setTimeout(function(){ window.print(); window.close(); }, 500);">
@@ -1407,27 +1395,14 @@ window.exportContractD14All = function() {
       <title>طباعة استمارات ض.د/14 لعقود الشركة</title>
       <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
       <style>
-        body { margin: 0; padding: 0; background: #eaedf2; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .page-break {
-          width: 210mm;
-          height: 296mm;
-          background: #fff;
-          margin: 10mm 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          padding: 12mm 15mm;
-          box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
-          page-break-after: always;
-          direction: rtl;
-        }
+        body { margin: 0; padding: 0; background: #fff; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
-          body { background: transparent; display: block; margin: 0; padding: 0; }
-          .page-break { margin: 0; box-shadow: none; border: none; page-break-after: always; height: 297mm; }
+          body { background: white; margin: 0; padding: 0; }
+          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; }
+          div[style*="page-break-after:always"] { page-break-after: always; }
         }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 5px; }
+        .page-break { box-sizing: border-box; }
       </style>
     </head>
     <body onload="setTimeout(function(){ window.print(); window.close(); }, 1500);">
@@ -1466,27 +1441,13 @@ window.printCurrentEmployeeDD4A = function() {
       <title>طباعة استمارة ض.د/14 للموظف</title>
       <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
       <style>
-        body { margin: 0; padding: 0; background: #eaedf2; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .page-break {
-          width: 210mm;
-          height: 296mm;
-          background: #fff;
-          margin: 10mm 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          padding: 12mm 15mm;
-          box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
-          page-break-after: always;
-          direction: rtl;
-        }
+        body { margin: 0; padding: 0; background: #fff; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
-          body { background: transparent; display: block; margin: 0; padding: 0; }
-          .page-break { margin: 0; box-shadow: none; border: none; page-break-after: always; height: 297mm; }
+          body { background: white; margin: 0; padding: 0; }
+          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; }
         }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 5px; }
+        .page-break { box-sizing: border-box; }
       </style>
     </head>
     <body onload="setTimeout(function(){ window.print(); window.close(); }, 500);">
@@ -1883,27 +1844,14 @@ function exportFormD14() {
       <title>طباعة استمارات ض.د/14 للجميع (PDF)</title>
       <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
       <style>
-        body { margin: 0; padding: 0; background: #eaedf2; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .page-break {
-          width: 210mm;
-          height: 296mm;
-          background: #fff;
-          margin: 10mm 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          padding: 12mm 15mm;
-          box-sizing: border-box;
-          position: relative;
-          overflow: hidden;
-          page-break-after: always;
-          direction: rtl;
-        }
+        body { margin: 0; padding: 0; background: #fff; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
-          body { background: transparent; display: block; margin: 0; padding: 0; }
-          .page-break { margin: 0; box-shadow: none; border: none; page-break-after: always; height: 297mm; }
+          body { background: white; margin: 0; padding: 0; }
+          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; }
+          div[style*="page-break-after:always"] { page-break-after: always; }
         }
-        table { border-collapse: collapse; }
-        th, td { border: 1px solid #000; padding: 5px; }
+        .page-break { box-sizing: border-box; }
       </style>
     </head>
     <body onload="setTimeout(function(){ window.print(); window.close(); }, 1500);">
@@ -2452,29 +2400,17 @@ function printAnnualStatement() {
   pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">');
   pw.document.write(`
     <style>
-        body { margin: 0; padding: 0; background: #eaedf2; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .page-break {
-          width: 297mm;
-          min-height: 209mm;
-          background: #fff;
-          margin: 10mm 0;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-          padding: 10mm;
-          box-sizing: border-box;
-          position: relative;
-          page-break-after: always;
-          direction: rtl;
-        }
-        @media print {
-          @page { size: A4 landscape; margin: 0; }
-          body { background: transparent; display: block; margin: 0; padding: 0; }
-          .page-break { margin: 0; box-shadow: none; border: none; page-break-after: always; min-height: 210mm; }
-        }
-        table { border-collapse: collapse; width: 100%; white-space: nowrap; }
-        th, td { border: 1px solid #333; padding: 6px; text-align: center; font-size: 13px; }
-        th { background: #f3f4f6 !important; -webkit-print-color-adjust: exact; color-adjust: exact; font-weight: bold; }
-        .totals-table th { background: #1e3a8a !important; color: #fff !important; }
-      </style>
+      body { margin:0; padding:15px; background:#fff; font-family:"Tajawal",Arial,sans-serif; color:#000; font-size:12px; }
+      table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      th, td { border: 1px solid #000; padding: 4px; text-align: center; }
+      th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
+      @media print {
+        @page { size: A4 landscape; margin: 10mm; }
+        body { padding: 0; }
+        .page-break { page-break-after: always; }
+      }
+    </style>
   `);
   pw.document.write('</head><body onload="setTimeout(function(){window.print();window.close();},500);">');
   pw.document.write(html);
@@ -2961,25 +2897,25 @@ function calculateNewPropertyTax() {
   if (document.getElementById('propPenDelay').checked) {
     var p = baseTax * 0.10;
     finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:12px;"><strong>غرامة تأخير:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 22 - الفقرة 1-أ).</div>';
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>غرامة تأخير:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 22 - الفقرة 1-أ).</div>';
     hasPen = true;
   }
   if (document.getElementById('propPenFalseInfo').checked) {
     var p = baseTax * 0.10;
     finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:12px;"><strong>إخفاء معلومات:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 7 - الفقرة 2).</div>';
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>إخفاء معلومات:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 7 - الفقرة 2).</div>';
     hasPen = true;
   }
   if (document.getElementById('propPenFakeEmpty').checked) {
     var p = baseTax * 2; // مثلي الضريبة
     finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:12px;"><strong>خلو وهمي:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام الغرامات (مثلي الضريبة المتهربة).</div>';
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>خلو وهمي:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام الغرامات (مثلي الضريبة المتهربة).</div>';
     hasPen = true;
   }
   if (document.getElementById('propPenUseChange').checked) {
     var p = baseTax * 1; // مثل الضريبة
     finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:12px;"><strong>تغيير استعمال:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) بسبب عدم الإخبار عن زوال شرط الإعفاء.</div>';
+    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>تغيير استعمال:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) بسبب عدم الإخبار عن زوال شرط الإعفاء.</div>';
     hasPen = true;
   }
 
@@ -4150,7 +4086,7 @@ function generateCustomReport(){
   var type=document.getElementById('rbType').value;
   var output=document.getElementById('customReportOutput');if(!output)return;
   output.style.display='block';
-  output.innerHTML='<div class="card" style="margin-top:16px;"><div class="card-header"><h3><i class="fas fa-chart-pie"></i> نتائج التقرير</h3></div><div class="card-body"><div class="stats-grid" style="margin-bottom:15px;"><div class="stat-card"><div class="stat-icon" style="background:var(--primary-light);color:var(--primary);"><i class="fas fa-coins"></i></div><div class="stat-info"><h3>4,250,000,000</h3><p>إجمالي الإيرادات (د.ع)</p></div></div><div class="stat-card"><div class="stat-icon" style="background:#e8f5e9;color:#4caf50;"><i class="fas fa-users"></i></div><div class="stat-info"><h3>1,247</h3><p>عدد المكلفين</p></div></div><div class="stat-card"><div class="stat-icon" style="background:#fff3e0;color:#ff9800;"><i class="fas fa-percentage"></i></div><div class="stat-info"><h3>87%</h3><p>نسبة التحصيل</p></div></div></div><canvas id="customReportChart" height="250"></canvas></div></div>';
+  output.innerHTML='<div class="card" style="margin-top:16px;"><div class="card-header"><h3><i class="fas fa-chart-pie"></i> نتائج التقرير</h3></div><div class="card-body"><div class="stats-grid" style="margin-bottom:20px;"><div class="stat-card"><div class="stat-icon" style="background:var(--primary-light);color:var(--primary);"><i class="fas fa-coins"></i></div><div class="stat-info"><h3>4,250,000,000</h3><p>إجمالي الإيرادات (د.ع)</p></div></div><div class="stat-card"><div class="stat-icon" style="background:#e8f5e9;color:#4caf50;"><i class="fas fa-users"></i></div><div class="stat-info"><h3>1,247</h3><p>عدد المكلفين</p></div></div><div class="stat-card"><div class="stat-icon" style="background:#fff3e0;color:#ff9800;"><i class="fas fa-percentage"></i></div><div class="stat-info"><h3>87%</h3><p>نسبة التحصيل</p></div></div></div><canvas id="customReportChart" height="250"></canvas></div></div>';
   try{
     var ctx=document.getElementById('customReportChart');
     if(ctx){new Chart(ctx,{type:type==='comparison'?'bar':'line',data:{labels:['كانون٢','شباط','آذار','نيسان','أيار','حزيران'],datasets:[{label:'الإيرادات (مليون)',data:[350,420,380,510,480,560],backgroundColor:'rgba(15,27,77,0.7)',borderColor:'#0f1b4d',tension:0.3}]},options:{responsive:true}});}
