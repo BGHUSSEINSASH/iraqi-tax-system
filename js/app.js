@@ -491,8 +491,8 @@ function switchTab(event, tabId) {
 
 // ========== UTILITIES ==========
 function formatNumber(num) {
-  if (isNaN(num) || num === null) return '٠';
-  return Number(num).toLocaleString('ar-IQ');
+  if (isNaN(num) || num === null) return '0';
+  return Number(num).toLocaleString('en-US');
 }
 function parseArabicNumber(str) {
   if (!str) return 0;
@@ -1205,6 +1205,8 @@ function buildEmployeeDD4AHtml(employee) {
   var page2 = `
     <div style="width:210mm; min-height:297mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
       <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">الاستمارة ض. د / 14</div>
+      ${settlementDisplay}
+      <div style="text-align:center; font-size:11px; margin-bottom:5px; color:#666; font-weight:bold;">${mathStr}</div>
       <div style="text-align:center; font-size:13px; margin-bottom:15px;">حساب ضريبة الدخل تُملأ من قبل المحاسب (في نهاية السنة)</div>
       
       <table style="width:100%; border-collapse:collapse; font-size:13px;" border="1">
