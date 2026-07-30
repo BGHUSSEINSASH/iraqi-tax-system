@@ -808,66 +808,80 @@ function getEmpModalInputs() {
   };
 }
 
-function doExcelMathForEmployee(inp) {
-  // Normalize and apply limits according to Step 1 & 5.4 in prompt
-  var salary = parseFloat(inp.salary) || 0;
-  var allow = parseFloat(inp.allow) || 0; // M: taxable
-  var cashHous = parseFloat(inp.cashHous) || 0; // N: eligible for 30% exempt
-  var inKind = inp.inKind || 'none';
-  var ins = parseFloat(inp.ins) || 0;
-  var alimony = parseFloat(inp.alimony) || 0;
-  var childCount = Math.min(parseInt(inp.child, 10) || 0, 6); // Max 6 defined
-  var sec = inp.sec || 'government';
-  var months = parseInt(inp.months, 10) || 12;
 
-  // monthlyAllowance (W)
-  var monthlyAllowance = calculateMonthlyAllowance(inp.nat, inp.res, inp.marital, childCount, inp.over63 === 'yes');
+// ========== UNIFIED TAX CORE (calcMonthly) ==========
+function calcMonthly(inp) {
+  var L = parseFloat(inp.salary) || 0;
+  var M = parseFloat(inp.taxableAllow) || 0;
+  var N = parseFloat(inp.housingFoodCash) || 0;
+  var housingInKind = inp.housingInKind || 'none';
+  var sector = inp.sector || 'private';
+  var residency = inp.residency || 'resident';
+  var maritalStatus = inp.maritalStatus || 'single';
+  var childrenCount = Math.min(parseInt(inp.childrenCount, 10) || 0, 6);
+  var isOver63 = inp.isOver63 === true || inp.isOver63 === 'yes';
+  var T = parseFloat(inp.lifeInsurance) || 0;
+  var U = parseFloat(inp.alimony) || 0;
 
-  // inKindValue (P)
-  var inKindValue = inKind === 'furnished' ? salary * 0.20 : inKind === 'unfurnished' ? salary * 0.10 : 0;
+  var P = housingInKind === 'furnished' || housingInKind === '0.20' ? L * 0.20 : 
+          housingInKind === 'unfurnished' || housingInKind === '0.10' ? L * 0.10 : 0;
   
-  // Gross (Q) (includes P which is not real cash)
-  var monthlyGross = salary + allow + cashHous + inKindValue;
-
-  // Private Exemption (R) - only on N, max 30% of L
-  var privateExempt = sec === 'private' ? Math.min(cashHous, salary * 0.30) : 0;
-
-  // Retirement (S) - evaluated on L+M+N capped at 1,750,000
-  var totalLMN = salary + allow + cashHous;
-  var retirement = Math.min(totalLMN, 1750000) * 0.05;
-
-  // Insurance monthly cap is assumed 166667 (2M / 12) from calculateMonthlyAllowance maybe? 
-  // Let's use 166667
-  var insurance = Math.min(ins, 166667);
-
-  // Total Deductions (V)
-  var totalMonthlyDeductions = privateExempt + retirement + insurance + alimony + monthlyAllowance;
+  var Q = L + M + N + P;
+  var R = sector === 'private' || sector === 'القطاع الخاص' ? Math.min(N, L * 0.30) : 0;
+  var S = Math.min(L + M + N, 1750000) * 0.05;
+  var V = R + S + Math.min(T, 166667) + U;
   
-  // Taxable Base (X)
-  var monthlyTaxable = Math.max(0, monthlyGross - totalMonthlyDeductions);
+  var W = 0;
+  if (residency !== 'nonresident' && residency !== 'غير مقيم') {
+    var baseAllowance = 208333.33; 
+    if (maritalStatus === 'married_housewife' || maritalStatus === 'married_spouse_no_income') {
+      baseAllowance = 375000;
+    } else if (maritalStatus === 'widowed' || maritalStatus === 'divorced') {
+      baseAllowance = 266666.67; 
+    }
+    var childAllowance = childrenCount * 16666.67;
+    var ageAllowance = isOver63 ? 25000 : 0;
+    W = baseAllowance + childAllowance + ageAllowance;
+  }
   
-  // Tax Amount (Y)
-  var monthlyTax = calculateProgressiveTax(monthlyTaxable, PAYROLL_MONTHLY_BRACKETS);
+  var X = Math.max(0, Q - V - W);
+  var Y = 0;
+  if (X > 0) {
+    if (X <= 20833.33) { Y = X * 0.03; }
+    else if (X <= 41666.67) { Y = (20833.33 * 0.03) + ((X - 20833.33) * 0.05); }
+    else if (X <= 83333.33) { Y = (20833.33 * 0.03) + (20833.34 * 0.05) + ((X - 41666.67) * 0.10); }
+    else { Y = (20833.33 * 0.03) + (20833.34 * 0.05) + (41666.66 * 0.10) + ((X - 83333.33) * 0.15); }
+  }
   
-  // Net Salary (AA)
-  // According to rule 5.6: AA = Q - P - Y - S
-  var monthlyNet = monthlyGross - inKindValue - monthlyTax - retirement;
+  var AA = Q - P - Y - S;
 
   return {
-    annualGross: monthlyGross * months,
-    annualDed: totalMonthlyDeductions * months,
-    annualTaxable: monthlyTaxable * months,
-    annualTax: monthlyTax * months,
-    monthlyTax: monthlyTax,
-    monthlyNet: monthlyNet,
-    monthlyAllowance: monthlyAllowance,
-    retirement: retirement,
-    insurance: insurance,
-    privateExempt: privateExempt,
-    inKindValue: inKindValue,
-    annualNet: monthlyNet * months
+    gross: Q, exempt30: R, retirement: S, deductions: V, allowances: W,
+    taxable: X, tax: Y, net: AA, inKind: P
   };
 }
+// ====================================================
+
+function doExcelMathForEmployee(inp) {
+  var months = Math.max(1, Math.min(12, parseInt(inp.months, 10) || 12));
+  var unified = calcMonthly({
+    salary: inp.salary, taxableAllow: inp.allow, housingFoodCash: inp.cashHous,
+    housingInKind: inp.inKind, sector: inp.sec === 'private' ? 'private' : 'government',
+    residency: inp.res, maritalStatus: inp.marital, childrenCount: inp.child,
+    isOver63: inp.over63 === 'yes', lifeInsurance: inp.ins, alimony: inp.alimony
+  });
+
+  return {
+    annualGross: unified.gross * months,
+    annualDed: unified.deductions * months,
+    annualTaxable: unified.taxable * months,
+    annualTax: unified.tax * months,
+    monthlyTax: unified.tax, monthlyNet: unified.net, monthlyAllowance: unified.allowances,
+    retirement: unified.retirement, insurance: Math.min(parseFloat(inp.ins) || 0, 166667),
+    privateExempt: unified.exempt30, inKindValue: unified.inKind, annualNet: unified.net * months
+  };
+}
+
 
 window.calcEmpModalPreview = function() {
   if (!document.getElementById('empModName')) return null;
@@ -1015,8 +1029,17 @@ window.removeExtEmployee = function(id) {
 };
 
 function buildEmployeeDD4AHtml(employee) {
+  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
   var math = doExcelMathForEmployee(employee);
-  
+  var ytd = getEmpYTD(employee.id, currentYear);
+
+  var isYTD = ytd && ytd.count > 0;
+  var annualTaxable = isYTD ? Math.round(ytd.taxable) : Math.round(math.annualTaxable);
+  var annualTax = isYTD ? Math.round(ytd.tax) : Math.round(math.annualTax);
+  var annualGross = isYTD ? Math.round(ytd.gross) : Math.round(math.annualGross);
+  var annualDed = isYTD ? Math.round(ytd.ded) : Math.round(math.annualDed);
+  var mathStr = isYTD ? 'تحاسب شهري (' + ytd.count + ' أشهر)' : 'تحاسب سنوي (12 شهر إفتراضاً)';
+
   function box(flag) {
     return flag ? '<span style="display:inline-block;width:12px;height:12px;border:1px solid #000;text-align:center;line-height:12px;font-size:10px;margin-right:2px;position:relative;top:2px;">&#10003;</span>' : '<span style="display:inline-block;width:12px;height:12px;border:1px solid #000;margin-right:2px;position:relative;top:2px;"></span>';
   }
@@ -1039,16 +1062,26 @@ function buildEmployeeDD4AHtml(employee) {
       '</tr>';
   }
 
-  var annualTaxable = Math.round(math.annualTaxable);
   var taxableColumn = annualTaxable <= 250000 ? 'a' : annualTaxable <= 500000 ? 'b' : annualTaxable <= 1000000 ? 'c' : 'd';
   var bracketStart = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 250000 : taxableColumn === 'c' ? 500000 : 1000000;
   var bracketRate = taxableColumn === 'a' ? 0.03 : taxableColumn === 'b' ? 0.05 : taxableColumn === 'c' ? 0.10 : 0.15;
   var baseTax = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 7500 : taxableColumn === 'c' ? 20000 : 70000;
   var row3Amount = Math.max(0, annualTaxable - bracketStart);
   var row5Amount = Math.round(row3Amount * bracketRate);
-  var row7Amount = Math.round(row5Amount + baseTax);
+  
+  // Enforce invariant: 
+  var row7Amount = annualTax;
 
-  function bCell(key, value) { return taxableColumn === key ? formatNumber(value) : ''; }
+  // Let's calculate the "Settlement" if this is a YTD real sum but the linear brackets calculate a different strict sum.
+  var strictLinearD14Tax = baseTax + (row3Amount * bracketRate);
+  var settlementDiff = annualTax - strictLinearD14Tax; 
+  var settlementDisplay = '';
+  if (Math.abs(settlementDiff) > 2) {
+     var diffWord = settlementDiff > 0 ? 'مطلوب (غير مدفوع)' : 'فائض (يُردّ أو يُرحّل)';
+     settlementDisplay = '<div style="margin-top:10px; padding:10px; border:1px solid #dc2626; color:#dc2626; background:#fef2f2; font-weight:bold;">تسوية سنوية: تم استيفاء مبلغ مختلف تفاضلياً لتغيّر الدخل خلال السنة. الفارق: ' + formatNumber(Math.abs(settlementDiff)) + ' د.ع ' + diffWord + '</div>';
+  }
+
+  function bCell(key, value) { return taxableColumn === key ? formatNumber(Math.round(value)) : ''; }
 
   var page1 = `
     <div class="page-break" style="width:210mm; height:296.5mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
