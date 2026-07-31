@@ -929,17 +929,17 @@
 <h3><i class="fas fa-coins"></i> الدخل والرواتب</h3>
 <div class="emp-grid-2">
 <div class="emp-field" style="display:none;"><label>عدد أشهر العمل (معطل للاقفال)</label><input type="hidden" id="empModMonths" value="1"></div>
-<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>السكن العيني الموفر من الشركة</label><select id="empModInKind" onchange="calcEmpModalPreview()"><option value="none">لا يوجد سكن عيني</option><option value="furnished">مؤثث (تضاف 20% من الراتب)</option><option value="unfurnished">غير مؤثث (تضاف 10% من الراتب)</option></select></div>
 </div>
 </div>
 <div class="emp-form-card">
 <h3><i class="fas fa-hand-holding-usd"></i> التنزيلات المسموحة (شهرياً)</h3>
 <div class="emp-grid-2">
-<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
 </div>
 <p style="font-size:0.8rem; color:var(--text-muted); margin:0;"><i class="fas fa-info-circle"></i> التوقيفات التقاعدية وإعفاء القطاع الخاص والسماحات الزوجية تحسب تلقائياً وفق القانون.</p>
 </div>
@@ -1545,7 +1545,7 @@
 <div class="form-grid">
 <div class="form-group">
 <label style="font-weight:bold;">الراتب الاسمي أو الأجر الأساسي (شهرياً)</label>
-<input id="profBaseSalary" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">إجمالي المخصصات النقدية الخاضعة (شهرياً)</label>

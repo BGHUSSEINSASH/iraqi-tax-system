@@ -1,3 +1,17 @@
+
+// --- Live Number Formatting ---
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.classList.contains('money-input')) {
+    var raw = e.target.value.replace(/,/g, '').replace(/\D/g, '');
+    if (raw !== '') {
+      var num = parseInt(raw, 10);
+      e.target.value = num.toLocaleString('en-US');
+    } else {
+      e.target.value = '';
+    }
+  }
+});
+
 /* ============================================
    Iraqi Tax System — App Logic v3.0
    ============================================ */
@@ -608,6 +622,12 @@ function saveTaxSnapshots() {
 
 function closeMonthlyTax() {
   var year = document.getElementById('closeTaxYear').value;
+  if(typeof checkYearLocked !== 'undefined' && checkYearLocked(year)) {
+      showToast('السنة المالية ' + year + ' مقفلة ولا يمكن التعديل عليها', true);
+      return;
+  }
+
+  var year = document.getElementById('closeTaxYear').value;
   var month = document.getElementById('closeTaxMonth').value;
   
   if (!confirm('تأكيد إقفال وتجميد بيانات رواتب الموظفين لشهر ' + month + ' لسنة ' + year + '؟\n سيتم ترحيل البيانات وحسابها تراكمياً.')) return;
@@ -1084,7 +1104,7 @@ function buildEmployeeDD4AHtml(employee) {
   function bCell(key, value) { return taxableColumn === key ? formatNumber(Math.round(value)) : ''; }
 
   var page1 = `
-    <div class="page-break" style="width:210mm; height:296mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
+    <div class="page-break" style="width:210mm; height:295mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
       <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
         <div style="font-size:12px; line-height:1.4;">رقم الاستمارة: 1<br>السنة المالية: ${new Date().getFullYear()}<br>الصفحة: 1</div>
         <div style="text-align:center; font-size:16px; flex-grow:1;"><strong>الاستمارة ض. د / 14</strong><br>خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</div>
@@ -1203,7 +1223,7 @@ function buildEmployeeDD4AHtml(employee) {
   `;
 
   var page2 = `
-    <div class="page-break" style="width:210mm; height:296mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
+    <div class="page-break" style="width:210mm; height:295mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
       <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">الاستمارة ض. د / 14</div>
       ${settlementDisplay}
       <div style="text-align:center; font-size:11px; margin-bottom:5px; color:#666; font-weight:bold;">${mathStr}</div>
@@ -1879,14 +1899,16 @@ function addCompanyEmployeeRow() {
 function removeCompanyEmployeeRow() {}
 
 function exportFormD14() {
-  if (!globalEmployees.length) {
-    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
+  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var emps = getMergedEmployeesForYear(currentYear);
+  if (!emps.length) {
+    showToast('لا توجد بيانات موظفين أو لقطات لهذه السنة', true);
     return;
   }
-  
-  var allHtml = globalEmployees.map(function(employee) { 
+  var allHtml = emps.map(function(employee) { 
     return buildEmployeeDD4AHtml(employee); 
   }).join('');
+
   
   var printWindow = window.open('', '_blank');
   printWindow.document.write(`
@@ -1916,10 +1938,7 @@ function exportFormD14() {
 }
 
 function exportAnnualMemo() {
-  if (!globalEmployees.length) {
-    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
-    return;
-  }
+  
   if (typeof html2pdf === 'undefined') {
     showToast('مكتبة PDF غير متاحة حالياً', true);
     return;
@@ -1948,10 +1967,7 @@ function exportAnnualMemo() {
 
 // ========== ANNUAL STATEMENT (الكشف السنوي) ==========
 function exportAnnualStatement() {
-  if (!globalEmployees.length) {
-    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
-    return;
-  }
+  
   if (typeof XLSX === 'undefined') {
     showToast('مكتبة XLSX غير متاحة', true);
     return;
@@ -1960,9 +1976,9 @@ function exportAnnualStatement() {
   var currentYear = new Date().getFullYear();
   var employerName = '';
   var employerId = '';
-  if (globalEmployees.length > 0 && globalEmployees[0].employerName) {
-    employerName = globalEmployees[0].employerName;
-    employerId = globalEmployees[0].employerId || '';
+  if (allEmps.length > 0 && allEmps[0].employerName) {
+    employerName = allEmps[0].employerName;
+    employerId = allEmps[0].employerId || '';
   }
 
   var wb = XLSX.utils.book_new();
@@ -2245,1143 +2261,105 @@ function importAnnualStatement(inputEl) {
 
 // ========== ANNUAL STATEMENT PREVIEW & PRINT (مطابق لـ الكشف السنوي ض د.xlsx) ==========
 function buildAnnualStatementHtml(forPrint) {
-  if (!globalEmployees.length) return null;
+  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var emps = getMergedEmployeesForYear(currentYear);
+  if (!emps.length) return null;
 
-  var currentYear = new Date().getFullYear();
-  var employerName = '';
-  var employerId = '';
-  if (globalEmployees.length > 0 && globalEmployees[0].employerName) {
-    employerName = globalEmployees[0].employerName;
-    employerId = globalEmployees[0].employerId || '';
-  }
+  var employerName = emps[0].employerName || '';
+  var employerId = emps[0].employerId || '';
 
   var cb = 'border:1px solid #000;';
-  var cp = 'padding:3px 4px;';
+  var cp = 'padding:6px;';
   var ct = 'text-align:center;vertical-align:middle;';
 
-  function calcEmp(e) {
-    var math = doExcelMathForEmployee({
-      nat: e.nat, res: e.res, marital: e.marital, child: e.child, over63: e.over63,
-      salary: e.salary, allow: e.allow, cashHous: e.cashHous, inKind: e.inKind,
-      ins: e.ins, alimony: e.alimony, months: e.months, sec: e.sec
-    });
-    var paid = math.monthlyTax * (e.months || 12);
-    return {
-      income: math.annualGross, deductions: math.annualDed,
-      taxable: math.annualTaxable, liability: math.annualTax,
-      paid: paid, unpaid: Math.max(0, math.annualTax - paid),
-      excess: Math.max(0, paid - math.annualTax)
-    };
-  }
-
+  
   var html = '';
   if (forPrint) {
     html += '<style>';
-    html += '@media print { body * { visibility:hidden; } #annualStatementPrintArea, #annualStatementPrintArea * { visibility:visible; } #annualStatementPrintArea { position:absolute; left:0; top:0; width:100%; } }';
-    html += '@page { size:A4 landscape; margin:4mm; }';
+    html += '@media print { body * { visibility:hidden; } #annualStatementPrintArea, #annualStatementPrintArea * { visibility:visible; } #annualStatementPrintArea { position:absolute; left:0; top:0; width:100%; margin:0; padding:0; } @page { size: A4 portrait; margin: 0; } }';
+    html += '.page-break { page-break-after: always; box-sizing: border-box; }';
     html += '</style>';
   }
-  html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:9px;color:#000;background:#fff;' + (forPrint ? 'padding:2mm;' : 'padding:8px;overflow-x:auto;') + '">';
-
-  // === HEADER: اسم رب العمل + الرقم التعريفي + صفحة ===
-  html += '<table style="width:100%;border-collapse:collapse;margin-bottom:2px;">';
-  html += '<tr>';
-  html += '<td style="' + cb + cp + 'width:50%;font-size:10px;font-weight:bold;">اسم رب العمل: ' + (employerName || '_______________________') + '</td>';
-  html += '<td style="' + cb + cp + 'width:50%;font-size:10px;font-weight:bold;">الرقم التعريفي لرب العمل: ' + (employerId || '_______________________') + '</td>';
-  html += '</tr></table>';
-
-  // === العنوان + السنة المالية ===
-  html += '<div style="text-align:center;margin:4px 0;">';
-  html += '<span style="font-size:14px;font-weight:bold;">جدول استقطاع ضريبة الدخل</span><br>';
-  html += '<span style="font-size:11px;">السنة المالية ' + currentYear + '</span>';
-  html += '</div>';
-
-  // === الجدول الرئيسي (15 عمود) ===
-  html += '<table style="width:100%;border-collapse:collapse;' + cb + 'font-size:8px;">';
-
-  // صف أرقام الأعمدة (يتوافق مع Row4 في الإكسل)
-  html += '<thead>';
-  html += '<tr style="background:#d1d5db;">';
-  var colNums = ['2','ا','ت','1','2','3','4','5','6','7','8','9','10','11','12'];
-  var colWidths = ['3%','3%','3%','7%','12%','8%','8%','8%','8%','8%','10%','8%','8%','10%','10%'];
-  colNums.forEach(function(n, ci) {
-    html += '<th style="' + cb + cp + ct + 'width:' + colWidths[ci] + ';font-weight:bold;">' + n + '</th>';
-  });
-  html += '</tr>';
-
-  // صف العناوين (يتوافق مع Row5 في الإكسل)
-  html += '<tr style="background:#1e3a5f;color:#fff;font-weight:bold;font-size:7px;">';
-  var headers = [
-    'اسم المستخدم', '', '#', 'رقم الاضبارة\nض.د/14',
-    'اسم المستخدم', 'رقم هوية\nالاحوال المدنية',
-    'اجمالي\nالدخل', 'اجمالي\nالمبالغ المنزلة',
-    'الدخل\nالخاضع للضريبة', 'الاستحقاق\nالضريبي',
-    'الضريبة\nالمدفوعة خلال السنة', 'الضريبة\nغير المدفوعة',
-    'الضريبة\nالزائدة', 'فترة العمل\nمن / / الى / /',
-    'رب العمل'
-  ];
-  headers.forEach(function(h) {
-    html += '<th style="' + cb + cp + ct + '">' + h.replace(/\n/g, '<br>') + '</th>';
-  });
-  html += '</tr>';
-  html += '</thead>';
-
-  // === صفوف البيانات ===
-  html += '<tbody>';
-  var GROUP_SIZE = 20;
-  var gi = 0, gd = 0, gt = 0, gl = 0;
-  var tgi = 0, tgd = 0, tgt = 0, tgl = 0, tgp = 0, tgu = 0, tgx = 0;
-
-  function subtotalRow(income, ded, taxable, liab) {
-    var s = '';
-    s += '<tr style="background:#e5e7eb;font-weight:bold;font-size:8px;">';
-    s += '<td ' + cb + cp + ' style="text-align:center;">المجموع الفرعي</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;">المجموع الفرعي</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(income)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(ded)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(taxable)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(liab)) + '</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '</tr>';
-    return s;
-  }
-
-  for (var i = 0; i < globalEmployees.length; i++) {
-    var e = globalEmployees[i];
-    var calc = calcEmp(e);
-    var regNumber = 'DD14-' + currentYear + '-' + String(i + 1).padStart(3, '0');
-    var workPeriod = (e.startDate || '  /  /  ') + '  الى  ' + (e.endDate || '  /  /  ');
-
-    gi += calc.income; gd += calc.deductions; gt += calc.taxable; gl += calc.liability;
-    tgi += calc.income; tgd += calc.deductions; tgt += calc.taxable; tgl += calc.liability;
-    tgp += calc.paid; tgu += calc.unpaid; tgx += calc.excess;
-
-    var altBg = (i % 2 === 0) ? '' : 'background:#f5f5f5;';
-    html += '<tr style="' + altBg + 'font-size:8px;">';
-    html += '<td style="' + cb + cp + ct + '">' + (i + 1) + '</td>';
-    html += '<td style="' + cb + cp + ct + '"></td>';
-    html += '<td style="' + cb + cp + ct + '">' + (i + 1) + '</td>';
-    html += '<td style="' + cb + cp + ct + ';font-size:7px;">' + regNumber + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:right;">' + (e.name || '') + '</td>';
-    html += '<td style="' + cb + cp + ct + '">' + (e.civilId || '') + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.income)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.deductions)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.taxable)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.liability)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.paid)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;' + (calc.unpaid > 0 ? 'color:#dc2626;font-weight:bold;' : '') + '">' + formatNumber(Math.round(calc.unpaid)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;' + (calc.excess > 0 ? 'color:#16a34a;font-weight:bold;' : '') + '">' + formatNumber(Math.round(calc.excess)) + '</td>';
-    html += '<td style="' + cb + cp + ct + ';font-size:7px;">' + workPeriod + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:right;font-size:7px;">' + (e.employerName || employerName || '') + '</td>';
-    html += '</tr>';
-
-    if ((i + 1) % GROUP_SIZE === 0 || i === globalEmployees.length - 1) {
-      html += subtotalRow(gi, gd, gt, gl);
-      gi = 0; gd = 0; gt = 0; gl = 0;
-    }
-  }
-
-  // صفوف فارغة إذا لم يكن هناك موظفين
-  if (globalEmployees.length === 0) {
-    for (var j = 0; j < 20; j++) {
-      html += '<tr>';
-      for (var k = 0; k < 15; k++) {
-        html += '<td style="' + cb + cp + ct + 'height:16px;">&nbsp;</td>';
-      }
-      html += '</tr>';
-    }
-  }
-
-  // === المجموع الكلي ===
-  html += '<tr style="background:#1e3a5f;color:#fff;font-weight:bold;font-size:9px;">';
-  html += '<td style="' + cb + cp + ct + '">الجموع الكلي</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '">' + globalEmployees.length + '</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '">الجموع الكلي</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgi)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgd)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgt)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgl)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgp)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgu)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgx)) + '</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '</tr>';
-
-  html += '</tbody></table>';
-  html += '</div>';
-  return html;
-}
-
-function renderAnnualStatementPreview() {
-  if (!globalEmployees.length) {
-    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
-    return;
-  }
-  var container = document.getElementById('annualStatementPreview');
-  var hint = document.getElementById('annualStatementHint');
-  if (!container) return;
-  var html = buildAnnualStatementHtml(false);
-  if (!html) { showToast('لا توجد بيانات', true); return; }
-  container.innerHTML = html;
-  container.style.display = 'block';
-  if (hint) hint.style.display = 'none';
-  showToast('تم تحديث معاينة الكشف السنوي — ' + globalEmployees.length + ' موظف');
-}
-
-function printAnnualStatement() {
-  if (!globalEmployees.length) {
-    showToast('يرجى إدخال بيانات الموظفين أولاً', true);
-    return;
-  }
-  var html = buildAnnualStatementHtml(true);
-  if (!html) return;
-  var pw = window.open('', '_blank');
-  pw.document.write('<!DOCTYPE html><html dir="rtl" lang="ar"><head><meta charset="UTF-8">');
-  pw.document.write('<title>الكشف السنوي — ضريبة الدخل</title>');
-  pw.document.write('<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">');
-  pw.document.write(`
-    <style>
-      body { margin:0; padding:15px; background:#fff; font-family:"Tajawal",Arial,sans-serif; color:#000; font-size:12px; }
-      table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
-      tr { page-break-inside: avoid; page-break-after: auto; }
-      th, td { border: 1px solid #000; padding: 4px; text-align: center; }
-      th { background-color: #f3f4f6 !important; -webkit-print-color-adjust: exact; }
-      @media print {
-        @page { size: A4 landscape; margin: 10mm; }
-        body { padding: 0; }
-        .page-break { page-break-after: always; }
-      }
-    </style>
-  `);
-  pw.document.write('</head><body onload="setTimeout(function(){window.print();window.close();},500);">');
-  pw.document.write(html);
-  pw.document.write('</body></html>');
-  pw.document.close();
-}
-
-// ========== CORPORATE TAX — CONTRACT TAX ==========
-var CONTRACT_TAX_RATES = {
-  construction: { name: 'مقاولات إنشائية', rate: 0.033 },
-  supply: { name: 'عقد توريد', rate: 0.033 },
-  services: { name: 'عقد خدمات', rate: 0.033 },
-  consulting: { name: 'عقد استشارات', rate: 0.07 },
-  transport: { name: 'عقد نقل', rate: 0.033 },
-  maintenance: { name: 'عقد صيانة', rate: 0.033 },
-  rent_equipment: { name: 'تأجير معدات', rate: 0.10 },
-  foreign: { name: 'عقد شركة أجنبية', rate: 0.07 }
-};
-
-function updateContractTaxRate() {
-  var type = document.getElementById('contractType').value;
-  var info = CONTRACT_TAX_RATES[type];
-  document.getElementById('contractTaxRateDisplay').value = info ? (info.rate * 100) + '%' : '';
-}
-
-function calculateContractTax() {
-  var type = document.getElementById('contractType').value;
-  var value = getVal('contractValue');
-  if (!type) { showToast('يرجى اختيار نوع العقد', true); return; }
-  if (!value) { showToast('يرجى إدخال قيمة العقد', true); return; }
-  var info = CONTRACT_TAX_RATES[type];
-  var tax = value * info.rate;
-  var signDate = document.getElementById('contractSignDate').value;
-  var endDate = document.getElementById('contractEndDate').value;
-  var duration = '-';
-  if (signDate && endDate) {
-    var d1 = new Date(signDate), d2 = new Date(endDate);
-    var months = (d2.getFullYear() - d1.getFullYear()) * 12 + d2.getMonth() - d1.getMonth();
-    duration = months + ' شهر';
-  }
-  setText('contractTypeResult', info.name);
-  setText('contractValueResult', formatNumber(value) + ' د.ع');
-  setText('contractRateResult', (info.rate * 100) + '٪');
-  setText('contractDurationResult', duration);
-  setText('contractTaxDue', formatNumber(Math.round(tax)) + ' د.ع');
-  document.getElementById('contractTaxResult').style.display = 'block';
-  showToast('تم احتساب ضريبة العقد بنجاح');
-}
-
-function switchContractSubTab(event, tabId) {
-  event.target.closest('.tabs-container').querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
-  event.target.classList.add('active');
-  document.querySelectorAll('.contract-subtab').forEach(function(s) { s.classList.remove('active'); s.style.display = 'none'; });
-  var panel = document.getElementById(tabId);
-  if (panel) { panel.classList.add('active'); panel.style.display = 'block'; }
-}
-
-function addContractEmployeeRow() {
-  var tbody = document.querySelector('#contractEmployeeTable tbody');
-  var row = document.createElement('tr');
-  row.innerHTML = '<td><input type="text" placeholder="اسم الموظف" class="table-input emp-name"></td>' +
-    '<td><select class="table-input emp-nationality"><option value="iraqi">عراقي</option><option value="foreign">أجنبي</option></select></td>' +
-    '<td><select class="table-input emp-gender"><option value="male">ذكر</option><option value="female">أنثى</option></select></td>' +
-    '<td><input type="text" placeholder="٠" class="table-input emp-salary" onchange="calculateCompanyEmployeeTax(this)"></td>' +
-    '<td><select class="table-input emp-marital" onchange="calculateCompanyEmployeeTax(this)"><option value="single">أعزب</option><option value="married">متزوج</option></select></td>' +
-    '<td><input type="number" value="0" min="0" max="20" class="table-input emp-children" onchange="calculateCompanyEmployeeTax(this)" style="width:60px;"></td>' +
-    '<td class="emp-monthly-tax">٠ د.ع</td>' +
-    '<td class="emp-annual-tax">٠ د.ع</td>' +
-    '<td><button class="btn btn-sm btn-danger" onclick="removeContractEmployeeRow(this)"><i class="fas fa-trash"></i></button></td>';
-  tbody.appendChild(row);
-}
-
-function removeContractEmployeeRow(btn) {
-  var tbody = btn.closest('tbody');
-  if (tbody.rows.length > 1) btn.closest('tr').remove();
-  else showToast('يجب الإبقاء على صف واحد على الأقل', true);
-}
-
-function calculateDeduction() {
-  var payment = getVal('deductionPayment');
-  var rate = parseFloat(document.getElementById('deductionRate').value) / 100;
-  if (!payment) { showToast('يرجى إدخال قيمة الدفعة', true); return; }
-  var deduction = payment * rate;
-  var net = payment - deduction;
-  setText('deductionPaymentResult', formatNumber(payment) + ' د.ع');
-  setText('deductionRateResult', (rate * 100) + '٪');
-  setText('deductionAmountResult', formatNumber(Math.round(deduction)) + ' د.ع');
-  setText('deductionNetResult', formatNumber(Math.round(net)) + ' د.ع');
-  document.getElementById('deductionResult').style.display = 'block';
-  showToast('تم احتساب الاستقطاع بنجاح');
-}
-
-// ========== SALARY TAX ==========
-function calculateIncomeTax(annualIncome) {
-  var taxable = annualIncome - SALARY_ANNUAL_EXEMPTION;
-  if (taxable <= 0) return 0;
-  var tax = 0, prev = 0;
-  for (var i = 0; i < SALARY_BRACKETS.length; i++) {
-    var b = SALARY_BRACKETS[i];
-    var chunk = Math.min(taxable, b.limit) - prev;
-    if (chunk <= 0) break;
-    tax += chunk * b.rate;
-    prev = Math.min(taxable, b.limit);
-    if (prev >= taxable) break;
-  }
-  return tax;
-}
-
-function calculateSalaryTax(inputEl) {
-  var row = inputEl.closest('tr');
-  var monthly = parseArabicNumber(inputEl.value);
-  var annual = monthly * 12;
-  var annualTax = calculateIncomeTax(annual);
-  var monthlyTax = annualTax / 12;
-  row.querySelector('.salary-result').textContent = formatNumber(Math.round(monthlyTax)) + ' د.ع';
-}
-
-function addSalaryRow() {
-  var tbody = document.querySelector('#salaryTable tbody');
-  var row = document.createElement('tr');
-  row.innerHTML = '<td><input type="text" placeholder="اسم الموظف" class="table-input"></td>' +
-    '<td><input type="text" placeholder="٠" class="table-input" onchange="calculateSalaryTax(this)"></td>' +
-    '<td class="salary-result">٠ د.ع</td>' +
-    '<td><button class="btn btn-sm btn-danger" onclick="removeSalaryRow(this)"><i class="fas fa-trash"></i></button></td>';
-  tbody.appendChild(row);
-}
-
-function removeSalaryRow(btn) {
-  var tbody = btn.closest('tbody');
-  if (tbody.rows.length > 1) btn.closest('tr').remove();
-  else showToast('يجب الإبقاء على صف واحد على الأقل', true);
-}
-
-// ========== LAND TAX ==========
-var LAND_DISTRICTS = {};
-var LAND_PRICES = {};
-// Populate from ALL_PROVINCES
-Object.keys(ALL_PROVINCES).forEach(function(k) {
-  LAND_DISTRICTS[k] = ALL_PROVINCES[k].districts;
-  LAND_PRICES[k] = ALL_PROVINCES[k].prices;
-});
-
-
-function updateLandDistricts() {}
-
-function formatInputNumber(val) {
-  if(!val) return '';
-  var num = val.replace(/[^0-9٠-٩۰-۹]/g, '');
-  if(!num) return '';
-  var parsed = parseArabicNumber(num);
-  return formatNumber(parsed);
-}
-
-function handleLandStep1() {
-  var step1 = document.getElementById('landExemptionCode').value;
-  var step2 = document.getElementById('landStep2');
-  var step3 = document.getElementById('landStep3');
-  var btn = document.getElementById('landCalculateBtnGroup');
-  var resBox = document.getElementById('landNewResultBox');
+  html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:12px;color:#000;background:#fff;' + (forPrint ? '' : 'padding:8px;overflow-x:auto;') + '">';
   
-  // reset down tree
-  document.getElementById('landIsMinor').value = "";
-  document.getElementById('landTotalArea').value = "";
-  document.getElementById('landTotalValue').value = "";
-  step2.style.display = 'none';
-  step3.style.display = 'none';
-  btn.style.display = 'none';
-  resBox.style.display = 'none';
+  html += 
+   <div class="page-break" style="width:210mm; min-height:295mm; margin:0 auto; padding:15mm; background:#fff; color:#000; direction:rtl; box-sizing:border-box; border:1px solid #ddd;">
+     <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">هيئة الضرائب العامة - الكشف السنوي الشامل الموحد</div>
+     <div style="text-align:center; font-size:12px; margin-bottom:15px;">السنة المالية: </div>
+     <div style="margin-bottom:15px; font-size:14px;"><strong>اسم جهة العمل (الشركة):</strong>  <br> <strong>الرقم التعريفي:</strong> </div>
+     <table style="width:100%; border-collapse:collapse; text-align:center; font-size:11px;" border="1">
+       <tr style="background:#f3f4f6; font-weight:bold;">
+         <td style="padding:5px;">ت</td>
+         <td style="padding:5px;">اسم الموظف</td>
+         <td style="padding:5px;">إجمالي الدخل (يضمن المخصصات والمنفعة)</td>
+         <td style="padding:5px;">التنزيلات والسماحات</td>
+         <td style="padding:5px;">الوعاء الضريبي</td>
+         <td style="padding:5px;">الضريبة السنوية المستحقة</td>
+         <td style="padding:5px;">المسدد خلال السنة</td>
+         <td style="padding:5px;">غير المسدد</td>
+         <td style="padding:5px;">الفائض (الزائد)</td>
+       </tr>
+  ;
 
-  if (!step1) return;
-
-  if (step1 === 'none') {
-    // Proceed to Step 2
-    step2.style.display = 'block';
-  } else {
-    // Total exemption directly
-    btn.style.display = 'block';
-  }
-}
-
-function handleLandStep2() {
-  var step2 = document.getElementById('landIsMinor').value;
-  var step3 = document.getElementById('landStep3');
-  var btn = document.getElementById('landCalculateBtnGroup');
-  var resBox = document.getElementById('landNewResultBox');
-
-  // reset down tree
-  document.getElementById('landTotalArea').value = "";
-  document.getElementById('landTotalValue').value = "";
-  step3.style.display = 'none';
-  btn.style.display = 'none';
-  resBox.style.display = 'none';
-
-  if (step2) {
-    step3.style.display = 'block';
-    btn.style.display = 'block';
-  }
-}
-
-function calculateNewLandTax() {
-  var step1 = document.getElementById('landExemptionCode').value;
-  var resBox = document.getElementById('landNewResultBox');
-  var resDetails = document.getElementById('landNewResultDetails');
-  var exemptMsg = document.getElementById('landExemptMessage');
-  var exemptText = document.getElementById('landExemptText');
+  var totalIncome = 0, totalDed = 0, totalTaxable = 0, totalLiab = 0, totalPaid = 0, totalUnpaid = 0, totalExcess = 0;
   
-  if (!step1) {
-    showToast('يرجى تحديد حالة الإعفاء من الخطوة الأولى', true);
-    return;
-  }
-
-  resBox.style.display = 'block';
-
-  // المرحلة الأولى: التحقق من الإعفاء الكلي
-  if (step1 !== 'none') {
-    resDetails.style.display = 'none';
-    exemptMsg.style.display = 'block';
-    exemptText.textContent = "العرصة معفاة من الضريبة بالكامل؛ لتطابقها مع أحد شروط الإعفاء التام.";
-    showToast('العرصة معفاة بالكامل');
-    return;
-  }
-
-  // Not strictly exempt, must check minor and numbers
-  var isMinor = document.getElementById('landIsMinor').value;
-  var totalArea = parseFloat(document.getElementById('landTotalArea').value);
-  var totalValue = parseArabicNumber(document.getElementById('landTotalValue').value);
-
-  if (!isMinor) {
-    showToast('يرجى الإجابة على سؤال القاصر', true);
-    return;
-  }
-  if (isNaN(totalArea) || totalArea <= 0 || isNaN(totalValue) || totalValue <= 0) {
-    showToast('يرجى إدخال المساحة الكلية والقيمة الكلية بأرقام صحيحة أكبر من صفر', true);
-    return;
-  }
-
-  var taxableArea = 0;
-  var statusMsg = "";
-
-  // المرحلة الثانية والثالثة
-  if (isMinor === 'yes') {
-    taxableArea = totalArea;
-    statusMsg = "المالك قاصر؛ لا يوجد إعفاء جزئي للمساحة (800 متر)، تخضع كامل المساحة للضريبة.";
-  } else {
-    if (totalArea <= 800) {
-      // معفى بالكامل
-      resDetails.style.display = 'none';
-      exemptMsg.style.display = 'block';
-      exemptText.textContent = "العرصة معفاة من الضريبة بالكامل ضمن السماح القانوني للمساحة (800 متر مربع فما دون).";
-      showToast('العرصة معفاة بالكامل');
-      return;
-    } else {
-      taxableArea = totalArea - 800;
-      statusMsg = "المالك بالغ؛ تم خصم الإعفاء الجزئي (800 م²). المساحة المتبقية خاضعة للضريبة.";
-    }
-  }
-
-  // الحساب المالي
-  var meterValue = totalValue / totalArea;
-  var taxableValue = meterValue * taxableArea;
-  var finalTax = taxableValue * 0.02; // نسبة 2%
-
-  exemptMsg.style.display = 'none';
-  resDetails.style.display = 'block';
-
-  setText('landResTotalArea', formatNumber(totalArea) + ' م²');
-  setText('landResTotalValue', formatNumber(Math.round(totalValue)) + ' د.ع');
-  setText('landResMeterValue', formatNumber(Math.round(meterValue)) + ' د.ع / م²');
-  setText('landResExemptStatus', statusMsg);
-  setText('landResTaxableArea', formatNumber(taxableArea) + ' م²');
-  setText('landResTaxableValue', formatNumber(Math.round(taxableValue)) + ' د.ع');
-  setText('landResFinalTax', formatNumber(Math.round(finalTax)) + ' د.ع');
-
-  showToast('تم احتساب الضريبة بنجاح');
-  
-  if (document.getElementById('dd4aPrintableArea')) {
-      // Note: we can add audit or other saves if necessary, 
-      // but not specifically requested for land just yet.
-  }
-}
-
-// ========== PROPERTY TAX (ضريبة العقار) ==========
-function handlePropStep1() {
-  var s1 = document.getElementById('propExemptType1').value;
-  var s2 = document.getElementById('propStep2');
-  var s3 = document.getElementById('propStep3');
-  var s4 = document.getElementById('propStep4');
-  var btn = document.getElementById('propCalculateBtnGroup');
-  var resBox = document.getElementById('propNewResultBox');
-
-  // reset down
-  document.getElementById('propExemptType2').value = "";
-  document.getElementById('propIsNew').value = "";
-  document.getElementById('propNewDate').value = "";
-  document.getElementById('propIsEmpty').value = "";
-  document.getElementById('propEmptyMonths').value = "";
-  s2.style.display = 'none';
-  s3.style.display = 'none';
-  s4.style.display = 'none';
-  btn.style.display = 'none';
-  resBox.style.display = 'none';
-
-  if (!s1) return;
-
-  if (s1 === 'none') {
-    s2.style.display = 'block';
-  } else {
-    btn.style.display = 'block';
-  }
-}
-
-function handlePropStep2() {
-  var s2 = document.getElementById('propExemptType2').value;
-  var s3 = document.getElementById('propStep3');
-  var s4 = document.getElementById('propStep4');
-  var btn = document.getElementById('propCalculateBtnGroup');
-  var resBox = document.getElementById('propNewResultBox');
-
-  document.getElementById('propIsNew').value = "";
-  document.getElementById('propNewDate').value = "";
-  document.getElementById('propIsEmpty').value = "";
-  document.getElementById('propEmptyMonths').value = "";
-  s3.style.display = 'none';
-  s4.style.display = 'none';
-  btn.style.display = 'none';
-  resBox.style.display = 'none';
-
-  if (!s2) return;
-
-  if (s2 === 'none') {
-    s3.style.display = 'block';
-  } else {
-    btn.style.display = 'block';
-  }
-}
-
-function togglePropNewDate() {
-  var val = document.getElementById('propIsNew').value;
-  document.getElementById('propNewDateGroup').style.display = val === 'yes' ? 'block' : 'none';
-  handlePropStep3();
-}
-
-function togglePropEmptyMonths() {
-  var val = document.getElementById('propIsEmpty').value;
-  document.getElementById('propEmptyMonthsGroup').style.display = val === 'yes' ? 'block' : 'none';
-  handlePropStep3();
-}
-
-function handlePropStep3() {
-  var isNew = document.getElementById('propIsNew').value;
-  var isEmp = document.getElementById('propIsEmpty').value;
-  var s4 = document.getElementById('propStep4');
-  var btn = document.getElementById('propCalculateBtnGroup');
-  var resBox = document.getElementById('propNewResultBox');
-
-  resBox.style.display = 'none';
-
-  if (!isNew || !isEmp) {
-    s4.style.display = 'none';
-    btn.style.display = 'none';
-    return;
-  }
-
-  // Check if fully exempt due to "New" within 5 years
-  if (isNew === 'yes') {
-    var d = document.getElementById('propNewDate').value;
-    if (d) {
-      var dDate = new Date(d);
-      var now = new Date();
-      var diffTime = Math.abs(now - dDate);
-      var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      if (diffDays <= (5 * 365)) {
-        s4.style.display = 'none';
-        btn.style.display = 'block';
-        return;
-      }
-    } else {
-      s4.style.display = 'none';
-      btn.style.display = 'none';
-      return;
-    }
-  }
-
-  s4.style.display = 'block';
-  btn.style.display = 'block';
-}
-
-function calculateNewPropertyTax() {
-  var s1 = document.getElementById('propExemptType1').value;
-  var resBox = document.getElementById('propNewResultBox');
-  var resDetails = document.getElementById('propNewResultDetails');
-  var exemptMsg = document.getElementById('propExemptMessage');
-  var exemptText = document.getElementById('propExemptText');
-  
-  resBox.style.display = 'block';
-
-  // Step 1 check
-  if (s1 !== 'none') {
-    resDetails.style.display = 'none';
-    exemptMsg.style.display = 'block';
-    exemptText.textContent = "تم إعفاء هذا العقار بالكامل بناءً على صفته أو منفعته العامة المنتجاة، وذلك استناداً إلى أحكام (المادة الثالثة) من قانون ضريبة العقار رقم 162 لسنة 1959 وتعديلاته التي تنص على إعفاء دور الدولة والأوقاف والنفع العام.";
-    showToast('العقار معفى بالكامل');
-    return;
-  }
-
-  // Step 2 check
-  var s2 = document.getElementById('propExemptType2').value;
-  if (s2 !== 'none') {
-    resDetails.style.display = 'none';
-    exemptMsg.style.display = 'block';
-    exemptText.textContent = "تم إعفاء هذا العقار بالكامل لأنه يمثل (دار سكن للعائلة)، وذلك استناداً إلى أحكام (المادة الرابعة - الفقرتين 1 و 2) من قانون ضريبة العقار رقم 162 لسنة 1959 وتعديلاته، والتي تنص على إعفاء دار السكن والشقة التي يسكنها المالك أو أقاربه من الدرجة الأولى.";
-    showToast('العقار معفى كدار سكن');
-    return;
-  }
-
-  // Step 3 check (New Building)
-  var isNew = document.getElementById('propIsNew').value;
-  if (isNew === 'yes') {
-    var d = document.getElementById('propNewDate').value;
-    var dDate = new Date(d);
-    var now = new Date();
-    var diffTime = Math.abs(now - dDate);
-    var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays <= (5 * 365)) {
-      resDetails.style.display = 'none';
-      exemptMsg.style.display = 'block';
-      exemptText.textContent = "تم إعفاء هذا العقار بالكامل لأنهُ عقار مشيد حديثاً لم تمضِ على إتمامه 5 سنوات، استناداً إلى أحكام (المادة الرابعة - الفقرة 3) من القانون.";
-      showToast('العقار معفى كمشيد حديثاً');
-      return;
-    }
-  }
-
-  // Base Calculation
-  var rent = parseArabicNumber(document.getElementById('propAnnualRent').value);
-  if (isNaN(rent) || rent <= 0) {
-    showToast('يرجى إدخال الإيراد السنوي رقمياً', true);
-    return;
-  }
-
-  var isEmp = document.getElementById('propIsEmpty').value;
-  var empMonths = parseInt(document.getElementById('propEmptyMonths').value) || 0;
-  
-  var maint = rent * 0.10;
-  var taxable = rent - maint;
-  
-  var emptyDeduction = 0;
-  var emptyMsg = "";
-  if (isEmp === 'yes' && empMonths >= 3) {
-    emptyDeduction = (taxable / 12) * empMonths;
-    taxable = taxable - emptyDeduction;
-    emptyMsg = "تم خصم نسبة من الوعاء تعادل مدة الخلو ("+empMonths+" أشهر)، استناداً إلى أحكام (المادة الرابعة - الفقرة 5-أ).";
-    document.getElementById('propRowEmptyWrap').style.display = 'block';
-    document.getElementById('propRowEmptyTextWrap').style.display = 'block';
-    setText('propResEmpty', formatNumber(Math.round(emptyDeduction)) + ' د.ع');
-    setText('propResEmptyText', emptyMsg);
-  } else {
-    document.getElementById('propRowEmptyWrap').style.display = 'none';
-    document.getElementById('propRowEmptyTextWrap').style.display = 'none';
-  }
-
-  var baseTax = taxable * 0.10;
-  var finalTax = baseTax;
-
-  exemptMsg.style.display = 'none';
-  resDetails.style.display = 'block';
-
-  setText('propResRent', formatNumber(rent) + ' د.ع');
-  setText('propResRentText', "قيمة الإيراد السنوي المدخلة");
-  
-  setText('propResMaint', formatNumber(Math.round(maint)) + ' د.ع');
-  setText('propResMaintText', "تم استقطاع مبلغ كنسبة اندثار وصيانة، استناداً لأحكام (المادة الثانية - الفقرة 2).");
-  
-  setText('propResTaxable', formatNumber(Math.round(taxable)) + ' د.ع');
-  
-  setText('propResBaseTax', formatNumber(Math.round(baseTax)) + ' د.ع');
-  setText('propResBaseTaxText', "تم ضرب الإيراد الخاضع للضريبة بنسبة 10%، استناداً لأحكام (المادة الثانية - الفقرة 1).");
-
-  // Penalties
-  var penSection = document.getElementById('propPenaltiesSection');
-  var penRows = document.getElementById('propPenRows');
-  penRows.innerHTML = '';
-  var hasPen = false;
-
-  if (document.getElementById('propPenDelay').checked) {
-    var p = baseTax * 0.10;
-    finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>غرامة تأخير:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 22 - الفقرة 1-أ).</div>';
-    hasPen = true;
-  }
-  if (document.getElementById('propPenFalseInfo').checked) {
-    var p = baseTax * 0.10;
-    finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>إخفاء معلومات:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام (المادة 7 - الفقرة 2).</div>';
-    hasPen = true;
-  }
-  if (document.getElementById('propPenFakeEmpty').checked) {
-    var p = baseTax * 2; // مثلي الضريبة
-    finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>خلو وهمي:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) استناداً لأحكام الغرامات (مثلي الضريبة المتهربة).</div>';
-    hasPen = true;
-  }
-  if (document.getElementById('propPenUseChange').checked) {
-    var p = baseTax * 1; // مثل الضريبة
-    finalTax += p;
-    penRows.innerHTML += '<div style="margin-bottom:8px;font-size:13px;"><strong>تغيير استعمال:</strong> تم إضافة ('+formatNumber(Math.round(p))+' د.ع) بسبب عدم الإخبار عن زوال شرط الإعفاء.</div>';
-    hasPen = true;
-  }
-
-  penSection.style.display = hasPen ? 'block' : 'none';
-  setText('propResFinalTax', formatNumber(Math.round(finalTax)) + ' د.ع');
-
-  showToast('تم إتمام الحساب وتوثيق الأسانيد بنجاح');
-}
-
-// ========== PROFESSION/INCOME TAX (ضريبة الاستقطاع المباشر) ==========
-function calculateProfTax() {
-  var resBox = document.getElementById('profResultBox');
-  
-  // 1. Demographics & Allowances
-  var isResident = document.getElementById('profRes').value === 'resident';
-  var is63 = document.getElementById('profAge63').value === 'yes';
-  var marital = document.getElementById('profMarital').value;
-  var children = parseInt(document.getElementById('profChildren').value) || 0;
-  
-  // 2. Financials
-  var salary = parseArabicNumber(document.getElementById('profBaseSalary').value) || 0;
-  var allowances = parseArabicNumber(document.getElementById('profAllowances').value) || 0;
-  var houseKindStr = document.getElementById('profHouseKind').value;
-  var houseKindRate = parseFloat(houseKindStr) || 0;
-  var foodKindVal = parseArabicNumber(document.getElementById('profFoodKindVal').value) || 0;
-  
-  // 3. Deductions
-  var socialSec = parseArabicNumber(document.getElementById('profSocialSec').value) || 0;
-  var lifeIns = parseArabicNumber(document.getElementById('profLifeIns').value) || 0;
-  var alimony = parseArabicNumber(document.getElementById('profAlimony').value) || 0;
-  
-  // 5. Admin Penalties
-  var delayDays = parseInt(document.getElementById('profDelayDays').value) || 0;
-
-  if (salary <= 0) {
-    resBox.style.display = 'none';
-    return;
-  }
-
-  // --- Step 1 calculations ---
-  var houseBenefit = 0;
-  // hotel edge case
-  if (houseKindStr === '0.20_hotel') { houseBenefit = salary * 0.20; }
-  else { houseBenefit = salary * houseKindRate; }
-
-  // Food benefit: min of 10% salary or actual cost
-  var maxFoodVal = salary * 0.10;
-  var foodBenefit = (foodKindVal > 0 && foodKindVal < maxFoodVal) ? foodKindVal : (foodKindVal > 0 ? maxFoodVal : 0);
-  
-  var totalBenefits = houseBenefit + foodBenefit;
-  var grossIncome = salary + allowances + totalBenefits;
-
-  // --- Step 2: 30% Exemption rule for cash allowances + benefits ---
-  // Note: PRD mentions "المخصصات النقدية (سكن، نقل، طعام...)" rule of 30%.
-  // Total additions (allowances)
-  var totalAdditions = allowances + totalBenefits;
-  var limit30 = salary * 0.30;
-  var exemptAdditions = 0;
-  var taxableAdditions = 0;
-  var exempt30Reason = "";
-  
-  if (totalAdditions <= limit30) {
-    exemptAdditions = totalAdditions;
-    taxableAdditions = 0;
-    exempt30Reason = "مجموع المخصصات والمنافع ("+formatNumber(Math.round(totalAdditions))+") أقل أو يساوي 30% من الراتب الاسمي ("+formatNumber(limit30)+"). تعفى المخصصات بالكامل.";
-  } else {
-    exemptAdditions = limit30;
-    taxableAdditions = totalAdditions - limit30;
-    exempt30Reason = "مجموع المخصصات والمنافع ("+formatNumber(Math.round(totalAdditions))+") تجاوز 30% من الراتب ("+formatNumber(limit30)+"). يعفى سقف الـ 30%، والباقي ("+formatNumber(Math.round(taxableAdditions))+") يضاف للوعاء الضريبي.";
-  }
-
-  // Revised Income after 30% exemption
-  var revisedGross = salary + taxableAdditions;
-
-  // --- Step 3: Legal Deductions ---
-  var totalDeductions = socialSec + lifeIns + alimony;
-  var netAfterDeductions = Math.max(0, revisedGross - totalDeductions);
-
-  // --- Step 4: Social Statutory Allowances (per month) ---
-  var statAllowance = 0;
-  var statAllowanceReason = "";
-  
-  if (isResident) {
-    if (marital === 'single' || marital === 'married_spouse_income') {
-      statAllowance = 208333; // ~ 2,500,000 / 12
-      statAllowanceReason = "أعزب / مطلّق / أرمل أو متزوج (وزوجته تحاسب مستقلاً): 2,500,000 د.ع سنوياً.";
-    } else if (marital === 'married_spouse_no_income') {
-      statAllowance = 375000; // ~ 4,500,000 / 12
-      statAllowanceReason = "متزوج (وزوجته ربة بيت): 4,500,000 د.ع سنوياً.";
-    } else if (marital === 'married_female_disabled_husband') {
-      statAllowance = 416667; // ~ 5,000,000 / 12
-      statAllowanceReason = "متزوجة (زوجها عاجز): 5,000,000 د.ع سنوياً.";
-    } else if (marital === 'widow_divorced') {
-      statAllowance = 266667; // ~ 3,200,000 / 12
-      statAllowanceReason = "أرملة/مطلقة مستقلة: 3,200,000 د.ع سنوياً.";
-    }
+  combined.forEach(function(e, i) {
+    var ytd = getEmpYTD(e.id, currentYear);
+    var isYTD = ytd && ytd.count > 0;
+    var math = doExcelMathForEmployee(e);
     
-    // Extensions
-    var childAllowance = 0;
-    // Child allowance is 200k annual = 16667 monthly
-    // According to PRD: for widows, divorced, or housewives.
-    // Assuming normally added for typical cases.
-    if (children > 0 && (marital === 'married_spouse_no_income' || marital === 'widow_divorced')) {
-      childAllowance = children * 16667; 
-      statAllowance += childAllowance;
-      statAllowanceReason += " إضافة " + formatNumber(Math.round(childAllowance)) + " عن الأولاد.";
-    }
-
-    if (is63) {
-      statAllowance += 25000; // ~ 300,000 / 12
-      statAllowanceReason += " إضافة 300,000 د.ع سنوي لإكمال سن 63.";
-    }
+    var income = isYTD ? ytd.gross : math.annualGross;
+    var rawDeductions = isYTD ? ytd.ded : math.annualDed;
+    var allowances = isYTD ? (ytd.count * math.monthlyAllowance) : (math.monthlyAllowance * 12); // approximations for history mixing if missing from YTD
+    // strictly use YTD's ded which is total deductions
+    var deductions = rawDeductions;
+    var taxable = isYTD ? ytd.taxable : math.annualTaxable;
+    var liab = isYTD ? ytd.tax : math.annualTax;
+    var paid = liab; // Enforce invariant: YTD calculated exact matches
     
-  } else {
-    statAllowanceReason = "غير مقيم: لا يُشمل السن، أو الزوجية، أو الأولاد بأي سماح.";
-  }
+    // Check if it's strict linear mismatch
+    var strictLiab = math.annualTax; 
+    var unpaid = Math.max(0, liab - strictLiab);
+    var excess = Math.max(0, strictLiab - liab);
+    if(isYTD) { unpaid = 0; excess = 0; paid = liab; } // they match YTD.
 
-  // Calculate Net Taxable Base
-  var taxableIncome = Math.max(0, netAfterDeductions - statAllowance);
+    totalIncome += income; totalDed += deductions; totalTaxable += taxable;
+    totalLiab += liab; totalPaid += paid; totalUnpaid += unpaid; totalExcess += excess;
 
-  // --- Step 5: Tax Brackets Calculation ---
-  var t = taxableIncome;
-  var b1Tax = 0; var b2Tax = 0; var b3Tax = 0; var b4Tax = 0;
-  
-  if (t > 83333) { b4Tax = (t - 83333) * 0.15; t = 83333; }
-  if (t > 41667) { b3Tax = (t - 41667) * 0.10; t = 41667; }
-  if (t > 20833) { b2Tax = (t - 20833) * 0.05; t = 20833; }
-  if (t > 0)     { b1Tax = t * 0.03;          }
-  
-  var baseTaxAmount = b1Tax + b2Tax + b3Tax + b4Tax;
-
-  // --- Step 6: Employer Penalties ---
-  var finalTaxAmount = baseTaxAmount;
-  var penaltyHtml = '';
-  var hasPenalties = false;
-
-  if (delayDays >= 21) {
-    hasPenalties = true;
-    var periods = Math.floor(delayDays / 21);
-    var rate = periods === 1 ? 0.05 : 0.10;
-    var penAmnt = baseTaxAmount * rate;
-    finalTaxAmount += penAmnt;
-    penaltyHtml += '<div style="margin-bottom:6px;"><strong>تأخير ('+delayDays+' يوم):</strong> غرامة ' + (rate*100) + '% بمبلغ <strong>'+formatNumber(Math.round(penAmnt))+' د.ع</strong>. استناداً لأحكام (المادة 10 - سادساً).</div>';
-    
-    // Add fake simple interest assuming 4% for demo (M10-8th)
-    var interestAmnt = baseTaxAmount * (delayDays / 365) * 0.04;
-    finalTaxAmount += interestAmnt;
-    penaltyHtml += '<div style="margin-bottom:6px;"><strong>فوائد تأخيرية مصرفية:</strong> مبلغ <strong>'+formatNumber(Math.round(interestAmnt))+' د.ع</strong>. استناداً لأحكام (المادة 10 - ثامناً).</div>';
-  }
-
-  // -------------------------------------------------------------
-  // RENDER UI
-  resBox.style.display = 'block';
-
-  setText('profResGross', formatNumber(Math.round(grossIncome)) + ' د.ع');
-  setText('profResGrossLegal', 'المادة (2) - رابعاً (المخصصات النقدية)، والمادة (2) - ثانياً وثالثاً (المنافع العينية للسكن والطعام).');
-  
-  setText('profResExempt30', formatNumber(Math.round(exemptAdditions)) + ' د.ع (المعفى)');
-  setText('profResExempt30Legal', exempt30Reason + ' المادة (6) - ثالث عشر.');
-
-  setText('profResDeductions', formatNumber(Math.round(totalDeductions)) + ' د.ع');
-  var dedRea = [];
-  if(socialSec>0) dedRea.push('المادة (3) عاشراً للتقاعد/الضمان');
-  if(lifeIns>0) dedRea.push('المادة (3) للتأمين');
-  if(alimony>0) dedRea.push('القانون للنفقة الشرعية');
-  setText('profResDeductionsLegal', (dedRea.length ? dedRea.join(' و ') : 'لا يوجد استقطاعات.') );
-
-  setText('profResAllowances', formatNumber(Math.round(statAllowance)) + ' د.ع');
-  setText('profResAllowancesLegal', statAllowanceReason + ' المادة (5) - أولاً.');
-
-  setText('profResTaxable', formatNumber(Math.round(taxableIncome)) + ' د.ع');
-
-  var bracketsOut = '<ul style="margin:0;padding-right:20px;list-style:decimal;">';
-  bracketsOut += '<li>الشريحة الأولى (لغاية 20,833) نسبة 3%: <strong>' + formatNumber(Math.round(b1Tax)) + ' د.ع</strong></li>';
-  bracketsOut += '<li>الشريحة الثانية (إلى 41,667) نسبة 5%: <strong>' + formatNumber(Math.round(b2Tax)) + ' د.ع</strong></li>';
-  bracketsOut += '<li>الشريحة الثالثة (إلى 83,333) نسبة 10%: <strong>' + formatNumber(Math.round(b3Tax)) + ' د.ع</strong></li>';
-  bracketsOut += '<li>الشريحة الرابعة (أكثر من 83,333) نسبة 15%: <strong>' + formatNumber(Math.round(b4Tax)) + ' د.ع</strong></li>';
-  bracketsOut += '<li>إجمالي الضريبة الأساسية قبل الغرامات: <strong><span style="color:var(--success);">' + formatNumber(Math.round(baseTaxAmount)) + ' د.ع</span></strong></li>';
-  bracketsOut += '</ul>';
-  document.getElementById('profBracketsHtml').innerHTML = bracketsOut;
-
-  var penSec = document.getElementById('profPenaltiesSection');
-  if (hasPenalties) {
-    penSec.style.display = 'block';
-    document.getElementById('profPenHtml').innerHTML = penaltyHtml;
-  } else {
-    penSec.style.display = 'none';
-  }
-
-  setText('profResFinalTax', formatNumber(Math.round(finalTaxAmount)) + ' د.ع');
-
-}
-// ========== SALES TAX ==========
-var salesEntries = [];
-var salesCounter = 0;
-
-function updateSalesTaxRate() {
-  var sel = document.getElementById('salesCategory');
-  var rate = sel.options[sel.selectedIndex].getAttribute('data-rate') || 0;
-  document.getElementById('salesTaxRate').value = rate + '٪';
-}
-
-function calculateSalesTax() {
-  var sel = document.getElementById('salesCategory');
-  var rate = parseFloat(sel.options[sel.selectedIndex].getAttribute('data-rate')) || 0;
-  var amount = getVal('salesAmount');
-  var qty = parseInt(document.getElementById('salesQty').value) || 1;
-  if (!amount || !rate) { showToast('يرجى اختيار الفئة وإدخال المبلغ', true); return; }
-  var subtotal = amount * qty;
-  var taxAmt = subtotal * (rate / 100);
-  var total = subtotal + taxAmt;
-  setText('salesSubtotal', formatNumber(subtotal) + ' د.ع');
-  setText('salesTaxAmount', formatNumber(Math.round(taxAmt)) + ' د.ع');
-  setText('salesTotal', formatNumber(Math.round(total)) + ' د.ع');
-  document.getElementById('salesSummary').style.display = 'grid';
-}
-
-function addSalesEntry() {
-  var sel = document.getElementById('salesCategory');
-  var catText = sel.options[sel.selectedIndex].text;
-  var rate = parseFloat(sel.options[sel.selectedIndex].getAttribute('data-rate')) || 0;
-  var amount = getVal('salesAmount');
-  var qty = parseInt(document.getElementById('salesQty').value) || 1;
-  if (!amount || !rate) { showToast('يرجى احتساب الضريبة أولاً', true); return; }
-  var subtotal = amount * qty;
-  var taxAmt = subtotal * (rate / 100);
-  var total = subtotal + taxAmt;
-  salesCounter++;
-  salesEntries.push({ id: salesCounter, category: catText, amount: subtotal, tax: taxAmt, total: total });
-
-  var tbody = document.getElementById('salesListBody');
-  tbody.innerHTML = '';
-  salesEntries.forEach(function(e) {
-    tbody.innerHTML += '<tr><td>' + e.id + '</td><td>' + e.category + '</td><td>' +
-      formatNumber(e.amount) + '</td><td>' + formatNumber(Math.round(e.tax)) + '</td><td>' +
-      formatNumber(Math.round(e.total)) + '</td></tr>';
+    html += <tr>
+      <td style="padding:5px;"></td>
+      <td style="padding:5px; text-align:right;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr; font-weight:bold;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
+      <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
+    </tr>;
   });
 
-  var totalSales = salesEntries.reduce(function(s, e) { return s + e.amount; }, 0);
-  var totalTax = salesEntries.reduce(function(s, e) { return s + e.tax; }, 0);
-  setText('salesReportTotal', formatNumber(Math.round(totalSales)) + ' د.ع');
-  setText('salesReportTax', formatNumber(Math.round(totalTax)) + ' د.ع');
-  setText('salesReportCount', salesEntries.length.toString());
-  showToast('تمت إضافة العملية للقائمة');
-}
+  html += 
+     <tr style="background:#f3f4f6; font-weight:bold;">
+       <td colspan="2" style="padding:5px;">المجموع الإجمالي</td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr; color:#000;"></td>
+       <td style="padding:5px; direction:ltr; color:#000;"></td>
+       <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
+       <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
+     </tr>
+     </table>
+     
+     <div style="display:flex; justify-content:space-between; margin-top:40px; font-size:14px; font-weight:bold;">
+        <div>توقيع المحاسب <br><br> ____________________</div>
+        <div>توقيع المدير المفوض <br><br> ____________________</div>
+     </div>
+   </div>
+   </div>
+  ;
 
-// ========== 1. DARK MODE ==========
-function toggleDarkMode() {
-  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
-  var icon = document.getElementById('darkModeIcon');
-  if (icon) icon.className = isDark ? 'fas fa-moon' : 'fas fa-sun';
-  var settingCheck = document.getElementById('settingDarkMode');
-  if (settingCheck) settingCheck.checked = !isDark;
-  localStorage.setItem('darkMode', isDark ? 'false' : 'true');
-  addAuditEntry('تغيير المظهر', isDark ? 'الوضع الفاتح' : 'الوضع الليلي');
-}
-
-function loadDarkMode() {
-  if (localStorage.getItem('darkMode') === 'true') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    var icon = document.getElementById('darkModeIcon');
-    if (icon) icon.className = 'fas fa-sun';
-    var settingCheck = document.getElementById('settingDarkMode');
-    if (settingCheck) settingCheck.checked = true;
-  }
-}
-
-// ========== 2. CHARTS (Chart.js) ==========
-var taxDistChart = null;
-var revenueChart = null;
-
-function initCharts() {
-  if (typeof Chart === 'undefined') return;
-  Chart.defaults.font.family = 'Tajawal';
-  var ctx1 = document.getElementById('taxDistributionChart');
-  if (ctx1) {
-    taxDistChart = new Chart(ctx1, {
-      type: 'doughnut',
-      data: {
-        labels: ['ضريبة الشركات', 'ضريبة العرصات', 'ضريبة العقار', 'ضريبة المهنة', 'ضريبة المبيعات'],
-        datasets: [{
-          data: [45, 15, 20, 12, 8],
-          backgroundColor: ['#1a237e','#2e7d32','#e65100','#6200ea','#c62828'],
-          borderWidth: 0, borderRadius: 4
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { position: 'bottom', labels: { padding: 16, usePointStyle: true } } }
-      }
-    });
-  }
-  var ctx2 = document.getElementById('monthlyRevenueChart');
-  if (ctx2) {
-    revenueChart = new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: ['كانون٢','شباط','آذار','نيسان','أيار','حزيران','تموز','آب','أيلول','ت١','ت٢','ك١'],
-        datasets: [{
-          label: 'الإيرادات (مليون د.ع)',
-          data: [8.5, 9.2, 12.1, 10.8, 11.5, 14.2, 13.0, 10.5, 15.3, 12.8, 11.0, 16.5],
-          backgroundColor: 'rgba(26,35,126,0.7)', borderRadius: 6, borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } }
-      }
-    });
-  }
-}
-
-// ========== 3. GLOBAL SEARCH ==========
-var searchIndex = [
-  { page: 'dashboard', title: 'لوحة التحكم', icon: 'fa-th-large', keywords: 'رئيسية لوحة تحكم إحصائيات' },
-  { page: 'corporate', title: 'ضريبة دخل الشركات', icon: 'fa-building', keywords: 'شركة شركات دخل أرباح إيرادات رواتب استقطاع' },
-  { page: 'land', title: 'ضريبة العرصات', icon: 'fa-map-marked-alt', keywords: 'أرض عرصة عرصات أراضي بغداد محافظة' },
-  { page: 'property', title: 'ضريبة العقار', icon: 'fa-home', keywords: 'عقار بيع إيجار شقة دار محل بناية طابو' },
-  { page: 'profession', title: 'ضريبة المهنة', icon: 'fa-user-tie', keywords: 'مهنة طبيب محامي مهندس تاجر مقاول' },
-  { page: 'sales', title: 'ضريبة المبيعات', icon: 'fa-shopping-cart', keywords: 'مبيعات هاتف سيارة سفر سكائر إلكترونيات' },
-  { page: 'reports', title: 'التقارير والتحليلات', icon: 'fa-chart-bar', keywords: 'تقرير تقارير تحليل إقرار إقرارات' },
-  { page: 'documents', title: 'المستندات', icon: 'fa-folder-open', keywords: 'مستند مستندات ملف ملفات رفع تحميل' },
-  { page: 'notifications', title: 'الإشعارات', icon: 'fa-bell', keywords: 'إشعار إشعارات تنبيه تنبيهات موعد' },
-  { page: 'penalties', title: 'حاسبة الغرامات', icon: 'fa-gavel', keywords: 'غرامة غرامات جزاء تأخير مخالفة تهرب' },
-  { page: 'comparison', title: 'مقارنة الضرائب', icon: 'fa-balance-scale', keywords: 'مقارنة سنوات تغيير نسبة' },
-  { page: 'calendar', title: 'التقويم الضريبي', icon: 'fa-calendar-alt', keywords: 'تقويم موعد مواعيد شهر سنة دفع' },
-  { page: 'audit', title: 'سجل العمليات', icon: 'fa-clipboard-list', keywords: 'سجل عمليات تدقيق مراجعة' },
-  { page: 'users', title: 'إدارة المستخدمين', icon: 'fa-users-cog', keywords: 'مستخدم مستخدمين صلاحية صلاحيات إدارة' },
-  { page: 'settings', title: 'الإعدادات', icon: 'fa-cog', keywords: 'إعداد إعدادات ضبط تفضيلات مظهر خط' },
-  { page: 'exportPDF', title: 'تصدير PDF', icon: 'fa-file-pdf', keywords: 'تصدير PDF طباعة تحميل', action: function() { exportToPDF(); } },
-  { page: 'exportExcel', title: 'تصدير Excel', icon: 'fa-file-excel', keywords: 'تصدير Excel اكسل جدول', action: function() { exportToExcel(); } }
-];
-
-function openSearchModal() {
-  var modal = document.getElementById('searchModal');
-  modal.classList.add('show');
-  var input = document.getElementById('searchInput');
-  input.value = '';
-  input.focus();
-  document.getElementById('searchResults').innerHTML = '<div class="search-empty"><i class="fas fa-search"></i><p>اكتب للبحث في الصفحات والوظائف</p></div>';
-}
-
-function closeSearchModal() {
-  document.getElementById('searchModal').classList.remove('show');
-}
-
-function performSearch(query) {
-  var results = document.getElementById('searchResults');
-  if (!query || query.length < 1) {
-    results.innerHTML = '<div class="search-empty"><i class="fas fa-search"></i><p>اكتب للبحث في الصفحات والوظائف</p></div>';
-    return;
-  }
-  var matches = searchIndex.filter(function(item) {
-    return item.title.indexOf(query) !== -1 || item.keywords.indexOf(query) !== -1;
-  });
-  if (matches.length === 0) {
-    results.innerHTML = '<div class="search-empty"><i class="fas fa-search"></i><p>لا توجد نتائج لـ "' + query + '"</p></div>';
-    return;
-  }
-  results.innerHTML = matches.map(function(m) {
-    return '<div class="search-result-item" onclick="' + (m.action ? 'searchIndex.find(function(s){return s.page===\'' + m.page + '\'}).action();closeSearchModal();' : 'navigateTo(\'' + m.page + '\');closeSearchModal();') + '"><i class="fas ' + m.icon + '"></i><span>' + m.title + '</span><small>' + (pageTitles[m.page] || '') + '</small></div>';
-  }).join('');
-}
-
-// ========== 4. PDF EXPORT ==========
-function exportToPDF() {
-  var activeSection = document.querySelector('.page-section.active');
-  if (!activeSection) { showToast('لا توجد صفحة نشطة للتصدير', true); return; }
-  if (typeof html2pdf === 'undefined') { showToast('مكتبة التصدير غير متوفرة', true); return; }
-  showToast('جاري تصدير PDF...');
-  var opt = {
-    margin: 10, filename: 'تقرير_ضريبي_' + new Date().toISOString().slice(0,10) + '.pdf',
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-  html2pdf().set(opt).from(activeSection).save().then(function() {
-    showToast('تم تصدير PDF بنجاح');
-    addAuditEntry('تصدير PDF', pageTitles[getCurrentPage()] || '');
-  });
-}
-
-// ========== 5. EXCEL EXPORT ==========
-function exportToExcel() {
-  if (typeof XLSX === 'undefined') { showToast('مكتبة التصدير غير متوفرة', true); return; }
-  var tables = document.querySelectorAll('.page-section.active table');
-  if (tables.length === 0) { showToast('لا توجد جداول للتصدير في هذه الصفحة', true); return; }
-  var wb = XLSX.utils.book_new();
-  tables.forEach(function(table, idx) {
-    var ws = XLSX.utils.table_to_sheet(table);
-    XLSX.utils.book_append_sheet(wb, ws, 'جدول ' + (idx + 1));
-  });
-  XLSX.writeFile(wb, 'تقرير_ضريبي_' + new Date().toISOString().slice(0,10) + '.xlsx');
-  showToast('تم تصدير Excel بنجاح');
-  addAuditEntry('تصدير Excel', pageTitles[getCurrentPage()] || '');
-}
-
-function getCurrentPage() {
-  var active = document.querySelector('.page-section.active');
-  return active ? active.id.replace('page-', '') : 'dashboard';
-}
-
-// ========== 6. USER MANAGEMENT ==========
-function getUsers() {
-  var stored = localStorage.getItem('taxUsers');
-  if (stored) return JSON.parse(stored);
-  return {
-    admin: { password: 'admin123', name: 'مدير النظام', role: 'مدير النظام', avatar: 'م', active: true },
-    accountant: { password: '123456', name: 'محمد أحمد', role: 'محاسب ضريبي', avatar: 'م', active: true }
-  };
-}
 
 function saveUsers(users) { localStorage.setItem('taxUsers', JSON.stringify(users)); }
 
@@ -4771,3 +3749,87 @@ window.exportBlankExcel = function() {
   XLSX.utils.book_append_sheet(wb, ws, "Template");
   XLSX.writeFile(wb, "Employee_Import_Template.xlsx");
 };
+
+
+function getMergedEmployeesForYear(year) {
+  var map = {};
+  // 1. Active employees
+  globalEmployees.forEach(function(e) { map[e.id] = Object.assign({}, e); });
+  contractEmployees.forEach(function(e) { map[e.id] = Object.assign({}, e); });
+  
+  // 2. Archived or modified from snapshots
+  taxSnapshots.forEach(function(s) {
+    if (String(s.year) === String(year)) {
+      if (!map[s.empId]) {
+        // Employee was deleted from active, but has snapshot
+        map[s.empId] = Object.assign({}, s.input);
+        map[s.empId].isDeleted = true;
+      }
+    }
+  });
+  return Object.values(map);
+}
+
+
+// Live Currency Formatter better logic
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.tagName === 'INPUT' && e.target.type === 'text') {
+    var id = e.target.id.toLowerCase();
+    if (id.includes('salary') || id.includes('allow') || id.includes('cash') || id.includes('ins') || id.includes('alimony') || id.includes('revenue') || id.includes('expenses')) {
+        var raw = e.target.value.replace(/[^0-9]/g, '');
+        if(raw) {
+            e.target.value = Number(raw).toLocaleString('en-US');
+        } else {
+            e.target.value = '';
+        }
+    }
+  }
+});
+
+function getAllEmployeesForYear(year) {
+  var emps = {};
+  globalEmployees.forEach(function(e) { emps[e.id] = e; });
+  var storedSnaps = JSON.parse(localStorage.getItem('taxSnapshots') || '[]');
+  storedSnaps.forEach(function(s) {
+    if (String(s.year) === String(year) && s.input && !emps[s.empId]) {
+      emps[s.empId] = s.input;
+    }
+  });
+  return Object.values(emps);
+}
+
+
+// Live Formatting for currency inputs
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.tagName === 'INPUT') {
+    var id = e.target.id || '';
+    if (id.includes('Salary') || id.includes('Allow') || id.includes('Cash') || id.includes('corpRevenue') || id.includes('corpExpenses')) {
+      var raw = e.target.value.replace(/,/g, '').replace(/[^0-9\.]/g, '');
+      if(raw && !isNaN(raw)) {
+        var num = parseInt(raw, 10);
+        e.target.value = num.toLocaleString('en-US');
+      }
+    }
+  }
+});
+
+
+var lockedYears = JSON.parse(localStorage.getItem('taxLockedYears') || '[]');
+
+function closeTaxYear() {
+  var year = document.getElementById('closeTaxYear').value;
+  if(!year) return;
+  if(lockedYears.includes(year)) {
+      showToast('هذه السنة مقفلة مسبقاً', true);
+      return;
+  }
+  if(confirm('تنبيه: هل أنت متأكد من إقفال السنة المالية ' + year + ' بالكامل؟\nلن تتمكن من تعديل أو إضافة لقطات أشهر إضافية لهذه السنة.')) {
+      lockedYears.push(year);
+      localStorage.setItem('taxLockedYears', JSON.stringify(lockedYears));
+      showToast('تم إقفال السنة المالية ' + year + ' بنجاح');
+  }
+}
+
+function checkYearLocked(year) {
+  return lockedYears.includes(String(year));
+}
