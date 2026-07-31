@@ -621,14 +621,12 @@ function saveTaxSnapshots() {
 }
 
 function closeMonthlyTax() {
-  var year = document.getElementById('closeTaxYear').value;
+  var year = document.getElementById('closeTaxMonth_Year').value;
   if(typeof checkYearLocked !== 'undefined' && checkYearLocked(year)) {
       showToast('السنة المالية ' + year + ' مقفلة ولا يمكن التعديل عليها', true);
       return;
   }
-
-  var year = document.getElementById('closeTaxYear').value;
-  var month = document.getElementById('closeTaxMonth').value;
+  var month = document.getElementById('closeTaxMonth_Month').value;
   
   if (!confirm('تأكيد إقفال وتجميد بيانات رواتب الموظفين لشهر ' + month + ' لسنة ' + year + '؟\n سيتم ترحيل البيانات وحسابها تراكمياً.')) return;
   
@@ -1049,7 +1047,7 @@ window.removeExtEmployee = function(id) {
 };
 
 function buildEmployeeDD4AHtml(employee) {
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   var math = doExcelMathForEmployee(employee);
   var ytd = getEmpYTD(employee.id, currentYear);
 
@@ -1558,7 +1556,7 @@ window.renderEmployeeList = function() {
   var totalTaxable = 0;
   var totalAnnual = 0;
   
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   
   globalEmployees.forEach(function(employee, index) {
     var ytd = getEmpYTD(employee.id, currentYear);
@@ -1707,7 +1705,7 @@ window.printComprehensiveEmployeeReport = function() {
 
   
   var totGross = 0, totDed = 0, totTaxable = 0, totMonth = 0, totAnn = 0;
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   
   globalEmployees.forEach(function(emp, idx) {
     var math = doExcelMathForEmployee(emp);
@@ -1843,7 +1841,7 @@ window.renderContractEmployeeList = function() {
   if (!tbody) return;
   tbody.innerHTML = '';
   
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   
   var totalGross = 0;
   var totalDed = 0;
@@ -1899,7 +1897,7 @@ function addCompanyEmployeeRow() {
 function removeCompanyEmployeeRow() {}
 
 function exportFormD14() {
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   var emps = getMergedEmployeesForYear(currentYear);
   if (!emps.length) {
     showToast('لا توجد بيانات موظفين أو لقطات لهذه السنة', true);
@@ -2261,7 +2259,7 @@ function importAnnualStatement(inputEl) {
 
 // ========== ANNUAL STATEMENT PREVIEW & PRINT (مطابق لـ الكشف السنوي ض د.xlsx) ==========
 function buildAnnualStatementHtml(forPrint) {
-  var currentYear = document.getElementById('closeTaxYear') ? document.getElementById('closeTaxYear').value : new Date().getFullYear();
+  var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
   var emps = getMergedEmployeesForYear(currentYear);
   if (!emps.length) return null;
 
@@ -3817,12 +3815,20 @@ document.addEventListener('input', function(e) {
 var lockedYears = JSON.parse(localStorage.getItem('taxLockedYears') || '[]');
 
 function closeTaxYear() {
-  var year = document.getElementById('closeTaxYear').value;
+  var year = document.getElementById('closeTaxYear_Year').value;
   if(!year) return;
   if(lockedYears.includes(year)) {
       showToast('هذه السنة مقفلة مسبقاً', true);
       return;
   }
+  if(confirm('تنبيه: هل أنت متأكد من إقفال السنة المالية ' + year + ' بالكامل؟
+لن تتمكن من تعديل أو إضافة لقطات أشهر إضافية لهذه السنة.')) {
+      lockedYears.push(year);
+      localStorage.setItem('taxLockedYears', JSON.stringify(lockedYears));
+      showToast('تم إقفال السنة المالية ' + year + ' بنجاح');
+      document.getElementById('closeTaxYear_Year').dispatchEvent(new Event('change'));
+  }
+}
   if(confirm('تنبيه: هل أنت متأكد من إقفال السنة المالية ' + year + ' بالكامل؟\nلن تتمكن من تعديل أو إضافة لقطات أشهر إضافية لهذه السنة.')) {
       lockedYears.push(year);
       localStorage.setItem('taxLockedYears', JSON.stringify(lockedYears));
@@ -3836,7 +3842,7 @@ function checkYearLocked(year) {
 
 
 document.addEventListener('DOMContentLoaded', function() {
-  var yrSel = document.getElementById('closeTaxYear');
+  var yrSel = document.getElementById('closeTaxYear_Year');
   if(yrSel) {
      yrSel.addEventListener('change', function() {
         var status = document.getElementById('yearLockStatus');
