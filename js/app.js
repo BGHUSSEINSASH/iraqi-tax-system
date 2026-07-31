@@ -1104,7 +1104,7 @@ function buildEmployeeDD4AHtml(employee) {
   function bCell(key, value) { return taxableColumn === key ? formatNumber(Math.round(value)) : ''; }
 
   var page1 = `
-    <div class="page-break" style="width:210mm; height:295mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; overflow:hidden; position:relative;">
+    <div class="page-break" style="width:210mm; min-height:285mm; margin:0 auto; padding:15mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:14px; line-height:1.6; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; position:relative;">
       <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
         <div style="font-size:12px; line-height:1.4;">رقم الاستمارة: 1<br>السنة المالية: ${new Date().getFullYear()}<br>الصفحة: 1</div>
         <div style="text-align:center; font-size:16px; flex-grow:1;"><strong>الاستمارة ض. د / 14</strong><br>خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</div>
@@ -2283,7 +2283,7 @@ function buildAnnualStatementHtml(forPrint) {
   html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:12px;color:#000;background:#fff;' + (forPrint ? '' : 'padding:8px;overflow-x:auto;') + '">';
   
   html += 
-   <div class="page-break" style="width:210mm; min-height:295mm; margin:0 auto; padding:15mm; background:#fff; color:#000; direction:rtl; box-sizing:border-box; border:1px solid #ddd;">
+   <div class="page-break" style="width:210mm; min-height:285mm; margin:0 auto; padding:15mm; background:#fff; color:#000; direction:rtl; box-sizing:border-box; border:1px solid #ddd; page-break-after:always;">
      <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">هيئة الضرائب العامة - الكشف السنوي الشامل الموحد</div>
      <div style="text-align:center; font-size:12px; margin-bottom:15px;">السنة المالية: </div>
      <div style="margin-bottom:15px; font-size:14px;"><strong>اسم جهة العمل (الشركة):</strong>  <br> <strong>الرقم التعريفي:</strong> </div>
@@ -3833,3 +3833,23 @@ function closeTaxYear() {
 function checkYearLocked(year) {
   return lockedYears.includes(String(year));
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  var yrSel = document.getElementById('closeTaxYear');
+  if(yrSel) {
+     yrSel.addEventListener('change', function() {
+        var status = document.getElementById('yearLockStatus');
+        if(status) {
+           if(lockedYears.includes(yrSel.value)) {
+              status.innerHTML = '<i class="fas fa-lock"></i> هذه السنة مقفلة';
+              status.style.color = 'var(--danger)';
+           } else {
+              status.innerHTML = '<i class="fas fa-lock-open"></i> السنة مفتوحة للتعديلات';
+              status.style.color = 'var(--success)';
+           }
+        }
+     });
+     yrSel.dispatchEvent(new Event('change'));
+  }
+});

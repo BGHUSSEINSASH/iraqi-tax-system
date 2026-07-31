@@ -726,11 +726,11 @@
 </div>
 <div class="form-group">
 <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-money-bill-wave" style="color: var(--success); margin-left: 5px;"></i> إجمالي إيرادات الشركة (د.ع)</label>
-<input id="corpRevenue" placeholder="أدخل الإيراد السنوي الكامل" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text"/>
+<input id="corpRevenue" placeholder="أدخل الإيراد السنوي الكامل" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 <div class="form-group">
 <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-file-invoice-dollar" style="color: var(--danger); margin-left: 5px;"></i> إجمالي المصاريف والمندثرات (د.ع)</label>
-<input id="corpExpenses" placeholder="أدخل الخصومات المقبولة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text"/>
+<input id="corpExpenses" placeholder="أدخل الخصومات المقبولة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 </div>
 <div class="form-grid" style="gap: 20px; margin-top: 20px;">
@@ -929,17 +929,17 @@
 <h3><i class="fas fa-coins"></i> الدخل والرواتب</h3>
 <div class="emp-grid-2">
 <div class="emp-field" style="display:none;"><label>عدد أشهر العمل (معطل للاقفال)</label><input type="hidden" id="empModMonths" value="1"></div>
-<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
+<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
+<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>السكن العيني الموفر من الشركة</label><select id="empModInKind" onchange="calcEmpModalPreview()"><option value="none">لا يوجد سكن عيني</option><option value="furnished">مؤثث (تضاف 20% من الراتب)</option><option value="unfurnished">غير مؤثث (تضاف 10% من الراتب)</option></select></div>
 </div>
 </div>
 <div class="emp-form-card">
 <h3><i class="fas fa-hand-holding-usd"></i> التنزيلات المسموحة (شهرياً)</h3>
 <div class="emp-grid-2">
-<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
-<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/></div>
+<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
+<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
 </div>
 <p style="font-size:0.8rem; color:var(--text-muted); margin:0;"><i class="fas fa-info-circle"></i> التوقيفات التقاعدية وإعفاء القطاع الخاص والسماحات الزوجية تحسب تلقائياً وفق القانون.</p>
 </div>
@@ -1545,11 +1545,11 @@
 <div class="form-grid">
 <div class="form-group">
 <label style="font-weight:bold;">الراتب الاسمي أو الأجر الأساسي (شهرياً)</label>
-<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">إجمالي المخصصات النقدية الخاضعة (شهرياً)</label>
-<input id="profAllowances" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profAllowances" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">المنافع العينية (السكن)</label>
@@ -1564,7 +1564,7 @@
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">المنافع العينية (الطعام)</label>
-<input id="profFoodKindVal" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profFoodKindVal" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 <small style="color:var(--text-muted);display:block;margin-top:4px;">سيحسب النظام 10% من الراتب أو الكلفة الفعلية أيهما أقل تلقائياً.</small>
 </div>
 </div>
@@ -1575,15 +1575,15 @@
 <div class="form-grid">
 <div class="form-group">
 <label style="font-weight:bold;">التوقيفات التقاعدية / اشتراك الضمان (شهرياً)</label>
-<input id="profSocialSec" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profSocialSec" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">أقساط التأمين المعتمدة (شهرياً)</label>
-<input id="profLifeIns" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profLifeIns" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">النفقة الشرعية المحكوم بها (شهرياً)</label>
-<input id="profAlimony" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
+<input id="profAlimony" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/ onkeyup="formatRealTime(this)" >
 </div>
 </div>
 </div>
@@ -1991,5 +1991,17 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
 <script src="js/app.js"></script>
+
+<script>
+// Format currency wrapper
+function formatRealTime(el) {
+    if(el.type !== 'text') el.type = 'text';
+    var raw = el.value.replace(/,/g, '').replace(/[^0-9\.]/g, '');
+    if(raw) {
+        el.value = Number(raw).toLocaleString('en-US');
+    }
+}
+</script>
+
 </body>
 </html>
