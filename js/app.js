@@ -2454,177 +2454,97 @@ function importAnnualStatement(inputEl) {
 // ========== ANNUAL STATEMENT PREVIEW & PRINT (مطابق لـ الكشف السنوي ض د.xlsx) ==========
 function buildAnnualStatementHtml(forPrint) {
   var currentYear = document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear();
-  var emps = getMergedEmployeesForYear(currentYear);
+  var emps = getCombinedEmployees();
   if (!emps.length) return null;
 
   var employerName = emps[0].employerName || '';
   var employerId = emps[0].employerId || '';
 
-  var cb = 'border:1px solid #000;';
-  var cp = 'padding:3px 4px;';
-  var ct = 'text-align:center;vertical-align:middle;';
-
-  function calcEmp(e) {
-    var math = doExcelMathForEmployee({
-      nat: e.nat, res: e.res, marital: e.marital, child: e.child, over63: e.over63,
-      salary: e.salary, allow: e.allow, cashHous: e.cashHous, inKind: e.inKind,
-      ins: e.ins, alimony: e.alimony, months: e.months, sec: e.sec
-    });
-    var ytd = getEmpYTD(e.id, currentYear);
-    var isYTD = ytd && ytd.count > 0;
-    var income = isYTD ? ytd.gross : math.annualGross;
-    var deductions = isYTD ? ytd.ded : math.annualDed;
-    var taxable = isYTD ? ytd.taxable : math.annualTaxable;
-    var liability = isYTD ? ytd.tax : math.annualTax;
-    var paid = isYTD ? liability : math.monthlyTax * (e.months || 12);
-    return {
-      income: income, deductions: deductions, taxable: taxable, liability: liability,
-      paid: paid, unpaid: Math.max(0, liability - paid), excess: Math.max(0, paid - liability)
-    };
-  }
-
   var html = '';
   if (forPrint) {
     html += '<style>';
-    html += '@media print { body * { visibility:hidden; } #annualStatementPrintArea, #annualStatementPrintArea * { visibility:visible; } #annualStatementPrintArea { position:absolute; left:0; top:0; width:100%; } }';
-    html += '@page { size:A4 landscape; margin:4mm; }';
-    html += '.page-break { page-break-after: always; }';
+    html += '@media print { body * { visibility:hidden; } #annualStatementPrintArea, #annualStatementPrintArea * { visibility:visible; } #annualStatementPrintArea { position:absolute; left:0; top:0; width:100%; margin:0; padding:0; } @page { size: A4 portrait; margin: 0; } }';
+    html += '.page-break { page-break-after: always; box-sizing: border-box; }';
     html += '</style>';
   }
-  html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:9px;color:#000;background:#fff;' + (forPrint ? 'padding:2mm;' : 'padding:8px;overflow-x:auto;') + '">';
+  html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:12px;color:#000;background:#fff;' + (forPrint ? '' : 'padding:8px;overflow-x:auto;') + '">';
+  
+  html += 
+   <div class="page-break" style="width:210mm; min-height:285mm; margin:0 auto; padding:15mm; background:#fff; color:#000; direction:rtl; box-sizing:border-box; border:1px solid #ddd;">
+     <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">هيئة الضرائب العامة - الكشف السنوي الشامل الموحد</div>
+     <div style="text-align:center; font-size:12px; margin-bottom:15px;">السنة المالية: </div>
+     <div style="margin-bottom:15px; font-size:14px;"><strong>اسم جهة العمل (الشركة):</strong>  <br> <strong>الرقم التعريفي:</strong> </div>
+     <table style="width:100%; border-collapse:collapse; text-align:center; font-size:11px;" border="1">
+       <tr style="background:#f3f4f6; font-weight:bold;">
+         <td style="padding:5px;">ت</td>
+         <td style="padding:5px;">اسم الموظف</td>
+         <td style="padding:5px;">إجمالي الدخل</td>
+         <td style="padding:5px;">التنزيلات والسماحات</td>
+         <td style="padding:5px;">الوعاء الضريبي</td>
+         <td style="padding:5px;">الضريبة السنوية المستحقة</td>
+         <td style="padding:5px;">المسدد خلال السنة</td>
+         <td style="padding:5px;">غير المسدد</td>
+         <td style="padding:5px;">الفائض (الزائد)</td>
+       </tr>
+  ;
 
-  // === HEADER رسمي مطابق لاستمارة ض.د/14 ===
-  html += '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3px;">';
-  html += '<div style="font-size:9px; line-height:1.3;">جمهورية العراق<br>وزارة المالية<br>الهيئة العامة للضرائب</div>';
-  html += '<div style="text-align:center; font-size:13px; flex-grow:1;"><strong>الاستمارة ض. د / 14</strong><br><span style="font-size:8.5px;">خاصة بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</span></div>';
-  html += '<div style="font-size:9px; line-height:1.3; text-align:right;">رقم الاستمارة: 1<br>السنة المالية: ' + currentYear + '<br>الصفحة: 1</div>';
-  html += '</div>';
-
-  html += '<table style="width:100%;border-collapse:collapse;margin-bottom:2px;">';
-  html += '<tr>';
-  html += '<td style="' + cb + cp + 'width:50%;font-size:10px;font-weight:bold;">اسم رب العمل: ' + (employerName || '_______________________') + '</td>';
-  html += '<td style="' + cb + cp + 'width:50%;font-size:10px;font-weight:bold;">الرقم التعريفي لرب العمل: ' + (employerId || '_______________________') + '</td>';
-  html += '</tr></table>';
-
-  // === العنوان + السنة المالية ===
-  html += '<div style="text-align:center;margin:4px 0;">';
-  html += '<span style="font-size:14px;font-weight:bold;">جدول استقطاع ضريبة الدخل</span><br>';
-  html += '<span style="font-size:11px;">السنة المالية ' + currentYear + '</span>';
-  html += '</div>';
-
-  // === الجدول الرئيسي (15 عمود) ===
-  html += '<table style="width:100%;border-collapse:collapse;' + cb + 'font-size:8px;">';
-
-  // صف أرقام الأعمدة
-  html += '<thead>';
-  html += '<tr style="background:#d1d5db;">';
-  var colNums = ['2','ا','ت','1','2','3','4','5','6','7','8','9','10','11','12'];
-  var colWidths = ['3%','3%','3%','7%','12%','8%','8%','8%','8%','8%','10%','8%','8%','10%','10%'];
-  colNums.forEach(function(n, ci) {
-    html += '<th style="' + cb + cp + ct + 'width:' + colWidths[ci] + ';font-weight:bold;">' + n + '</th>';
-  });
-  html += '</tr>';
-
-  // صف العناوين
-  html += '<tr style="background:#1e3a5f;color:#fff;font-weight:bold;font-size:7px;">';
-  var headers = [
-    'اسم المستخدم', '', '#', 'رقم الاضبارة\nض.د/14',
-    'اسم المستخدم', 'رقم هوية\nالاحوال المدنية',
-    'اجمالي\nالدخل', 'اجمالي\nالمبالغ المنزلة',
-    'الدخل\nالخاضع للضريبة', 'الاستحقاق\nالضريبي',
-    'الضريبة\nالمدفوعة خلال السنة', 'الضريبة\nغير المدفوعة',
-    'الضريبة\nالزائدة', 'فترة العمل\nمن / / الى / /',
-    'رب العمل'
-  ];
-  headers.forEach(function(h) {
-    html += '<th style="' + cb + cp + ct + '">' + h.replace(/\n/g, '<br>') + '</th>';
-  });
-  html += '</tr>';
-  html += '</thead>';
-
-  html += '<tbody>';
-  var GROUP_SIZE = 20;
-  var gi = 0, gd = 0, gt = 0, gl = 0;
-  var tgi = 0, tgd = 0, tgt = 0, tgl = 0, tgp = 0, tgu = 0, tgx = 0;
-
-  function subtotalRow(income, ded, taxable, liab) {
-    var s = '';
-    s += '<tr style="background:#e5e7eb;font-weight:bold;font-size:8px;">';
-    s += '<td ' + cb + cp + ' style="text-align:center;">المجموع الفرعي</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;">المجموع الفرعي</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(income)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(ded)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(taxable)) + '</td>';
-    s += '<td ' + cb + cp + ' style="text-align:center;font-family:monospace;">' + formatNumber(Math.round(liab)) + '</td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '<td ' + cb + cp + '></td>';
-    s += '</tr>';
-    return s;
-  }
-
+  var totalIncome = 0, totalDed = 0, totalTaxable = 0, totalLiab = 0, totalPaid = 0, totalUnpaid = 0, totalExcess = 0;
+  
   emps.forEach(function(e, i) {
-    var calc = calcEmp(e);
-    var regNumber = 'DD14-' + currentYear + '-' + String(i + 1).padStart(3, '0');
-    var workPeriod = (e.startDate || '  /  /  ') + '  الى  ' + (e.endDate || '  /  /  ');
+    var ytd = getEmpYTD(e.id, currentYear);
+    var isYTD = ytd && ytd.count > 0;
+    var math = doExcelMathForEmployee(e);
+    
+    var income = isYTD ? ytd.gross : math.annualGross;
+    var deductions = isYTD ? ytd.ded : math.annualDed;
+    var taxable = isYTD ? ytd.taxable : math.annualTaxable;
+    var liab = isYTD ? ytd.tax : math.annualTax;
+    var paid = liab;
+    
+    var strictLiab = math.annualTax; 
+    var unpaid = Math.max(0, liab - strictLiab);
+    var excess = Math.max(0, strictLiab - liab);
+    if(isYTD) { unpaid = 0; excess = 0; paid = liab; }
 
-    gi += calc.income; gd += calc.deductions; gt += calc.taxable; gl += calc.liability;
-    tgi += calc.income; tgd += calc.deductions; tgt += calc.taxable; tgl += calc.liability;
-    tgp += calc.paid; tgu += calc.unpaid; tgx += calc.excess;
+    totalIncome += income; totalDed += deductions; totalTaxable += taxable;
+    totalLiab += liab; totalPaid += paid; totalUnpaid += unpaid; totalExcess += excess;
 
-    var altBg = (i % 2 === 0) ? '' : 'background:#f5f5f5;';
-    html += '<tr style="' + altBg + 'font-size:8px;">';
-    html += '<td style="' + cb + cp + ct + '">' + (i + 1) + '</td>';
-    html += '<td style="' + cb + cp + ct + '"></td>';
-    html += '<td style="' + cb + cp + ct + '">' + (i + 1) + '</td>';
-    html += '<td style="' + cb + cp + ct + ';font-size:7px;">' + regNumber + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:right;">' + (e.name || '') + '</td>';
-    html += '<td style="' + cb + cp + ct + '">' + (e.civilId || '') + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.income)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.deductions)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.taxable)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.liability)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(calc.paid)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;' + (calc.unpaid > 0 ? 'color:#dc2626;font-weight:bold;' : '') + '">' + formatNumber(Math.round(calc.unpaid)) + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;' + (calc.excess > 0 ? 'color:#16a34a;font-weight:bold;' : '') + '">' + formatNumber(Math.round(calc.excess)) + '</td>';
-    html += '<td style="' + cb + cp + ct + ';font-size:7px;">' + workPeriod + '</td>';
-    html += '<td style="' + cb + cp + ';text-align:right;font-size:7px;">' + (e.employerName || employerName || '') + '</td>';
-    html += '</tr>';
-
-    if ((i + 1) % GROUP_SIZE === 0 || i === emps.length - 1) {
-      html += subtotalRow(gi, gd, gt, gl);
-      gi = 0; gd = 0; gt = 0; gl = 0;
-    }
+    html += <tr>
+      <td style="padding:5px;"></td>
+      <td style="padding:5px; text-align:right;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr; font-weight:bold;"></td>
+      <td style="padding:5px; direction:ltr;"></td>
+      <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
+      <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
+    </tr>;
   });
 
-  // === المجموع الكلي ===
-  html += '<tr style="background:#1e3a5f;color:#fff;font-weight:bold;font-size:9px;">';
-  html += '<td style="' + cb + cp + ct + '">الجموع الكلي</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '">' + emps.length + '</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '">الجموع الكلي</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgi)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgd)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgt)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgl)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgp)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgu)) + '</td>';
-  html += '<td style="' + cb + cp + ';text-align:center;font-family:monospace;">' + formatNumber(Math.round(tgx)) + '</td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '<td style="' + cb + cp + ct + '"></td>';
-  html += '</tr>';
-  html += '</tbody></table>';
-  html += '</div>';
+  html += 
+     <tr style="background:#f3f4f6; font-weight:bold;">
+       <td colspan="2" style="padding:5px;">المجموع الإجمالي</td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr;"></td>
+       <td style="padding:5px; direction:ltr; color:#000;"></td>
+       <td style="padding:5px; direction:ltr; color:#000;"></td>
+       <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
+       <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
+     </tr>
+     </table>
+     
+     <div style="display:flex; justify-content:space-between; margin-top:40px; font-size:14px; font-weight:bold;">
+        <div>توقيع المحاسب <br><br> ____________________</div>
+        <div>توقيع المدير المفوض <br><br> ____________________</div>
+     </div>
+   </div>
+   </div>
+  ;
   return html;
 }
+
 
 function renderAnnualStatementPreview() {
   if (!globalEmployees.length) {
