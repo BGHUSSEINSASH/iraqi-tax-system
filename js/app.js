@@ -2469,11 +2469,11 @@ function buildAnnualStatementHtml(forPrint) {
   }
   html += '<div id="annualStatementPrintArea" style="direction:rtl;font-family:\'Tajawal\',Arial,sans-serif;font-size:12px;color:#000;background:#fff;' + (forPrint ? '' : 'padding:8px;overflow-x:auto;') + '">';
   
-  html += 
+  html += `
    <div class="page-break" style="width:210mm; min-height:285mm; margin:0 auto; padding:15mm; background:#fff; color:#000; direction:rtl; box-sizing:border-box; border:1px solid #ddd;">
      <div style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:5px;">هيئة الضرائب العامة - الكشف السنوي الشامل الموحد</div>
-     <div style="text-align:center; font-size:12px; margin-bottom:15px;">السنة المالية: </div>
-     <div style="margin-bottom:15px; font-size:14px;"><strong>اسم جهة العمل (الشركة):</strong>  <br> <strong>الرقم التعريفي:</strong> </div>
+     <div style="text-align:center; font-size:12px; margin-bottom:15px;">السنة المالية: ${currentYear}</div>
+     <div style="margin-bottom:15px; font-size:14px;"><strong>اسم جهة العمل (الشركة):</strong> ${employerName} <br> <strong>الرقم التعريفي:</strong> ${employerId}</div>
      <table style="width:100%; border-collapse:collapse; text-align:center; font-size:11px;" border="1">
        <tr style="background:#f3f4f6; font-weight:bold;">
          <td style="padding:5px;">ت</td>
@@ -2486,7 +2486,7 @@ function buildAnnualStatementHtml(forPrint) {
          <td style="padding:5px;">غير المسدد</td>
          <td style="padding:5px;">الفائض (الزائد)</td>
        </tr>
-  ;
+  `;
 
   var totalIncome = 0, totalDed = 0, totalTaxable = 0, totalLiab = 0, totalPaid = 0, totalUnpaid = 0, totalExcess = 0;
   
@@ -2509,29 +2509,29 @@ function buildAnnualStatementHtml(forPrint) {
     totalIncome += income; totalDed += deductions; totalTaxable += taxable;
     totalLiab += liab; totalPaid += paid; totalUnpaid += unpaid; totalExcess += excess;
 
-    html += <tr>
-      <td style="padding:5px;"></td>
-      <td style="padding:5px; text-align:right;"></td>
-      <td style="padding:5px; direction:ltr;"></td>
-      <td style="padding:5px; direction:ltr;"></td>
-      <td style="padding:5px; direction:ltr;"></td>
-      <td style="padding:5px; direction:ltr; font-weight:bold;"></td>
-      <td style="padding:5px; direction:ltr;"></td>
-      <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
-      <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
-    </tr>;
+    html += `<tr>
+      <td style="padding:5px;">${i + 1}</td>
+      <td style="padding:5px; text-align:right;">${e.name || 'بدون اسم'}</td>
+      <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(income))}</td>
+      <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(deductions))}</td>
+      <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(taxable))}</td>
+      <td style="padding:5px; direction:ltr; font-weight:bold;">${formatNumber(Math.round(liab))}</td>
+      <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(paid))}</td>
+      <td style="padding:5px; direction:ltr; color:#dc2626;">${formatNumber(Math.round(unpaid))}</td>
+      <td style="padding:5px; direction:ltr; color:#16a34a;">${formatNumber(Math.round(excess))}</td>
+    </tr>`;
   });
 
-  html += 
+  html += `
      <tr style="background:#f3f4f6; font-weight:bold;">
        <td colspan="2" style="padding:5px;">المجموع الإجمالي</td>
-       <td style="padding:5px; direction:ltr;"></td>
-       <td style="padding:5px; direction:ltr;"></td>
-       <td style="padding:5px; direction:ltr;"></td>
-       <td style="padding:5px; direction:ltr; color:#000;"></td>
-       <td style="padding:5px; direction:ltr; color:#000;"></td>
-       <td style="padding:5px; direction:ltr; color:#dc2626;"></td>
-       <td style="padding:5px; direction:ltr; color:#16a34a;"></td>
+       <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(totalIncome))}</td>
+       <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(totalDed))}</td>
+       <td style="padding:5px; direction:ltr;">${formatNumber(Math.round(totalTaxable))}</td>
+       <td style="padding:5px; direction:ltr; color:#000;">${formatNumber(Math.round(totalLiab))}</td>
+       <td style="padding:5px; direction:ltr; color:#000;">${formatNumber(Math.round(totalPaid))}</td>
+       <td style="padding:5px; direction:ltr; color:#dc2626;">${formatNumber(Math.round(totalUnpaid))}</td>
+       <td style="padding:5px; direction:ltr; color:#16a34a;">${formatNumber(Math.round(totalExcess))}</td>
      </tr>
      </table>
      
@@ -2541,7 +2541,7 @@ function buildAnnualStatementHtml(forPrint) {
      </div>
    </div>
    </div>
-  ;
+  `;
   return html;
 }
 
