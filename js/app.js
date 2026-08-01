@@ -20,30 +20,20 @@ document.addEventListener('input', function(e) {
 
 // ========== PACKAGE SYSTEM ==========
 var PACKAGES = {
-  trial: {
-    name: 'التجريبية',
-    icon: 'fa-flask',
-    pages: ['dashboard','corporate','calendar','notifications','settings','packages','contact']
-  },
   basic: {
-    name: 'الأساسية',
-    icon: 'fa-leaf',
-    pages: ['dashboard','corporate','calendar','notifications','settings','packages','provinces','tasks','contact']
+    name: 'تأسيس',
+    icon: 'fa-seedling',
+    pages: ['dashboard','corporate','profession','notifications','packages']
   },
   professional: {
-    name: 'المتقدمة',
-    icon: 'fa-crown',
-    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks','contact']
-  },
-  business: {
-    name: 'باقة الأعمال',
-    icon: 'fa-briefcase',
-    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','audit','users','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','appointments','tasks','contact']
+    name: 'المهني',
+    icon: 'fa-rocket',
+    pages: ['dashboard','corporate','profession','notifications','settings','packages']
   },
   enterprise: {
     name: 'الشاملة',
     icon: 'fa-building',
-    pages: ['dashboard','corporate','land','property','profession','sales','reports','documents','calendar','notifications','penalties','comparison','audit','users','settings','packages','provinces','invoices','taxpayers','attachments','heatmap','kpi','reportbuilder','workflow','tickets','appointments','esignature','tasks','loginhistory','backup','api','contact']
+    pages: ['dashboard','corporate','profession','notifications','settings','packages']
   }
 };
 
@@ -95,7 +85,7 @@ function updateSidebarLocks() {
 }
 
 function updateModuleCardLocks() {
-  var modulePages = {corporate:'corporate',land:'land',property:'property',profession:'profession',sales:'sales'};
+  var modulePages = {corporate:'corporate',profession:'profession'};
   document.querySelectorAll('.module-card').forEach(function(card) {
     var cls = card.className.split(' ');
     for (var c of cls) {
@@ -342,7 +332,7 @@ function showApp(session) {
   var stored = localStorage.getItem('taxUsers');
   if (stored) { var u = JSON.parse(stored); Object.keys(u).forEach(function(k) { USERS[k] = u[k]; }); }
   // Update package UI
-  setTimeout(function() { updateSidebarLocks(); updateModuleCardLocks(); renderPackagesPage(); renderProvincesPage(); }, 100);
+  setTimeout(function() { updateSidebarLocks(); updateModuleCardLocks(); renderPackagesPage();  }, 100);
 }
 
 function handleLogout() {
@@ -474,7 +464,7 @@ function navigateTo(page) {
   if (page === 'calendar') renderCalendar();
   animatePageTransition(page);
   if (page === 'packages') renderPackagesPage();
-  if (page === 'provinces') renderProvincesPage();
+  if (page === 'provinces') 
   if (page === 'dashboard') setTimeout(animateCounters, 300);
   if (page === 'invoices') renderInvoices();
   if (page === 'taxpayers') renderTaxpayers();
@@ -3526,12 +3516,12 @@ function renderESignature(){
 }
 function initSignaturePad(){
   var canvas=document.getElementById('signaturePad');if(!canvas)return;
-  signatureCtx=canvas.getContext('2d');
+  if(canvas) { signatureCtx=canvas.getContext('2d');
   signatureCtx.strokeStyle='#0f1b4d';signatureCtx.lineWidth=2;signatureCtx.lineCap='round';
   canvas.addEventListener('mousedown',function(e){isDrawing=true;signatureCtx.beginPath();signatureCtx.moveTo(e.offsetX,e.offsetY);});
   canvas.addEventListener('mousemove',function(e){if(isDrawing){signatureCtx.lineTo(e.offsetX,e.offsetY);signatureCtx.stroke();}});
   canvas.addEventListener('mouseup',function(){isDrawing=false;});
-  canvas.addEventListener('mouseleave',function(){isDrawing=false;});
+  canvas.addEventListener('mouseleave',function(){isDrawing=false;}); }
 }
 function clearSignature(){ var c=document.getElementById('signaturePad');if(c&&signatureCtx)signatureCtx.clearRect(0,0,c.width,c.height); }
 function saveSignature(){ showToast('تم حفظ التوقيع الإلكتروني بنجاح');addAuditEntry('توقيع إلكتروني','تم حفظ توقيع جديد'); }
