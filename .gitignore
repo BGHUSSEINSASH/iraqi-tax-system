@@ -4,3 +4,6 @@ node_modules/
 .vscode/
 .venv/
 _docx_extract/
+_v4_extract/
+backups/
+rollback_safety_*/
