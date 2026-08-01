@@ -628,7 +628,7 @@
 </div>
 </div>
 </div>
-<div class="card animate-in" style="margin-top: 20px;">
+<div class="card animate-in" style="margin-top:20px;">
 <div class="card-header">
 <h3><i class="fas fa-calendar-check"></i> المواعيد القادمة للدفعات</h3>
 </div>
@@ -726,11 +726,11 @@
 </div>
 <div class="form-group">
 <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-money-bill-wave" style="color: var(--success); margin-left: 5px;"></i> إجمالي إيرادات الشركة (د.ع)</label>
-<input id="corpRevenue" placeholder="أدخل الإيراد السنوي الكامل" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text" onkeyup="formatRealTime(this)" >
+<input id="corpRevenue" placeholder="أدخل الإيراد السنوي الكامل" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 <div class="form-group">
 <label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-file-invoice-dollar" style="color: var(--danger); margin-left: 5px;"></i> إجمالي المصاريف والمندثرات (د.ع)</label>
-<input id="corpExpenses" placeholder="أدخل الخصومات المقبولة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text" onkeyup="formatRealTime(this)" >
+<input id="corpExpenses" placeholder="أدخل الخصومات المقبولة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; font-weight: 700; box-sizing: border-box;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 </div>
 <div class="form-grid" style="gap: 20px; margin-top: 20px;">
@@ -929,17 +929,17 @@
 <h3><i class="fas fa-coins"></i> الدخل والرواتب</h3>
 <div class="emp-grid-2">
 <div class="emp-field" style="display:none;"><label>عدد أشهر العمل (معطل للاقفال)</label><input type="hidden" id="empModMonths" value="1"></div>
-<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
-<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
-<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
+<div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
+<div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
+<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>السكن العيني الموفر من الشركة</label><select id="empModInKind" onchange="calcEmpModalPreview()"><option value="none">لا يوجد سكن عيني</option><option value="furnished">مؤثث (تضاف 20% من الراتب)</option><option value="unfurnished">غير مؤثث (تضاف 10% من الراتب)</option></select></div>
 </div>
 </div>
 <div class="emp-form-card">
 <h3><i class="fas fa-hand-holding-usd"></i> التنزيلات المسموحة (شهرياً)</h3>
 <div class="emp-grid-2">
-<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
-<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0"/ onkeyup="formatRealTime(this)" ></div>
+<div class="emp-field"><label>أقساط التأمين المعتمدة (د.ع)</label><input id="empModIns" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
+<div class="emp-field"><label>النفقة الشرعية المدفوعة (د.ع)</label><input id="empModAlimony" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
 </div>
 <p style="font-size:0.8rem; color:var(--text-muted); margin:0;"><i class="fas fa-info-circle"></i> التوقيفات التقاعدية وإعفاء القطاع الخاص والسماحات الزوجية تحسب تلقائياً وفق القانون.</p>
 </div>
@@ -985,7 +985,6 @@
 <button class="btn btn-sm" onclick="exportAnnualStatement()" style="border-radius: 20px; background:#7c3aed; color:#fff; border:none; font-weight: 700; padding: 6px 16px;"><i class="fas fa-table"></i> كشف سنوي</button>
 <button class="btn btn-sm" onclick="printComprehensiveEmployeeReport()" style="border-radius: 20px; background:#0f1b4d; color:#fff; border:none; font-weight: 700; padding: 6px 16px;"><i class="fas fa-print"></i> برونت السجل الشامل</button>
 <button class="btn btn-sm" onclick="document.getElementById('importAnnualStatementFile').click()" style="border-radius: 20px; background:rgba(255,255,255,0.2); color:#fff; border:1px solid rgba(255,255,255,0.3); font-weight: 700; padding: 6px 16px;"><i class="fas fa-file-import"></i> استيراد</button>
-<button class="btn btn-sm" onclick="exportBlankExcel()" style="border-radius: 20px; background:#10b981; color:#fff; border:none; font-weight: 700; padding: 6px 16px;" title="تنزيل قالب إكسل فارغ بنفس حقول إضافة موظف ثم تعبئته واستيراده"><i class="fas fa-file-excel"></i> قالب إكسل فارغ</button>
 <input accept=".xlsx,.xls" id="importAnnualStatementFile" onchange="importAnnualStatement(this)" style="display:none;" type="file"/>
 </div>
 </div>
@@ -1000,32 +999,17 @@
                 <div class="card animate-in" style="margin-bottom: 20px; border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.15); border-radius: 16px;">
                   <div class="card-body" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; background: linear-gradient(to left, #f0fdf4, #ecfdf5);">
                     <div style="flex:1; min-width: 250px;">
-                      <h4 style="margin:0 0 5px; color:#065f46; font-size:1.1rem;"><i class="fas fa-calendar-lock"></i> قفل السنة المالية</h4>
-                      <p style="margin:0; font-size:0.9rem; color:#166534;">أقفل سنة كاملة لمنع أي تعديل أو إضافة لقطات لأشهرها (صلاحية مدير النظام فقط). لا يؤثر على بقية السنوات.</p>
+                      <h4 style="margin:0 0 5px; color:#065f46; font-size:1.1rem;"><i class="fas fa-lock"></i> محرك اللقطات الشهرية (الإقفال التراكمي)</h4>
+                      <p style="margin:0; font-size:0.9rem; color:#166534;">احفظ وأقفل الشهر الحالي لتجميد قيم الضريبة. (السنوي يُجمع من هذه اللقطات لتشمل التغيرات بدقة).</p>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                      <select id="closeTaxYear_Year" style="border: 2px solid #bbf7d0; border-radius: 8px; padding: 8px 12px; font-weight:700; color:#065f46;"><option value="2025">سنة 2025</option><option value="2026" selected>سنة 2026</option></select>
-                      <button class="btn btn-success" onclick="closeTaxYear()" style="border-radius:20px; font-weight:700; box-shadow:0 2px 8px rgba(16,185,129,0.4);"><i class="fas fa-lock"></i> إقفال السنة</button>
-                      <span id="yearLockStatus" style="font-size:0.9rem; font-weight:700; padding:6px 12px; border-radius:20px; background:#dcfce7; color:#166534;"></span>
-                    </div>
-                  </div>
-                </div>
-                <div class="card animate-in" style="margin-bottom: 20px; border: none; box-shadow: 0 4px 15px rgba(16,185,129,0.15); border-radius: 16px;">
-                  <div class="card-body" style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; background: linear-gradient(to left, #f0fdf4, #ecfdf5);">
-                    <div style="flex:1; min-width: 250px;">
-                      <h4 style="margin:0 0 5px; color:#065f46; font-size:1.1rem;"><i class="fas fa-lock"></i> قفل الشهر (محرك اللقطات الشهرية)</h4>
-                      <p style="margin:0; font-size:0.9rem; color:#166534;">أقفل الشهر الحالي لتجميد قيم الضريبة (يُحسب تراكمياً ضمن الكشف السنوي). السنة تُحدد من قفل السنة أعلاه، وفتح القفل متاح لمدير النظام فقط.</p>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                      <select id="closeTaxMonth_Month" style="border: 2px solid #bbf7d0; border-radius: 8px; padding: 8px 12px; font-weight:700; color:#065f46;">
+                      <select id="closeTaxYear" style="border: 2px solid #bbf7d0; border-radius: 8px; padding: 8px 12px; font-weight:700; color:#065f46;"><option value="2025">سنة 2025</option><option value="2026" selected>سنة 2026</option></select>
+                      <select id="closeTaxMonth" style="border: 2px solid #bbf7d0; border-radius: 8px; padding: 8px 12px; font-weight:700; color:#065f46;">
                         <option value="1">1 (كانون٢)</option><option value="2">2 (شباط)</option><option value="3">3 (آذار)</option><option value="4">4 (نيسان)</option><option value="5">5 (أيار)</option><option value="6">6 (حزيران)</option><option value="7">7 (تموز)</option><option value="8">8 (آب)</option><option value="9">9 (أيلول)</option><option value="10">10 (ت١)</option><option value="11">11 (ت٢)</option><option value="12">12 (ك١)</option>
                       </select>
                       <button class="btn btn-success" onclick="closeMonthlyTax()" style="border-radius:20px; font-weight:700; box-shadow:0 2px 8px rgba(16,185,129,0.4);"><i class="fas fa-save"></i> إقفال الشهر</button>
                       <button class="btn btn-danger btn-sm" onclick="clearAllSnapshots()" style="border-radius:20px;" title="تفريغ كل السجلات"><i class="fas fa-trash-restore"></i></button>
                     </div>
-                  </div>
-                  <div class="card-body" style="padding-top:0;">
-                    <div id="monthLockStatus" style="font-size:0.85rem; color:#065f46; font-weight:600;"></div>
                   </div>
                 </div>
                 <div class="table-container" style="overflow-x:auto; border-radius: 12px; box-shadow: inset 0 0 0 1px var(--border-light);">
@@ -1253,247 +1237,6 @@
 </div>
 </div>
 </section>
-<section class="page-section" id="page-land">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#059669;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-map-marked-alt"></i>
-</div>
-<div class="section-hero-text">
-<h2>ضريبة العرصات</h2>
-<p>احتساب ضريبة الأراضي ضمن حدود أمانة بغداد ومراكز المحافظات والأقضية والنواحي</p>
-</div>
-</div>
-</div>
-<!-- احتساب ضريبة العرصة -->
-<div class="card">
-<div class="card-header"><h3><i class="fas fa-map-marked-alt"></i> نموذج متعدد الخطوات لحساب ضريبة العرصات</h3></div>
-<div class="card-body">
-<div class="info-banner" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:10px;padding:16px;margin-bottom:20px;">
-<p style="color:#166534;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> اتبع الخطوات أدناه لتحديد موقفك من الإعفاءات واحتساب الضريبة وفقاً للقانون.</p>
-</div>
-<!-- الخطوة 1 -->
-<div class="form-card" id="landStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-list-alt"></i> الخطوة 1: فحص الإعفاء التام</h4>
-<div class="form-group">
-<label style="font-weight:bold;">هل تنطبق إحدى الحالات التالية على العرصة؟</label>
-<select id="landExemptionCode" onchange="handleLandStep1()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="1">مضى على تملكها أكثر من 15 سنة.</option>
-<option value="2">عائدة لدائرة رسمية أو شبه رسمية.</option>
-<option value="3">عائدة لمديرية الأوقاف العامة (وغير مؤجرة).</option>
-<option value="4">مخصصة لمحلات العبادة، المدارس، الجمعيات، النقابات، المعاهد الخيرية، أو المقابر.</option>
-<option value="5">عائدة لحكومة أجنبية (بشرط المقابلة بالمثل).</option>
-<option value="6">يتعذر التصرف بها أو إفرازها بسبب مانع قانوني.</option>
-<option value="7">مخصصة لمنافع عامة (بموافقة مجلس الوزراء).</option>
-<option value="8">عائدة ليتيم فقير الحال (لم يبلغ سن الرشد).</option>
-<option value="9">واقعة في حي الزوراء (مباعة من الحكومة ولم تمر 5 سنوات على التسجيل).</option>
-<option value="none">لا تنطبق عليّ أي من هذه الحالات.</option>
-</select>
-</div>
-</div>
-<!-- الخطوة 2 -->
-<div class="form-card" id="landStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-child"></i> الخطوة 2: فحص حالة القاصر</h4>
-<div class="form-group">
-<label style="font-weight:bold;">هل العرصة أو الحصة مسجلة باسم قاصر؟</label>
-<select id="landIsMinor" onchange="handleLandStep2()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="yes">نعم</option>
-<option value="no">لا</option>
-</select>
-</div>
-</div>
-<!-- الخطوة 3 -->
-<div class="form-card" id="landStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: none;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-chart-area"></i> الخطوة 3: إدخال المساحة والقيمة</h4>
-<div class="form-grid">
-<div class="form-group">
-<label style="font-weight:bold;">المساحة الكلية للعرصة (بالمتر المربع)</label>
-<input id="landTotalArea" min="1" placeholder="أدخل المساحة بالمتر المربع" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="number"/>
-</div>
-<div class="form-group">
-<label style="font-weight:bold;">القيمة المقدرة الكلية للعرصة (بالدينار)</label>
-<input id="landTotalValue" oninput="this.value = formatInputNumber(this.value)" placeholder="أدخل القيمة الكلية بالدينار" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
-</div>
-</div>
-</div>
-<div class="btn-group" id="landCalculateBtnGroup" style="margin-top:20px; display:none;">
-<button class="btn btn-primary" onclick="calculateNewLandTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
-</div>
-<div class="result-box" id="landNewResultBox" style="margin-top:20px; display:none;">
-<div class="result-icon"><i class="fas fa-map"></i></div>
-<h2>التقرير الضريبي التفصيلي للعرصة</h2>
-<div class="info-banner" id="landExemptMessage" style="display:none; background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin:20px 0;">
-<p style="color:#1e40af;font-size:15px;text-align:center;margin:0;font-weight:bold;"><i class="fas fa-medal" style="margin-left:6px;"></i> <span id="landExemptText">العرصة معفاة من الضريبة بالكامل</span></p>
-</div>
-<div class="result-details" id="landNewResultDetails" style="display:none;">
-<div class="result-row"><span>المساحة الكلية المدخلة:</span><strong id="landResTotalArea">-</strong></div>
-<div class="result-row"><span>القيمة الكلية المدخلة:</span><strong id="landResTotalValue">-</strong></div>
-<div class="result-row"><span>قيمة المتر الواحد المقدرة:</span><strong id="landResMeterValue">-</strong></div>
-<div class="result-row"><span>موقف القاصر / الإعفاء الجزئي:</span><strong id="landResExemptStatus">-</strong></div>
-<div class="result-row"><span>المساحة الخاضعة للضريبة:</span><strong id="landResTaxableArea" style="color:var(--danger);">-</strong></div>
-<div class="result-row"><span>القيمة الخاضعة للضريبة (الوعاء الضريبي):</span><strong id="landResTaxableValue" style="color:var(--danger);">-</strong></div>
-<div class="result-row"><span>نسبة الضريبة (حسب المادة 3):</span><strong>٢٪ سنوياً</strong></div>
-<div class="result-row total"><span>مبلغ الضريبة المستحق الدفع:</span><strong id="landResFinalTax">-</strong></div>
-</div>
-</div>
-</div>
-</div>
-<!-- الاعفاءات -->
-</section>
-<section class="page-section" id="page-property">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#c2410c;--hero-c2:#ea580c;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-home"></i>
-</div>
-<div class="section-hero-text">
-<h2>ضريبة العقار</h2>
-<p>احتساب ضريبة العقار وفقاً لأحكام القانون رقم 162 لسنة 1959 وتعديلاته</p>
-</div>
-</div>
-</div>
-<div class="card">
-<div class="card-header"><h3><i class="fas fa-home"></i> نموذج متعدد الخطوات لحساب ضريبة العقار</h3></div>
-<div class="card-body">
-<div class="info-banner" style="background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fed7aa;border-radius:10px;padding:16px;margin-bottom:20px;">
-<p style="color:#c2410c;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> اتبع الخطوات أدناه لتصفية حالات المنفعة العامة والسكن العائلي والإعفاءات المؤقتة وصولاً للاحتساب المالي الدقيق.</p>
-</div>
-<!-- الخطوة 1 -->
-<div class="form-card" id="propStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-building"></i> الخطوة 1: فحص إعفاءات مؤسسات الدولة والنفع العام</h4>
-<div class="form-group">
-<label style="font-weight:bold;">ما هي صفة أو عائدية العقار؟</label>
-<select id="propExemptType1" onchange="handlePropStep1()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="state">عقار عائد للحكومة، أمانة بغداد، البلديات، أو المصالح والمؤسسات العامة غير المستغلة.</option>
-<option value="awqaf">عقار عائد لمديرية الأوقاف العامة.</option>
-<option value="religious">عقار مخصص لإقامة الشعائر الدينية (غير مؤجر) أو سكن القائمين عليها.</option>
-<option value="charity">عقار تملكه طوائف دينية أو هيئات خيرية وتستخدمه كمدارس، مستشفيات، مياتم، أو دور عجزة.</option>
-<option value="foreign">عقار تملكه دولة أجنبية كسكن لدبلوماسييها أو دوائر رسمية (بشرط المقابلة بالمثل).</option>
-<option value="ngo">عقار تملكه أحزاب، نقابات، جمعيات نفع عام، أو أندية رياضية (ومستغل لنشاطها حصراً).</option>
-<option value="donated">عقار متبرع بمنفعته للدوائر الرسمية والمؤسسات الخيرية (ومشغول من قبلها).</option>
-<option value="commercial">عقار مستغل لنشاط اقتصادي ومملوك لصاحبه الخاضع لضريبة الدخل.</option>
-<option value="agri">عقار معد لحفظ الحاصلات الزراعية أو سكن الزراع والعمال داخل المزرعة (غير مؤجر).</option>
-<option value="none">لا تنطبق أي من هذه الحالات (عقار للأفراد أو الشركات العادية).</option>
-</select>
-</div>
-</div>
-<!-- الخطوة 2 -->
-<div class="form-card" id="propStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-user-friends"></i> الخطوة 2: فحص الإعفاءات السكنية (للأفراد)</h4>
-<div class="form-group">
-<label style="font-weight:bold;">ما هي طبيعة إشغال العقار؟</label>
-<select id="propExemptType2" onchange="handlePropStep2()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="owner">دار سكن أو شقة يسكنها المالك نفسه.</option>
-<option value="parents_children">دار سكن أو شقة يشغلها والدا المالك، أو أولاده المتزوجون (أو الأرامل/المطلقات مع أولاد)، بشرط أن لا يملك الشاغل عقاراً مستقلاً.</option>
-<option value="company_housing">عقار تم إنشاؤه من قبل الدولة أو الشركات لتمليكه لمنتسبيهم بموجب عقد بيع.</option>
-<option value="none">مؤجر لجهة أخرى أو لا ينطبق أي مما سبق.</option>
-</select>
-</div>
-</div>
-<!-- الخطوة 3 -->
-<div class="form-card" id="propStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px; display: none;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-clock"></i> الخطوة 3: فحص الإعفاءات المؤقتة وحالة العقار</h4>
-<div class="form-grid">
-<div class="form-group">
-<label style="font-weight:bold;">هل العقار (أو الطابق) مشيد حديثاً؟</label>
-<select id="propIsNew" onchange="togglePropNewDate()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="yes">نعم</option>
-<option value="no">لا</option>
-</select>
-</div>
-<div class="form-group" id="propNewDateGroup" style="display:none;">
-<label style="font-weight:bold;">تاريخ إكمال التشييد</label>
-<input id="propNewDate" onchange="handlePropStep3()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="date"/>
-</div>
-</div>
-<div class="form-grid" style="margin-top: 15px;">
-<div class="form-group">
-<label style="font-weight:bold;">هل العقار خالٍ من الشواغل بتأكيد ورقي للمالية؟</label>
-<select id="propIsEmpty" onchange="togglePropEmptyMonths()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option disabled="" selected="" value="">-- يرجى الاختيار --</option>
-<option value="yes">نعم</option>
-<option value="no">لا</option>
-</select>
-</div>
-<div class="form-group" id="propEmptyMonthsGroup" style="display:none;">
-<label style="font-weight:bold;">مدة الخلو (بالأشهر)</label>
-<input id="propEmptyMonths" max="12" min="1" oninput="handlePropStep3()" placeholder="أشهر الخلو المثبتة" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="number"/>
-</div>
-</div>
-</div>
-<!-- الخطوة 4 -->
-<div class="form-card" id="propStep4" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; display: none;">
-<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-file-invoice-dollar"></i> الخطوة 4: إدخال الإيراد المالي والغرامات</h4>
-<div class="form-group" style="margin-bottom:15px;">
-<label style="font-weight:bold;">الإيراد السنوي للعقار (بدل الإيجار الفعلي أو المقدر - دينار)</label>
-<input id="propAnnualRent" oninput="this.value = formatInputNumber(this.value)" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text"/>
-</div>
-<h5 style="color: var(--text-secondary); margin-bottom: 10px;"><i class="fas fa-gavel"></i> الغرامات والمخالفات (اختياري)</h5>
-<div class="form-grid">
-<div class="form-group">
-<label style="font-size:0.85rem;font-weight:bold;"><input id="propPenDelay" type="checkbox"/> تأخير الدفع عن السنة المالية</label>
-</div>
-<div class="form-group">
-<label style="font-size:0.85rem;font-weight:bold;"><input id="propPenFalseInfo" type="checkbox"/> إخفاء / تقديم معلومات غير صحيحة للسلطة المالية</label>
-</div>
-<div class="form-group">
-<label style="font-size:0.85rem;font-weight:bold;"><input id="propPenFakeEmpty" type="checkbox"/> ادعاء خلو العقار بشكل وهمي (كذب بالإخلاء)</label>
-</div>
-<div class="form-group">
-<label style="font-size:0.85rem;font-weight:bold;"><input id="propPenUseChange" type="checkbox"/> عدم الإخبار عن تغيير الاستعمال لغرض غير معفي</label>
-</div>
-</div>
-</div>
-<div class="btn-group" id="propCalculateBtnGroup" style="margin-top:20px; display:none;">
-<button class="btn btn-primary" onclick="calculateNewPropertyTax()"><i class="fas fa-calculator"></i> احتساب الضريبة والأسانيد</button>
-</div>
-<div class="result-box" id="propNewResultBox" style="margin-top:20px; display:none;">
-<div class="result-icon"><i class="fas fa-home"></i></div>
-<h2>النتيجة والسند القانوني وفق قانون رقم 162 لسنة 1959</h2>
-<div class="info-banner" id="propExemptMessage" style="display:none; background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin:20px 0;">
-<p style="color:#1e40af;font-size:15px;margin:0;font-weight:bold;"><i class="fas fa-medal" style="margin-left:6px;"></i> صفر دينار (العقار معفى من الضريبة).</p>
-<p id="propExemptText" style="color:#1e40af;font-size:13px;margin:10px 0 0 0;line-height:1.6;"></p>
-</div>
-<div class="result-details" id="propNewResultDetails" style="display:none;">
-<div class="result-row"><span>الإيراد السنوي المدخل:</span><strong id="propResRent">-</strong></div>
-<div class="result-row"><span>كيف تم الحساب:</span><strong id="propResRentText" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
-<div class="result-row"><span>تنزيل مصاريف الصيانة (10%):</span><strong id="propResMaint">-</strong></div>
-<div class="result-row"><span>كيف تم الحساب:</span><strong id="propResMaintText" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
-<div class="result-row" id="propRowEmptyWrap" style="display:none;"><span>خصم فترة الخلو:</span><strong id="propResEmpty">-</strong></div>
-<div class="result-row" id="propRowEmptyTextWrap" style="display:none;"><span>كيف تم الحساب:</span><strong id="propResEmptyText" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
-<div class="result-row"><span>الإيراد الخاضع للضريبة:</span><strong id="propResTaxable" style="color:var(--danger);">-</strong></div>
-<div class="result-row"><span>احتساب الضريبة الأساسية (10%):</span><strong id="propResBaseTax">-</strong></div>
-<div class="result-row"><span>كيف تم الحساب:</span><strong id="propResBaseTaxText" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
-<div id="propPenaltiesSection" style="display:none;background:#fef2f2;padding:10px;border-radius:10px;margin-bottom:15px;border:1px solid #fecaca;">
-<h5 style="color:#dc2626;margin:0 0 10px;">الغرامات الإضافية</h5>
-<div id="propPenRows"></div>
-</div>
-<div class="result-row total"><span>الضريبة النهائية المستحقة:</span><strong id="propResFinalTax">-</strong></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-
 <!-- ==================== LAND TAX ==================== -->
 <section class="page-section" id="page-profession">
 <div class="section-hero" data-aos="fade-down" style="--hero-c1:#5b21b6;--hero-c2:#7c3aed;">
@@ -1541,9 +1284,7 @@
 <div class="form-group">
 <label style="font-weight:bold;">الحالة الاجتماعية للموظف/المكلف</label>
 <select id="profMarital" onchange="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
-<option selected="" value="single">أعزب</option>
-<option value="widowed">أرمل</option>
-<option value="divorced">مطلق</option>
+<option selected="" value="single">أعزب</option>\n<option value="widowed">أرمل</option>\n<option value="divorced">مطلق</option>
 <option value="married_spouse_no_income">متزوج (الزوج/ة ربة بيت أو دُمج دخلها)</option>
 <option value="married_spouse_income">متزوج (الزوج/ة يحاسب ضريبياً مستقلاً)</option>
 <option value="married_female_disabled_husband">مرأة متزوجة (زوجها عاجز كلياً وليس له مورد)</option>
@@ -1562,11 +1303,11 @@
 <div class="form-grid">
 <div class="form-group">
 <label style="font-weight:bold;">الراتب الاسمي أو الأجر الأساسي (شهرياً)</label>
-<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">إجمالي المخصصات النقدية الخاضعة (شهرياً)</label>
-<input id="profAllowances" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profAllowances" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">المنافع العينية (السكن)</label>
@@ -1581,7 +1322,7 @@
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">المنافع العينية (الطعام)</label>
-<input id="profFoodKindVal" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profFoodKindVal" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 <small style="color:var(--text-muted);display:block;margin-top:4px;">سيحسب النظام 10% من الراتب أو الكلفة الفعلية أيهما أقل تلقائياً.</small>
 </div>
 </div>
@@ -1592,15 +1333,15 @@
 <div class="form-grid">
 <div class="form-group">
 <label style="font-weight:bold;">التوقيفات التقاعدية / اشتراك الضمان (شهرياً)</label>
-<input id="profSocialSec" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profSocialSec" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">أقساط التأمين المعتمدة (شهرياً)</label>
-<input id="profLifeIns" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profLifeIns" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 <div class="form-group">
 <label style="font-weight:bold;">النفقة الشرعية المحكوم بها (شهرياً)</label>
-<input id="profAlimony" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" >
+<input id="profAlimony" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
 </div>
 </div>
 </div>
@@ -1653,54 +1394,6 @@
 </div>
 </section>
 <!-- ==================== SALES TAX ==================== -->
-<section class="page-section" id="page-documents">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#10b981;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-folder-open"></i>
-</div>
-<div class="section-hero-text">
-<h2>إدارة المستندات</h2>
-<p>رفع وتنظيم المستندات والوثائق الضريبية</p>
-</div>
-</div>
-</div>
-<div class="card">
-<div class="card-header"><h3><i class="fas fa-cloud-upload-alt"></i> رفع المستندات</h3></div>
-<div class="card-body">
-<div class="upload-zone" onclick="triggerUpload()">
-<i class="fas fa-cloud-upload-alt"></i>
-<h3>اسحب الملفات هنا أو انقر للتحميل</h3>
-<p>PDF, JPG, PNG, DOCX — حتى ٢٠ ميجا</p>
-<input id="fileInput" multiple="" style="display:none" type="file"/>
-</div>
-</div>
-</div>
-<div class="card" style="margin-top:24px;">
-<div class="card-header"><h3><i class="fas fa-folder"></i> المستندات المحفوظة</h3></div>
-<div class="card-body">
-<div class="table-container">
-<table>
-<thead><tr><th>اسم المستند</th><th>النوع</th><th>الحجم</th><th>التاريخ</th><th>إجراء</th></tr></thead>
-<tbody>
-<tr><td><i class="fas fa-file-pdf" style="color:#ef476f;"></i> الميزانية_٢٠٢٥.pdf</td><td>ميزانية</td><td>٢.٤ MB</td><td>٢٤ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
-<tr><td><i class="fas fa-file-image" style="color:#00b4d8;"></i> صورة_الطابو.jpg</td><td>سند ملكية</td><td>١.١ MB</td><td>٢٣ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
-<tr><td><i class="fas fa-file-pdf" style="color:#ef476f;"></i> عقد_الإيجار.pdf</td><td>عقد</td><td>٨٥٠ KB</td><td>٢٠ آذار ٢٠٢٦</td><td><button class="btn btn-sm btn-ghost"><i class="fas fa-download"></i></button></td></tr>
-</tbody>
-</table>
-</div>
-</div>
-</div>
-</section>
-<!-- ==================== NOTIFICATIONS ==================== -->
-
 <section class="page-section" id="page-notifications">
 <div class="section-hero" data-aos="fade-down" style="--hero-c1:#d97706;--hero-c2:#f59e0b;">
 <div class="section-hero-bg">
@@ -1778,191 +1471,9 @@
 </section>
 
 <!-- ==================== PENALTIES CALCULATOR ==================== -->
-<section class="page-section" id="page-penalties">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#dc2626;--hero-c2:#ef4444;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-gavel"></i>
-</div>
-<div class="section-hero-text">
-<h2>حاسبة الغرامات</h2>
-<p>احتساب غرامات التأخر في السداد وفق القانون</p>
-</div>
-</div>
-</div>
-<div class="card" data-aos="fade-up">
-<div class="card-header"><h3><i class="fas fa-gavel"></i> حاسبة الغرامات والجزاءات الضريبية</h3></div>
-<div class="card-body">
-<p style="color:var(--text-light);margin-bottom:20px;">وفقاً لقانون ضريبة الدخل رقم ١١٣ لسنة ١٩٨٢ وتعديلاته</p>
-<div class="form-grid">
-<div class="form-group">
-<label>نوع المخالفة</label>
-<select id="penaltyType">
-<option value="late_payment">تأخر في الدفع</option>
-<option value="late_declaration">تأخر في تقديم الإقرار</option>
-<option value="tax_evasion">تهرب ضريبي</option>
-<option value="false_info">معلومات كاذبة</option>
-<option value="no_records">عدم مسك سجلات</option>
-</select>
-</div>
-<div class="form-group">
-<label>مبلغ الضريبة الأصلي (د.ع)</label>
-<input id="penaltyOriginalTax" placeholder="٠" type="text"/>
-</div>
-<div class="form-group">
-<label>تاريخ الاستحقاق</label>
-<input id="penaltyDueDate" type="date"/>
-</div>
-<div class="form-group">
-<label>تاريخ الدفع الفعلي</label>
-<input id="penaltyPayDate" type="date"/>
-</div>
-</div>
-<div class="btn-group">
-<button class="btn btn-primary" onclick="calculatePenalty()"><i class="fas fa-calculator"></i> حساب الغرامة</button>
-</div>
-<div class="result-box" id="penaltyResult" style="display:none;margin-top:24px;">
-<div class="result-icon"><i class="fas fa-gavel"></i></div>
-<h2>نتيجة حساب الغرامة</h2>
-<div class="result-details">
-<div class="result-row"><span>نوع المخالفة:</span><strong id="penaltyTypeResult">-</strong></div>
-<div class="result-row"><span>مدة التأخير:</span><strong id="penaltyDays">-</strong></div>
-<div class="result-row"><span>نسبة الغرامة:</span><strong id="penaltyRate">-</strong></div>
-<div class="result-row"><span>مبلغ الضريبة الأصلي:</span><strong id="penaltyOriginal">-</strong></div>
-<div class="result-row total"><span>مبلغ الغرامة:</span><strong id="penaltyAmount">-</strong></div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- ==================== SETTINGS ==================== -->
-<section class="page-section" id="page-settings">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#6b7280;--hero-c2:#9ca3af;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-cogs"></i>
-</div>
-<div class="section-hero-text">
-<h2>الإعدادات</h2>
-<p>تخصيص إعدادات النظام والتفضيلات الشخصية</p>
-</div>
-</div>
-</div>
-<div class="card" data-aos="fade-up">
-<div class="card-header"><h3><i class="fas fa-cog"></i> إعدادات النظام</h3></div>
-<div class="card-body">
-<div class="settings-section">
-<h4><i class="fas fa-palette"></i> المظهر</h4>
-<div class="settings-item">
-<div><strong>الوضع الليلي</strong><p style="font-size:0.85rem;color:var(--text-light);">تفعيل المظهر الداكن للنظام</p></div>
-<label class="switch"><input id="settingDarkMode" onchange="toggleDarkMode()" type="checkbox"/><span class="switch-slider"></span></label>
-</div>
-<div class="settings-item">
-<div><strong>حجم الخط</strong><p style="font-size:0.85rem;color:var(--text-light);">تغيير حجم الخط الافتراضي</p></div>
-<select id="settingFontSize" onchange="changeFontSize(this.value)" style="padding:8px 16px;border:2px solid var(--border);border-radius:var(--radius-xs);">
-<option value="14">صغير</option>
-<option selected="" value="15">متوسط</option>
-<option value="17">كبير</option>
-</select>
-</div>
-</div>
-<div class="settings-section">
-<h4><i class="fas fa-bell"></i> الإشعارات</h4>
-<div class="settings-item">
-<div><strong>إشعارات المتصفح</strong><p style="font-size:0.85rem;color:var(--text-light);">إرسال تنبيهات لمواعيد الدفع</p></div>
-<label class="switch"><input id="settingNotifications" onchange="toggleBrowserNotifications()" type="checkbox"/><span class="switch-slider"></span></label>
-</div>
-<div class="settings-item">
-<div><strong>حفظ تلقائي للمسودات</strong><p style="font-size:0.85rem;color:var(--text-light);">حفظ البيانات المدخلة تلقائياً</p></div>
-<label class="switch"><input checked="" id="settingAutoSave" onchange="toggleAutoSave()" type="checkbox"/><span class="switch-slider"></span></label>
-</div>
-</div>
-<div class="settings-section">
-<h4><i class="fas fa-database"></i> البيانات</h4>
-<div class="settings-item">
-<div><strong>تصدير جميع البيانات</strong><p style="font-size:0.85rem;color:var(--text-light);">تحميل نسخة احتياطية من البيانات</p></div>
-<button class="btn btn-sm btn-primary" onclick="exportAllData()"><i class="fas fa-download"></i> تصدير</button>
-</div>
-<div class="settings-item">
-<div><strong>مسح البيانات المحفوظة</strong><p style="font-size:0.85rem;color:var(--text-light);">حذف جميع المسودات والإعدادات المحفوظة</p></div>
-<button class="btn btn-sm btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> مسح</button>
-</div>
-</div>
-</div>
-</div>
-</section>
-<!-- ==================== APPOINTMENTS ==================== -->
-<section class="page-section" id="page-appointments">
-<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0d47a1;--hero-c2:#1565c0;">
-<div class="section-hero-bg">
-<div class="hero-particle hp-1"></div>
-<div class="hero-particle hp-2"></div>
-<div class="hero-particle hp-3"></div>
-<div class="hero-wave"></div>
-</div>
-<div class="section-hero-content">
-<div class="section-hero-icon-3d">
-<div class="hero-icon-ring"></div>
-<i class="fas fa-calendar-check"></i>
-</div>
-<div class="section-hero-text">
-<h2>المواعيد</h2>
-<p>جدولة وإدارة المواعيد الضريبية</p>
-</div>
-</div>
-</div>
-<div class="card" data-aos="fade-up">
-<div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
-<h3><i class="fas fa-calendar-check"></i> المواعيد</h3>
-<button class="btn btn-primary" onclick="createAppointment()"><i class="fas fa-plus"></i> موعد جديد</button>
-</div>
-<div class="card-body">
-<div class="invoice-stats-row" style="margin-bottom:20px;">
-<div class="inv-stat"><i class="fas fa-calendar-day" style="color:var(--primary)"></i><div><span class="inv-stat-num" id="apptTotalCount">24</span><small>إجمالي المواعيد</small></div></div>
-<div class="inv-stat"><i class="fas fa-calendar-check" style="color:var(--success)"></i><div><span class="inv-stat-num" id="apptTodayCount">3</span><small>مواعيد اليوم</small></div></div>
-<div class="inv-stat"><i class="fas fa-calendar-week" style="color:var(--info)"></i><div><span class="inv-stat-num" id="apptWeekCount">8</span><small>هذا الأسبوع</small></div></div>
-<div class="inv-stat"><i class="fas fa-ban" style="color:var(--danger)"></i><div><span class="inv-stat-num" id="apptCancelledCount">2</span><small>ملغاة</small></div></div>
-</div>
-<div class="tasks-filters" style="display:flex;gap:8px;margin-bottom:16px;">
-<button class="btn btn-sm active" onclick="filterAppointments('all',this)">الكل</button>
-<button class="btn btn-sm" onclick="filterAppointments('today',this)">اليوم</button>
-<button class="btn btn-sm" onclick="filterAppointments('week',this)">هذا الأسبوع</button>
-<button class="btn btn-sm" onclick="filterAppointments('month',this)">هذا الشهر</button>
-</div>
-<div class="appointments-timeline" id="appointmentsTimeline"></div>
-</div>
-</div>
-<!-- Appointment Modal -->
-<div class="modal-overlay" id="appointmentModal" style="display:none;">
-<div class="modal-content" style="max-width:550px;">
-<div class="modal-header"><h3><i class="fas fa-calendar-plus"></i> موعد جديد</h3><button class="modal-close" onclick="closeAppointmentModal()"><i class="fas fa-times"></i></button></div>
-<div class="modal-body">
-<div class="form-group"><label>عنوان الموعد</label><input class="form-control" id="apptTitle" placeholder="مثال: مراجعة ملف المكلف" type="text"/></div>
-<div class="form-row"><div class="form-group"><label>التاريخ</label><input class="form-control" id="apptDate" type="date"/></div><div class="form-group"><label>الوقت</label><input class="form-control" id="apptTime" type="time"/></div></div>
-<div class="form-group"><label>اسم المكلف (اختياري)</label><input class="form-control" id="apptClient" type="text"/></div>
-<div class="form-group"><label>ملاحظات</label><textarea class="form-control" id="apptNotes" rows="2"></textarea></div>
-</div>
-<div class="modal-footer"><button class="btn btn-primary" onclick="saveAppointment()"><i class="fas fa-save"></i> حفظ الموعد</button><button class="btn btn-secondary" onclick="closeAppointmentModal()">إلغاء</button></div>
-</div>
-</div>
-</section>
-
-</main>
+</div>\n</main>
 </div><!-- end app-container -->
+<!-- ====== SEARCH MODAL ====== -->
 <div class="search-modal" id="searchModal">
 <div class="search-modal-backdrop" onclick="closeSearchModal()"></div>
 <div class="search-modal-content">
