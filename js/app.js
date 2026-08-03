@@ -769,7 +769,8 @@ function calcYearRow(e) {
     });
     return tot;
   }
-  var math = e.annualGross !== undefined ? e : (materializeEmployee(getBaseEmployee(e.id), cid, year) || {});
+  var base = getBaseEmployee(e.id);
+  var math = e.annualGross !== undefined ? e : (base ? materializeEmployee(base, cid, year) : null) || e;
   var cnt = Math.max(1, Math.min(12, parseInt(math.months, 10) || 12));
   return {
     gross: math.annualGross || 0, ded: math.annualDed || 0,
@@ -827,7 +828,7 @@ function getTaxParameters(fiscalYear) {
    taxActiveCompany       → الشركة النشطة
    taxActiveYear          → السنة النشطة
    taxV2Migrated          → علامة الهجرة */
-var V2_BASE_FIELDS = ['name','nat','res','gender','birthDate','civilId','phone','email','sec','startDate','endDate','mainEmployer','jobTitle','province','city','neighborhood','street','houseNo','marriageDate','spouseName','divorceDate','spouseCivilId','spouseDisabled','spouseEmpName','spouseEmployed','incomeMerge','spouseEmpId','origId','version','versionOf','salaryChangeDate','importedFromTemplate','importedFromDD14'];
+var V2_BASE_FIELDS = ['name','nat','res','gender','birthDate','civilId','phone','email','sec','startDate','endDate','mainEmployer','jobTitle','province','city','neighborhood','street','houseNo','marriageDate','spouseName','divorceDate','spouseCivilId','spouseDisabled','spouseEmpName','spouseEmployed','incomeMerge','spouseEmpId','origId','version','versionOf','salaryChangeDate','importedFromTemplate','importedFromDD14','leaveYear','leaveMonth'];
 var V2_YEAR_FIELDS = ['months','salary','allow','cashHous','inKind','actualRent','marital','child','childNames','over63','res','ins','alimony'];
 
 var globalEmployees = [];
@@ -835,6 +836,9 @@ var contractEmployees = [];
 var currentEmpType = "company";
 var currentDd4aEmployeeId = null;
 var currentDd4aPreviewKind = 'form';
+var currentEmpRegisterMode = 'annual';
+var currentEmpTargetYear = null;
+var currentEmpTargetMonth = null;
 
 function hydrateStoredEmployeeRecord(record) {
   var base = Object.assign({}, record || {});
@@ -943,7 +947,21 @@ function getEmpModalInputs() {
     var childEl = document.getElementById('empModChildName_' + i);
     childNames.push(childEl ? childEl.value : '');
   }
-  return {
+  var workStatus = (document.getElementById('empModWorkStatus') || {}).value || 'active';
+  var leaveDate = (document.getElementById('empModLeaveDate') || {}).value || '';
+  var endDateOut = '';
+  var leaveYearOut = null;
+  var leaveMonthOut = null;
+  if (workStatus === 'left' && leaveDate) {
+    var ldY = Number(String(leaveDate).slice(0, 4));
+    var ldM = Number(String(leaveDate).slice(5, 7));
+    if (isFinite(ldY) && isFinite(ldM) && ldM >= 1 && ldM <= 12) {
+      endDateOut = leaveDate;
+      leaveYearOut = String(ldY);
+      leaveMonthOut = String(ldM);
+    }
+  }
+  var inputs = {
     name: document.getElementById('empModName').value || 'موظف غير مسمى',
     nat: document.getElementById('empModNat').value,
     res: document.getElementById('empModRes').value,
@@ -954,7 +972,9 @@ function getEmpModalInputs() {
     email: document.getElementById('empModEmail').value,
     sec: document.getElementById('empModSec').value,
     startDate: document.getElementById('empModStartDate').value,
-    endDate: document.getElementById('empModEndDate').value,
+    endDate: endDateOut,
+    leaveYear: leaveYearOut,
+    leaveMonth: leaveMonthOut,
     mainEmployer: document.getElementById('empModMainEmployer').value,
     jobTitle: document.getElementById('empModJobTitle').value,
     employerName: document.getElementById('empModEmployerName').value,
@@ -986,6 +1006,7 @@ function getEmpModalInputs() {
     ins: parseArabicNumber(document.getElementById('empModIns').value) || 0,
     alimony: parseArabicNumber(document.getElementById('empModAlimony').value) || 0
   };
+  return inputs;
 }
 
 
@@ -1092,10 +1113,16 @@ window.calcEmpModalPreview = function() {
   if (!document.getElementById('empModName')) return null;
   var employeeData = getEmpModalInputs();
   var math = doExcelMathForEmployee(employeeData);
-  document.getElementById('livePreviewGross').textContent = formatNumber(Math.round(math.annualGross)) + ' د.ع';
-  document.getElementById('livePreviewDed').textContent = formatNumber(Math.round(math.annualDed)) + ' د.ع';
-  document.getElementById('livePreviewTaxable').textContent = formatNumber(Math.round(math.annualTaxable)) + ' د.ع';
-  document.getElementById('livePreviewTax').textContent = formatNumber(Math.round(math.annualTax)) + ' د.ع';
+  var months = employeeData.months;
+  function setPreview(id, v) { var el = document.getElementById(id); if (el) el.textContent = formatNumber(Math.round(v)) + ' د.ع'; }
+  setPreview('livePreviewGross', math.annualGross);
+  setPreview('livePreviewAllowance', (math.monthlyAllowance || 0) * months);
+  setPreview('livePreviewRetirement', (math.retirement || 0) * months);
+  setPreview('livePreviewInsAlim', ((math.insurance || 0) + (employeeData.alimony || 0)) * months);
+  setPreview('livePreviewExempt30', (math.privateExempt || 0) * months);
+  setPreview('livePreviewDed', math.annualDedDisplayed !== undefined ? math.annualDedDisplayed : math.annualDed);
+  setPreview('livePreviewTaxable', math.annualTaxable);
+  setPreview('livePreviewTax', math.annualTax);
   return math;
 };
 
@@ -1133,14 +1160,22 @@ window.nextEmpStep = function(dir) {
   }
 };
 
-window.openEmployeeModal = function(editId, type) {
+window.openEmployeeModal = function(editId, type, registerMode) {
   currentEmpType = type || 'company';
+  currentEmpRegisterMode = registerMode === 'monthly' ? 'monthly' : 'annual';
   var modal = document.getElementById('employeeExcelModal');
   if (!modal) return;
   if (typeof ensureActiveCompany === 'function') ensureActiveCompany();
   loadEmployeesForContext();
   var targetArray = currentEmpType === 'contract' ? contractEmployees : globalEmployees;
-  var employee = editId ? targetArray.find(function(item) { return item.id === editId; }) : null;
+  var employee = null;
+  if (editId) {
+    if (currentEmpRegisterMode === 'monthly' && currentEmpTargetYear && currentEmpTargetMonth) {
+      employee = getMonthlyRecord(editId, currentEmpTargetYear, currentEmpTargetMonth);
+      if (employee) employee = Object.assign({}, employee);
+    }
+    if (!employee) employee = targetArray.find(function(item) { return item.id === editId; }) || null;
+  }
   var company = getActiveCompany();
 
   document.getElementById('empModEditId').value = employee ? employee.id : '';
@@ -1152,9 +1187,18 @@ window.openEmployeeModal = function(editId, type) {
   document.getElementById('empModCivilId').value = employee ? employee.civilId : '';
   document.getElementById('empModPhone').value = employee ? employee.phone : '';
   document.getElementById('empModEmail').value = employee ? employee.email : '';
-  document.getElementById('empModSec').value = employee ? employee.sec : 'government';
+  document.getElementById('empModSec').value = employee ? (employee.sec || '') : '';
   document.getElementById('empModStartDate').value = employee ? employee.startDate : '';
-  document.getElementById('empModEndDate').value = employee ? employee.endDate : '';
+  var empLeft = employee && (employee.leaveYear || employee.endDate);
+  var workStatusEl = document.getElementById('empModWorkStatus');
+  if (workStatusEl) workStatusEl.value = empLeft ? 'left' : 'active';
+  var leaveDateEl = document.getElementById('empModLeaveDate');
+  var leaveDateWrap = document.getElementById('empModLeaveDateWrap');
+  if (leaveDateEl) {
+    leaveDateEl.value = employee && employee.endDate ? employee.endDate
+      : (employee && employee.leaveYear ? String(employee.leaveYear) + '-' + ('0' + (Number(employee.leaveMonth) || 1)).slice(-2) + '-15' : '');
+  }
+  if (leaveDateWrap) leaveDateWrap.style.display = empLeft ? 'block' : 'none';
   document.getElementById('empModMainEmployer').value = employee ? employee.mainEmployer : 'yes';
   document.getElementById('empModJobTitle').value = employee ? employee.jobTitle : '';
   document.getElementById('empModEmployerName').value = employee ? employee.employerName : (company ? company.name : '');
@@ -1176,7 +1220,7 @@ window.openEmployeeModal = function(editId, type) {
   if (document.getElementById('empModSpouseEmpId')) document.getElementById('empModSpouseEmpId').value = employee ? (employee.spouseEmpId || '') : '';
   document.getElementById('empModChild').value = employee ? employee.child : 0;
   document.getElementById('empMod63').value = employee ? employee.over63 : 'no';
-  document.getElementById('empModMonths').value = employee ? employee.months : 12;
+  document.getElementById('empModMonths').value = currentEmpRegisterMode === 'monthly' ? 1 : (employee ? employee.months : 12);
   document.getElementById('empModSalary').value = employee ? fmtMoney(employee.salary) : '0';
   document.getElementById('empModAllow').value = employee ? fmtMoney(employee.allow) : '0';
   document.getElementById('empModCashHous').value = employee ? fmtMoney(employee.cashHous) : '0';
@@ -1185,9 +1229,57 @@ window.openEmployeeModal = function(editId, type) {
   document.getElementById('empModIns').value = employee ? fmtMoney(employee.ins) : '0';
   document.getElementById('empModAlimony').value = employee ? fmtMoney(employee.alimony) : '0';
   renderChildNameInputs(employee ? employee.childNames : []);
+  updateEmpRegisterContext();
   switchEmpStep(1);
   modal.style.display = 'flex';
   calcEmpModalPreview();
+};
+
+window.toggleEmpModLeaveDate = function() {
+  var wrap = document.getElementById('empModLeaveDateWrap');
+  var status = document.getElementById('empModWorkStatus');
+  if (wrap) wrap.style.display = (status && status.value === 'left') ? 'block' : 'none';
+  if (typeof calcEmpModalPreview === 'function') calcEmpModalPreview();
+};
+
+window.updateEmpRegisterContext = function() {
+  var bar = document.getElementById('empRegContext');
+  if (!bar) return;
+  var monthsWrap = document.getElementById('empModMonthsWrap');
+  var monthsInput = document.getElementById('empModMonths');
+  if (currentEmpRegisterMode === 'monthly') {
+    bar.style.display = 'flex';
+    var cid = getActiveCompanyId();
+    var ay = Number(getActiveYear());
+    var yearSel = document.getElementById('empModTargetYear');
+    if (yearSel) {
+      var yearSet = {};
+      getAvailableFiscalYearsForCompany(cid).forEach(function(y) { yearSet[String(y)] = true; });
+      if (currentEmpTargetYear) yearSet[String(currentEmpTargetYear)] = true;
+      for (var yy = ay - 5; yy <= ay + 5; yy++) yearSet[String(yy)] = true;
+      var years = Object.keys(yearSet).sort(function(a, b) { return Number(a) - Number(b); });
+      var prev = yearSel.value || currentEmpTargetYear || String(ay);
+      yearSel.innerHTML = years.map(function(y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+      yearSel.value = prev;
+    }
+    var monthSel = document.getElementById('empModTargetMonth');
+    if (monthSel) {
+      if (!monthSel.value) monthSel.value = currentEmpTargetMonth || '1';
+      var hint = document.getElementById('empRegContextHint');
+      if (hint) hint.textContent = 'سيُسجَّل القيد لشهر ' + monthSel.value + ' / ' + (yearSel ? yearSel.value : ay);
+    }
+    if (monthsWrap) monthsWrap.style.display = 'none';
+    if (monthsInput) monthsInput.value = '1';
+  } else {
+    bar.style.display = 'none';
+    if (monthsWrap) monthsWrap.style.display = 'block';
+  }
+};
+
+window.openMonthlyEmployeeModal = function(id, year, month) {
+  currentEmpTargetYear = String(year || getActiveYear());
+  currentEmpTargetMonth = String(month || '1');
+  openEmployeeModal(id, 'company', 'monthly');
 };
 
 window.closeEmployeeModal = function() {
@@ -1195,15 +1287,35 @@ window.closeEmployeeModal = function() {
   if (modal) modal.style.display = 'none';
 };
 
+function computeAge(birthDate) {
+  if (!birthDate) return null;
+  var m = String(birthDate).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return null;
+  var by = Number(m[1]), bm = Number(m[2]), bd = Number(m[3]);
+  var now = new Date();
+  var age = now.getFullYear() - by;
+  if (now.getMonth() + 1 < bm || (now.getMonth() + 1 === bm && now.getDate() < bd)) age--;
+  return age;
+}
+
 window.saveEmployeeFromModal = function() {
   var inputs = getEmpModalInputs();
   if (!inputs.res) { showToast('يرجى تحديد الإقامة الضريبية للموظف إجبارياً', true); return; }
+  if (!inputs.sec) { showToast('يرجى تحديد قطاع العمل (خاص / حكومي) إجبارياً', true); switchEmpStep(2); return; }
+  var nameParts = String(inputs.name || '').trim().split(/\s+/).filter(Boolean);
+  if (nameParts.length < 4) { showToast('يرجى إدخال الاسم الرباعي (4 أسماء على الأقل) إجبارياً', true); switchEmpStep(1); return; }
+  if (!inputs.birthDate) { showToast('يرجى تحديد تاريخ الميلاد إجبارياً', true); switchEmpStep(1); return; }
+  var age = computeAge(inputs.birthDate);
+  if (age === null || age < 18) { showToast('عمر الموظف يجب أن يكون 18 سنة أو أكثر (حسب قانون العمل)', true); switchEmpStep(1); return; }
+  if (inputs.civilId && !/^\d{10}$/.test(String(inputs.civilId).trim())) { showToast('الرقم المدني يجب أن يكون 10 أرقام', true); switchEmpStep(1); return; }
   
   var math = doExcelMathForEmployee(inputs);
   var merged = Object.assign({}, inputs, math);
   merged._v2type = currentEmpType === 'contract' ? 'contract' : 'company';
   var editId = document.getElementById('empModEditId').value;
   var targetArray = currentEmpType === 'contract' ? contractEmployees : globalEmployees;
+
+  if (currentEmpRegisterMode === 'monthly') { saveMonthlyEmployeeFromModal(inputs, merged); return; }
   
   function hasFinancialChange(oldRec, newInput) {
     return Math.abs((Number(oldRec.salary) || 0) - (Number(newInput.salary) || 0)) > 0.5 ||
@@ -1256,6 +1368,307 @@ window.saveEmployeeFromModal = function() {
 }
 ;
 
+function saveMonthlyEmployeeFromModal(inputs, merged) {
+  var yearEl = document.getElementById('empModTargetYear');
+  var monthEl = document.getElementById('empModTargetMonth');
+  var year = (yearEl && yearEl.value) || currentEmpTargetYear || getActiveYear();
+  var month = (monthEl && monthEl.value) || currentEmpTargetMonth || '1';
+  var cid = getActiveCompanyId();
+  var editId = document.getElementById('empModEditId').value;
+  var id = editId || ('EMP_' + Date.now());
+  merged.id = id;
+  merged.origId = merged.origId || id;
+  merged.version = merged.version || 1;
+  merged.months = 1;
+
+  var bases = getEmployeeBase();
+  var base = bases.find(function(b) { return String(b.id) === String(id); });
+  if (!base) {
+    base = {};
+    V2_BASE_FIELDS.forEach(function(k) { if (merged[k] !== undefined) base[k] = merged[k]; });
+    base.id = id; base.companyId = cid; base.type = currentEmpType === 'contract' ? 'contract' : 'company';
+    bases.push(base);
+  } else {
+    V2_BASE_FIELDS.forEach(function(k) { if (merged[k] !== undefined) base[k] = merged[k]; });
+    base.companyId = cid;
+  }
+  saveEmployeeBase(bases);
+
+  var rec = Object.assign({}, merged, {
+    id: id, employeeId: id, companyId: cid,
+    year: String(year), month: String(month),
+    updatedAt: new Date().toISOString()
+  });
+  upsertMonthlyRecord(rec);
+
+  currentEmpTargetYear = null;
+  currentEmpTargetMonth = null;
+  closeEmployeeModal();
+  loadEmployeesForContext();
+  renderEmployeeList();
+  showToast('تم حفظ الموظف الشهري لشهر ' + month + ' / ' + year + ' — ' + (merged.name || ''));
+  if (typeof addAuditEntry === 'function') addAuditEntry('إضافة/تعديل موظف شهري', (merged.name || '') + ' — ' + month + '/' + year);
+}
+
+window.deleteMonthlyEmployee = function(id, year, month) {
+  if (!confirm('حذف سجل الموظف الشهري (' + month + '/' + year + ')؟')) return;
+  deleteMonthlyRecord(id, year, month);
+  loadEmployeesForContext();
+  renderEmployeeList();
+  showToast('تم حذف السجل الشهري');
+};
+
+/* ---- ترك العمل: يحدد سنة+شهر الترك، ويُحتسب الموظف عن أشهر عمله قبل الترك فقط ---- */
+var currentLeaveEmployeeId = null;
+
+window.openLeaveEmployeeModal = function(id) {
+  currentLeaveEmployeeId = id;
+  var modal = document.getElementById('leaveEmployeeModal');
+  if (!modal) return;
+  var emp = getEmployeeBase().find(function(b) { return String(b.id) === String(id); }) ||
+    globalEmployees.concat(contractEmployees).find(function(e) { return String(e.id) === String(id); });
+  var nameEl = document.getElementById('leaveModalName');
+  if (nameEl) nameEl.textContent = emp ? (emp.name || id) : id;
+  var ay = Number(getActiveYear());
+  var years = [];
+  for (var y = ay - 5; y <= ay + 5; y++) years.push(String(y));
+  var yEl = document.getElementById('leaveModalYear');
+  if (yEl) {
+    yEl.innerHTML = years.map(function(y) { return '<option value="' + y + '">' + y + '</option>'; }).join('');
+    yEl.value = emp && emp.leaveYear ? String(emp.leaveYear) : String(ay);
+  }
+  var mEl = document.getElementById('leaveModalMonth');
+  if (mEl) mEl.value = emp && emp.leaveMonth ? String(emp.leaveMonth) : '12';
+  var cancelBtn = document.getElementById('leaveModalCancelLeave');
+  if (cancelBtn) cancelBtn.style.display = (emp && emp.leaveYear) ? 'inline-block' : 'none';
+  modal.style.display = 'flex';
+};
+
+window.closeLeaveEmployeeModal = function() {
+  var modal = document.getElementById('leaveEmployeeModal');
+  if (modal) modal.style.display = 'none';
+  currentLeaveEmployeeId = null;
+};
+
+window.saveLeaveEmployee = function() {
+  var id = currentLeaveEmployeeId;
+  if (!id) return;
+  var year = (document.getElementById('leaveModalYear') || {}).value || getActiveYear();
+  var month = (document.getElementById('leaveModalMonth') || {}).value || '12';
+  var bases = getEmployeeBase();
+  var base = bases.find(function(b) { return String(b.id) === String(id); });
+  if (!base) { showToast('تعذر العثور على الموظف', true); closeLeaveEmployeeModal(); return; }
+  if (base.leaveYear && String(base.leaveYear) === String(year) && String(base.leaveMonth) === String(month)) {
+    closeLeaveEmployeeModal();
+    showToast('لا تغيير — ترك العمل مسجل مسبقاً');
+    return;
+  }
+  base.leaveYear = String(year);
+  base.leaveMonth = String(month);
+  base.endDate = String(year) + '-' + ('0' + (Number(month) || 1)).slice(-2) + '-15';
+  saveEmployeeBase(bases);
+  closeLeaveEmployeeModal();
+  loadEmployeesForContext();
+  renderEmployeeList();
+  if (typeof renderContractEmployeeList === 'function') renderContractEmployeeList();
+  showToast('تم تسجيل ترك العمل — يُحتسب عن أشهر العمل قبل الترك فقط');
+  if (typeof addAuditEntry === 'function') addAuditEntry('ترك عمل', (base.name || '') + ' — ' + month + '/' + year);
+};
+
+window.clearLeaveEmployee = function() {
+  var id = currentLeaveEmployeeId;
+  var bases = getEmployeeBase();
+  var base = id ? bases.find(function(b) { return String(b.id) === String(id); }) : null;
+  if (base) {
+    delete base.leaveYear;
+    delete base.leaveMonth;
+    saveEmployeeBase(bases);
+  }
+  closeLeaveEmployeeModal();
+  loadEmployeesForContext();
+  renderEmployeeList();
+  if (typeof renderContractEmployeeList === 'function') renderContractEmployeeList();
+  showToast('تم إلغاء ترك العمل');
+};
+
+/* يجمع صفوف شهر معيّن (تلقائي + يدوي) مع إزالة الازدواجية ويحسب إجماليات الشهر */
+function collectMonthlyMonthRows(cid, year, m) {
+  var bases = getEmployeeBase().filter(function(b) { return String(b.companyId) === String(cid); });
+  var monthlyRecs = getMonthlyRecords().filter(function(r) { return String(r.companyId || '') === String(cid) && String(r.year) === String(year); });
+  var rows = [];
+  var seen = {};
+  var taxable = 0, tax = 0;
+  function push(e, manual, math) {
+    var key = String(e.origId || e.id || e.employeeId);
+    if (seen[key]) return;
+    seen[key] = true;
+    rows.push({ e: e, manual: manual, math: math, idx: rows.length + 1 });
+    taxable += math.annualTaxable;
+    tax += math.annualTax;
+  }
+  bases.forEach(function(b) {
+    if ((b.type || 'company') === 'contract') return;
+    var e = materializeEmployee(b, cid, year);
+    if (!e || !employeeActiveInMonth(e, year, m)) return;
+    push(e, false, doExcelMathForEmployee(Object.assign({}, e, { months: 1 })));
+  });
+  monthlyRecs.forEach(function(mr) {
+    if (Number(mr.month) !== m) return;
+    var e = Object.assign({}, mr);
+    var base = bases.find(function(b) { return String(b.id) === String(mr.employeeId); });
+    if (base) Object.assign(e, base, mr);
+    if (!employeeActiveInMonth(e, year, m)) return;
+    push(e, true, doExcelMathForEmployee(Object.assign({}, e, { months: 1 })));
+  });
+  return { rows: rows, taxable: taxable, tax: tax, count: rows.length };
+}
+
+window.printMonthlyRegisterMonth = function(year, month) {
+  var cid = getActiveCompanyId();
+  var company = getActiveCompany();
+  var monthNames = ['كانون الثاني', 'شباط', 'آذار', 'نيسان', 'أيار', 'حزيران', 'تموز', 'آب', 'أيلول', 'تشرين الأول', 'تشرين الثاني', 'كانون الأول'];
+  var m = Number(month);
+  var data = collectMonthlyMonthRows(cid, year, m);
+  var rows = data.rows.map(function(item) {
+    var e = item.e;
+    var math = item.math;
+    return '<tr>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + item.idx + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; font-weight:700;">' + (e.name || '') + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + (e.sec === 'private' ? 'خاص' : 'حكومي') + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + formatNumber(Math.round(Number(e.salary) || 0)) + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + formatNumber(Math.round((Number(e.allow) || 0) + (Number(e.cashHous) || 0))) + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + formatNumber(Math.round(math.annualDedDisplayed)) + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center;">' + formatNumber(Math.round(math.annualTaxable)) + '</td>' +
+      '<td style="border:1px solid #000; padding:3px; text-align:center; font-weight:700;">' + formatNumber(Math.round(math.annualTax)) + '</td>' +
+      '</tr>';
+  }).join('');
+  if (!rows) rows = '<tr><td colspan="8" style="border:1px solid #000; padding:8px; text-align:center;">لا يوجد موظفون نشطون في هذا الشهر</td></tr>';
+  var html = '<div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:9mm; background:#fff; color:#000; font-family:Arial,sans-serif; direction:rtl; box-sizing:border-box; position:relative;">' +
+    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">' +
+      '<div style="font-size:11px; line-height:1.5;">جمهورية العراق<br>وزارة المالية<br>الهيئة العامة للضرائب</div>' +
+      '<div style="text-align:center; font-size:14px; font-weight:800;">سجل استقطاع ضريبة الدخل — شهري<br><span style="font-size:9px; font-weight:400;">خاص بالمنتسبين الخاضعين للضريبة بطريق الاستقطاع المباشر</span></div>' +
+      '<div style="font-size:11px; text-align:right; line-height:1.5;">الشهر: ' + m + ' — ' + monthNames[m - 1] + '<br>السنة المالية: ' + year + '</div>' +
+    '</div>' +
+    '<div style="font-size:11px; font-weight:700; margin-bottom:8px;">اسم رب العمل: ' + (company ? company.name : '') + ' &nbsp;&nbsp;|&nbsp;&nbsp; الرقم التعريفي: ' + (company ? (company.taxId || '') : '') + '</div>' +
+    '<table style="width:100%; border-collapse:collapse; font-size:11px; table-layout:fixed;">' +
+      '<thead><tr>' +
+        '<th style="border:1px solid #000; padding:3px; width:4%;">ت</th>' +
+        '<th style="border:1px solid #000; padding:3px;">اسم الموظف</th>' +
+        '<th style="border:1px solid #000; padding:3px; width:8%;">القطاع</th>' +
+        '<th style="border:1px solid #000; padding:3px;">الراتب الشهري</th>' +
+        '<th style="border:1px solid #000; padding:3px;">المخصصات</th>' +
+        '<th style="border:1px solid #000; padding:3px;">التنزيلات والسماحات</th>' +
+        '<th style="border:1px solid #000; padding:3px;">الوعاء الشهري</th>' +
+        '<th style="border:1px solid #000; padding:3px;">ضريبة الشهر</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+      '<tfoot><tr>' +
+        '<td colspan="3" style="border:1px solid #000; padding:4px; font-weight:800; text-align:center;">إجمالي ' + monthNames[m - 1] + ' (' + data.count + ' موظف)</td>' +
+        '<td colspan="3" style="border:1px solid #000; padding:4px;"></td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + formatNumber(Math.round(data.taxable)) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + formatNumber(Math.round(data.tax)) + '</td>' +
+      '</tr></tfoot>' +
+    '</table>' +
+    '<div style="display:flex; justify-content:space-between; margin-top:70px; font-size:11px; font-weight:700;">' +
+      '<div style="text-align:center;">توقيع المحاسب<br><span style="display:block; margin-top:26px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+      '<div style="text-align:center;">توقيع رئيس الحسابات<br><span style="display:block; margin-top:26px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+      '<div style="text-align:center;">توقيع صاحب العمل / المختص<br><span style="display:block; margin-top:26px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+      '<div style="text-align:center;">ختم رب العمل</div>' +
+    '</div>' +
+  '</div>';
+  var printWindow = window.open('', '_blank');
+  printWindow.document.write('<!DOCTYPE html>' +
+    '<html dir="rtl" lang="ar"><head><meta charset="UTF-8">' +
+    '<title>طباعة سجل شهر ' + monthNames[m - 1] + ' ' + year + '</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">' +
+    '<style>' +
+      'body { margin:0; padding:0; background:#fff; font-family:Tajawal,Arial,sans-serif; display:flex; flex-direction:column; align-items:center; }' +
+      '@media print { @page { size: A4 portrait; margin: 0; } body { background:white; margin:0; padding:0; }' +
+      '.page-break { page-break-after:auto; margin:0 !important; border:none !important; box-shadow:none !important; overflow:hidden !important; } }' +
+      '.page-break { box-sizing:border-box; }' +
+    '</style></head>' +
+    '<body onload="setTimeout(function(){ window.print(); window.close(); }, 500);">' + html + '</body></html>');
+  printWindow.document.close();
+  if (typeof addAuditEntry === 'function') addAuditEntry('طباعة سجل شهري', m + '/' + year);
+};
+
+window.renderMonthlyRegister = function() {
+  var container = document.getElementById('monthlyRegisterContainer');
+  if (!container) return;
+  var cid = getActiveCompanyId();
+  var yearSel = document.getElementById('monthlyRegYear');
+  if (yearSel) {
+    if (!yearSel.options.length) {
+      var ay = Number(getActiveYear());
+      for (var yy = ay - 5; yy <= ay + 5; yy++) yearSel.add(new Option(String(yy), String(yy)));
+    }
+    if (!yearSel.dataset.userPicked) yearSel.value = getActiveYear();
+  }
+  var year = (yearSel && yearSel.value) || getActiveYear();
+  var monthNames = ['كانون الثاني', 'شباط', 'آذار', 'نيسان', 'أيار', 'حزيران', 'تموز', 'آب', 'أيلول', 'تشرين الأول', 'تشرين الثاني', 'كانون الأول'];
+  var html = '';
+  var grandTaxable = 0, grandTax = 0, grandCount = 0;
+  for (var m = 1; m <= 12; m++) {
+    var data = collectMonthlyMonthRows(cid, year, m);
+    var count = data.count, tTaxable = data.taxable, tTax = data.tax;
+    var rows = data.rows.map(function(item) {
+      var e = item.e;
+      var math = item.math;
+      var sectorLabel = e.sec === 'private' ? 'خاص' : (e.sec === 'government' ? 'حكومي' : 'خاص');
+      var actions;
+      if (item.manual) {
+        actions = '<button class="btn btn-sm btn-info" onclick="openMonthlyEmployeeModal(\'' + e.employeeId + '\',\'' + year + '\',\'' + m + '\')" title="تعديل"><i class="fas fa-edit"></i></button> ' +
+          '<button class="btn btn-sm btn-danger" onclick="deleteMonthlyEmployee(\'' + e.employeeId + '\',\'' + year + '\',\'' + m + '\')" title="حذف"><i class="fas fa-trash"></i></button>';
+      } else {
+        actions = '<button class="btn btn-sm" onclick="printEmployeeDD4A(\'' + e.id + '\')" title="استمارة ض.د/14" style="background:#dbeafe;color:#1d4ed8;border:none;border-radius:8px;padding:4px 9px;"><i class="fas fa-file-invoice"></i></button>';
+      }
+      return '<tr>' +
+        '<td>' + item.idx + '</td>' +
+        '<td style="font-weight:bold;">' + (e.name || '') + '</td>' +
+        '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span></td>' +
+        '<td>' + formatNumber(Math.round(Number(e.salary) || 0)) + '</td>' +
+        '<td>' + formatNumber(Math.round((Number(e.allow) || 0) + (Number(e.cashHous) || 0))) + '</td>' +
+        '<td>' + formatNumber(Math.round(math.annualDedDisplayed)) + '</td>' +
+        '<td>' + formatNumber(Math.round(math.annualTaxable)) + '</td>' +
+        '<td style="color:#b45309;font-weight:bold;">' + formatNumber(Math.round(math.annualTax)) + '</td>' +
+        '<td style="white-space:nowrap;">' + actions + '</td>' +
+        '</tr>';
+    }).join('');
+    if (!rows) rows = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:14px;">لا يوجد موظفون نشطون في هذا الشهر</td></tr>';
+    grandCount += count;
+    grandTaxable += tTaxable;
+    grandTax += tTax;
+    html += '<div style="margin-bottom:22px;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:8px 12px; background:linear-gradient(135deg,#fff7ed,#ffedd5); border:1px solid #fed7aa; border-radius:12px 12px 0 0;">' +
+      '<strong style="color:#9a3412; font-size:.9rem;">' + m + ' — ' + monthNames[m - 1] + '</strong>' +
+      '<span style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">' +
+        '<span style="font-size:.78rem; color:#b45309; font-weight:700;">الموظفون: ' + count + ' | الوعاء الشهري: ' + formatNumber(Math.round(tTaxable)) + ' | ضريبة الشهر: ' + formatNumber(Math.round(tTax)) + '</span>' +
+        '<button class="corp-btn outline sm" onclick="printMonthlyRegisterMonth(\'' + year + '\',\'' + m + '\')" title="طباعة سجل شهر ' + monthNames[m - 1] + '"><i class="fas fa-print"></i> طباعة الشهر</button>' +
+      '</span>' +
+      '</div>' +
+      '<div class="corp-table-wrap" style="border-radius:0 0 12px 12px;">' +
+      '<table class="data-table" style="margin:0;">' +
+      '<thead><tr><th>ت</th><th>اسم الموظف</th><th>القطاع</th><th>الراتب الشهري</th><th>المخصصات</th><th>التنزيلات والسماحات</th><th>الوعاء الشهري</th><th>ضريبة الشهر</th><th>إجراءات</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+      '<tfoot><tr>' +
+        '<td class="total-label" colspan="3" style="text-align:left; font-weight:bold;">إجمالي ' + monthNames[m - 1] + '</td>' +
+        '<td colspan="3" style="font-weight:bold;">' + count + ' موظف</td>' +
+        '<td style="font-weight:bold; color:var(--danger);">' + formatNumber(Math.round(tTaxable)) + '</td>' +
+        '<td style="font-weight:bold; color:#b45309;">' + formatNumber(Math.round(tTax)) + '</td>' +
+        '<td></td>' +
+      '</tr></tfoot>' +
+      '</table></div></div>';
+  }
+  container.innerHTML = html +
+    '<div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; padding:12px 16px; background:#fffbeb; border:1px solid #fde68a; border-radius:12px; font-weight:800; color:#78350f; font-size:.88rem;">' +
+    '<span>الإجمالي لسنة ' + year + ': ' + grandCount + ' سجل شهري</span>' +
+    '<span>الوعاء الشهري الإجمالي: ' + formatNumber(Math.round(grandTaxable)) + ' د.ع</span>' +
+    '<span>ضريبة الشهر الإجمالية: ' + formatNumber(Math.round(grandTax)) + ' د.ع</span>' +
+    '</div>';
+};
+window.renderMonthlyEmployeeList = window.renderMonthlyRegister;
+
 window.removeExtEmployee = function(id) {
   var rec = globalEmployees.concat(contractEmployees).find(function(item) { return item.id === id; });
   var origId = rec ? (rec.origId || id) : id;
@@ -1271,8 +1684,8 @@ window.removeExtEmployee = function(id) {
   showToast('تم حذف الموظف — تبقّى سجلاته في الأشهر المقفلة');
 };
 
-function buildEmployeeDD4AHtml(employee) {
-  var currentYear = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
+function buildEmployeeDD4AHtml(employee, fiscalYear) {
+  var currentYear = fiscalYear || (getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear()));
   var math = doExcelMathForEmployee(employee);
   var row = calcYearRow(employee);
 
@@ -1281,7 +1694,8 @@ function buildEmployeeDD4AHtml(employee) {
   var annualTax = isYTD ? Math.round(row.tax) : Math.round(math.annualTax);
   var annualGross = isYTD ? Math.round(row.gross) : Math.round(math.annualGross);
   var annualDed = isYTD ? Math.round(row.dedD) : Math.round(math.annualDedDisplayed !== undefined ? math.annualDedDisplayed : math.annualDed);
-  var mathStr = isYTD ? 'تحاسب شهري (' + row.count + ' أشهر)' : 'تحاسب سنوي (12 شهر إفتراضاً)';
+  var monthsShown = isYTD ? row.count : (employee.months || 12);
+  var mathStr = (isYTD ? 'تحاسب شهري (' + monthsShown + ' أشهر)' : 'تحاسب سنوي (' + monthsShown + ' شهراً)');
   if (!employee.employerName) {
     var company = getActiveCompany();
     if (company) {
@@ -1298,6 +1712,10 @@ function buildEmployeeDD4AHtml(employee) {
     var v = val ? val : '&nbsp;';
     return '<span style="display:inline-block; border-bottom:1px solid #000; padding:0 5px; min-width:' + (width || '100px') + '; text-align:center; font-weight:bold;">' + v + '</span>';
   }
+
+  /* فترة العمل في السنة المالية: من تاريخ المباشرة (أو أول السنة) إلى نهاية العمل أو 31/12 */
+  var periodStart = employee.startDate || (String(currentYear) + '-01-01');
+  var periodEnd = employee.endDate || (String(currentYear) + '-12-31');
 
   var childRows = '';
   for (var i = 0; i < 6; i++) {
@@ -1318,9 +1736,16 @@ function buildEmployeeDD4AHtml(employee) {
   var baseTax = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 7500 : taxableColumn === 'c' ? 20000 : 70000;
   var row3Amount = Math.max(0, annualTaxable - bracketStart);
   var row5Amount = Math.round(row3Amount * bracketRate);
-  
-  // Enforce invariant: 
-  var row7Amount = annualTax;
+  var row7Amount = Math.round(baseTax + row5Amount);
+
+  function bracketCells(v) {
+    var cols = ['a', 'b', 'c', 'd'];
+    return cols.map(function(c) {
+      var val = (c === taxableColumn) ? Math.round(v) : '';
+      return '<td style="padding:2px;' + (c === taxableColumn ? ' background:#fef3c7;' : '') + '">' +
+        (val === '' ? '&nbsp;' : '<span style="font-weight:bold;">' + formatNumber(val) + '</span>') + '</td>';
+    }).join('');
+  }
 
   // Let's calculate the "Settlement" if this is a YTD real sum but the linear brackets calculate a different strict sum.
   var strictLinearD14Tax = baseTax + (row3Amount * bracketRate);
@@ -1330,8 +1755,6 @@ function buildEmployeeDD4AHtml(employee) {
      var diffWord = settlementDiff > 0 ? 'مطلوب (غير مدفوع)' : 'فائض (يُردّ أو يُرحّل)';
      settlementDisplay = '<div style="margin-top:4px; padding:5px; border:1px solid #dc2626; color:#dc2626; background:#fef2f2; font-weight:bold; font-size:10.5px;">تسوية سنوية: تم استيفاء مبلغ مختلف تفاضلياً لتغيّر الدخل خلال السنة. الفارق: ' + formatNumber(Math.abs(settlementDiff)) + ' د.ع ' + diffWord + '</div>';
   }
-
-  function bCell(key, value) { return taxableColumn === key ? formatNumber(Math.round(value)) : ''; }
 
   var page1 = `
     <div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:9mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:13.5px; line-height:1.4; direction:rtl; box-sizing:border-box; border:1px solid #fff; page-break-after:always; position:relative;">
@@ -1362,7 +1785,7 @@ function buildEmployeeDD4AHtml(employee) {
 <div style="margin-bottom:9px;">
         <div style="display:flex; gap:10px; margin-bottom:6px;">
           <div>2- العنوان الوظيفي: ${fmtLine(employee.jobTitle, '150px')}</div>
-          <div>اليوم الاول لبدء العمل: ${fmtLine(employee.startDate, '100px')} الى ${fmtLine(employee.endDate, '100px')}</div>
+          <div>اليوم الاول لبدء العمل: ${fmtLine(periodStart, '100px')} الى ${fmtLine(periodEnd, '100px')}</div>
         </div>
         <div style="display:flex; gap:10px; margin-bottom:6px;">
           <div>اسم صاحب العمل: ${fmtLine(employee.employerName, '250px')}</div>
@@ -1453,10 +1876,14 @@ function buildEmployeeDD4AHtml(employee) {
 
   var page2 = `
     <div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:7mm; background:#fff; color:#000; font-family:Arial,sans-serif; font-size:11.5px; line-height:1.32; direction:rtl; box-sizing:border-box; border:1px solid #ddd;">
-      <div style="text-align:center; font-size:14px; font-weight:bold; margin-bottom:3px;">الاستمارة ض. د / 14</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px; align-items:center;">
+        <div style="font-size:11px; line-height:1.3;">رقم الاستمارة: 1<br>السنة المالية: ${currentYear}<br>الصفحة: 2</div>
+        <div style="text-align:center; font-size:14px; font-weight:bold;">الاستمارة ض. د / 14</div>
+        <div style="font-size:11px; text-align:right; line-height:1.3;">جمهورية العراق<br>وزارة المالية<br>الهيئة العامة للضرائب</div>
+      </div>
       ${settlementDisplay}
       <div style="text-align:center; font-size:10.5px; margin-bottom:3px; color:#666; font-weight:bold;">${mathStr}</div>
-      <div style="text-align:center; font-size:11px; margin-bottom:8px;">حساب ضريبة الدخل تُملأ من قبل المحاسب (في نهاية السنة)</div>
+      <div style="text-align:center; font-size:11px; margin-bottom:8px; font-weight:bold; color:#334155;">حساب ضريبة الدخل تُملأ من قبل المحاسب (في نهاية السنة)</div>
       
       <table style="width:100%; border-collapse:collapse; font-size:11px;" border="1">
         <tr>
@@ -1472,7 +1899,7 @@ function buildEmployeeDD4AHtml(employee) {
           <td style="padding:3px; text-align:center; font-weight:bold;">${formatNumber(Math.round(employee.cashHous * employee.months))}</td>
         </tr>
         <tr>
-          <td style="padding:3px;">1 ج) مجموع المخصصات والمزايا الأخرى الخاضعة للضريبة المدفوعة خلال السنة</td>
+          <td style="padding:3px;">1 ج) كافة المخصصات الخاضعة كلياً</td>
           <td style="padding:3px; text-align:center; font-weight:bold;">${formatNumber(Math.round(employee.allow * employee.months))}</td>
         </tr>
         <tr>
@@ -1507,7 +1934,7 @@ function buildEmployeeDD4AHtml(employee) {
           <td style="padding:3px; text-align:center; font-weight:bold;">${formatNumber(isYTD ? Math.round(row.insurance + (employee.alimony || 0) * row.count) : Math.round((math.insurance + employee.alimony) * employee.months))}</td>
         </tr>
         <tr>
-          <td style="padding:3px;">2 د) المبلغ من (1ب) بما لا يتجاوز 30 % من المبلغ في السطر (1 أ)</td>
+          <td style="padding:3px;">2 د) مخصصات السكن والطعام والاقامة والخطورة والنقل والملابس (معفاة 30 %)</td>
           <td style="padding:3px; text-align:center; font-weight:bold;">${formatNumber(isYTD ? Math.round(row.privateExempt) : Math.round(math.privateExempt * employee.months))}</td>
         </tr>
         <tr>
@@ -1557,10 +1984,7 @@ function buildEmployeeDD4AHtml(employee) {
         </tr>
         <tr>
           <td style="padding:2px; font-weight:bold;">1</td>
-          <td style="padding:2px;">${bCell('a', annualTaxable)}</td>
-          <td style="padding:2px;">${bCell('b', annualTaxable)}</td>
-          <td style="padding:2px;">${bCell('c', annualTaxable)}</td>
-          <td style="padding:2px;">${bCell('d', annualTaxable)}</td>
+          ${bracketCells(annualTaxable)}
         </tr>
         <tr style="color:#666;">
           <td style="padding:2px;">2</td>
@@ -1571,10 +1995,7 @@ function buildEmployeeDD4AHtml(employee) {
         </tr>
         <tr>
           <td style="padding:2px; font-weight:bold;">3</td>
-          <td style="padding:2px;">${bCell('a', row3Amount)}</td>
-          <td style="padding:2px;">${bCell('b', row3Amount)}</td>
-          <td style="padding:2px;">${bCell('c', row3Amount)}</td>
-          <td style="padding:2px;">${bCell('d', row3Amount)}</td>
+          ${bracketCells(row3Amount)}
         </tr>
         <tr style="color:#666;">
           <td style="padding:2px;">4</td>
@@ -1585,10 +2006,7 @@ function buildEmployeeDD4AHtml(employee) {
         </tr>
         <tr>
           <td style="padding:2px; font-weight:bold;">5</td>
-          <td style="padding:2px;">${bCell('a', row5Amount)}</td>
-          <td style="padding:2px;">${bCell('b', row5Amount)}</td>
-          <td style="padding:2px;">${bCell('c', row5Amount)}</td>
-          <td style="padding:2px;">${bCell('d', row5Amount)}</td>
+          ${bracketCells(row5Amount)}
         </tr>
         <tr style="color:#666;">
           <td style="padding:2px;">6</td>
@@ -1599,21 +2017,23 @@ function buildEmployeeDD4AHtml(employee) {
         </tr>
         <tr>
           <td style="padding:2px; font-weight:bold;">7</td>
-          <td style="padding:2px; font-weight:bold;">${bCell('a', row7Amount)}</td>
-          <td style="padding:2px; font-weight:bold;">${bCell('b', row7Amount)}</td>
-          <td style="padding:2px; font-weight:bold;">${bCell('c', row7Amount)}</td>
-          <td style="padding:2px; font-weight:bold;">${bCell('d', row7Amount)}</td>
+          ${bracketCells(row7Amount)}
         </tr>
       </table>
 
-      <div style="display:flex; justify-content:space-between; margin-top:14px;">
-        <div style="text-align:center;">
-          توقيع المحاسب __________________ <br><br>
-          التاريخ &nbsp; &nbsp;/&nbsp; &nbsp;/&nbsp; &nbsp; &nbsp;
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:42px; padding:0 10px;">
+        <div style="text-align:center; flex:1;">
+          <div style="font-weight:bold;">توقيع المحاسب</div>
+          <div style="height:34px;"></div>
+          <div style="border-top:1px solid #000; width:85%; margin:0 auto;"></div>
+          <div style="margin-top:5px;">التاريخ &nbsp;&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;</div>
         </div>
-        <div style="text-align:center;">
-          توقيع المدير __________________ <br><br>
-          التاريخ &nbsp; &nbsp;/&nbsp; &nbsp;/&nbsp; &nbsp; &nbsp;
+        <div style="width:70px;"></div>
+        <div style="text-align:center; flex:1;">
+          <div style="font-weight:bold;">توقيع المدير</div>
+          <div style="height:34px;"></div>
+          <div style="border-top:1px solid #000; width:85%; margin:0 auto;"></div>
+          <div style="margin-top:5px;">التاريخ &nbsp;&nbsp;/&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;</div>
         </div>
       </div>
     </div>
@@ -1621,15 +2041,27 @@ function buildEmployeeDD4AHtml(employee) {
 
   return page1 + page2;
 }
+/* استمارات ض.د/14: استمارة مستقلة لكل سنة خدمة للموظف (قاعدة التقطيع عبر السنوات) */
+function buildEmployeeDD4AHtmlAllYears(base) {
+  var id = base.origId || base.id;
+  var out = '';
+  getAnnualRegisterYears(getActiveCompanyId()).forEach(function(y) {
+    var emp = getMergedEmployeesForYear(y).find(function(e) { return String(e.id) === String(id) || String(e.origId) === String(id); });
+    if (emp) out += buildEmployeeDD4AHtml(emp, y);
+  });
+  return out || buildEmployeeDD4AHtml(base);
+}
 function showEmployeeDD4A(employee, fromContract) {
   var printArea = document.getElementById('dd4aPrintableArea');
   var hint = document.getElementById('dd4aPreviewHint');
   if (!printArea) return;
   currentDd4aPreviewKind = 'form';
-  printArea.innerHTML = buildEmployeeDD4AHtml(employee);
+  var base = getEmployeeBase().find(function(b) { return String(b.id) === String(employee.origId || employee.id); });
+  var html = (base && !fromContract) ? buildEmployeeDD4AHtmlAllYears(base) : buildEmployeeDD4AHtml(employee);
+  printArea.innerHTML = '<div class="dd4a-preview">' + html + '</div>';
   printArea.style.display = 'block';
-  if (hint) hint.style.display = 'none';
-  currentDd4aEmployeeId = employee.id;
+  if (hint) hint.innerHTML = '<i class="fas fa-info-circle"></i> معاينة استمارات ض.د/14 لكل سنوات خدمة الموظف — استمارة لكل سنة يظهر فيها الموظف.';
+  currentDd4aEmployeeId = employee.origId || employee.id;
   if (!fromContract) {
     printArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -1653,7 +2085,8 @@ window.printSpecificEmployeeDD4A = function(empId, type) {
     showToast('تعذر العثور على بيانات الموظف', true);
     return;
   }
-  var html = buildEmployeeDD4AHtml(employee);
+  var base = getEmployeeBase().find(function(b) { return String(b.id) === String(employee.origId || employee.id); });
+  var html = base && type !== 'contract' ? buildEmployeeDD4AHtmlAllYears(base) : buildEmployeeDD4AHtml(employee);
   var printWindow = window.open('', '_blank');
   printWindow.document.write(`
     <!DOCTYPE html>
@@ -1667,7 +2100,8 @@ window.printSpecificEmployeeDD4A = function(empId, type) {
         @media print {
           @page { size: A4 portrait; margin: 0; }
           body { background: white; margin: 0; padding: 0; }
-          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break { page-break-after: always; break-after: page; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break:last-child { page-break-after: auto; break-after: auto; }
         }
         .page-break { box-sizing: border-box; }
       </style>
@@ -1702,7 +2136,8 @@ window.exportContractD14All = function() {
         @media print {
           @page { size: A4 portrait; margin: 0; }
           body { background: white; margin: 0; padding: 0; }
-          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break { page-break-after: always; break-after: page; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break:last-child { page-break-after: auto; break-after: auto; }
           div[style*="page-break-after:always"] { page-break-after: always; }
         }
         .page-break { box-sizing: border-box; }
@@ -1737,7 +2172,8 @@ window.printCurrentEmployeeDD4A = function() {
     return;
   }
   
-  var html = buildEmployeeDD4AHtml(employee);
+  var base = getEmployeeBase().find(function(b) { return String(b.id) === String(employee.origId || employee.id); });
+  var html = base ? buildEmployeeDD4AHtmlAllYears(base) : buildEmployeeDD4AHtml(employee);
   
   var printWindow = window.open('', '_blank');
   printWindow.document.write(`
@@ -1752,7 +2188,8 @@ window.printCurrentEmployeeDD4A = function() {
         @media print {
           @page { size: A4 portrait; margin: 0; }
           body { background: white; margin: 0; padding: 0; }
-          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break { page-break-after: always; break-after: page; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break:last-child { page-break-after: auto; break-after: auto; }
         }
         .page-break { box-sizing: border-box; }
       </style>
@@ -1794,55 +2231,110 @@ window.exportCurrentEmployeeDD4APdf = function() {
 };
 
 window.renderEmployeeList = function() {
-  var tbody = document.getElementById('empTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  var totalGross = 0;
-  var totalDed = 0;
-  var totalTaxable = 0;
-  var totalAnnual = 0;
-  
-  var currentYear = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
-  
-  globalEmployees.forEach(function(employee, index) {
-    var row = calcYearRow(employee);
-    var currentMath = doExcelMathForEmployee(employee); // for current month
-    var monthlyPath = row.count > 0 && row.monthly !== undefined;
-    
-    // We add current projection if no snapshots to help out
-    var displayAnnTax = monthlyPath ? row.tax : currentMath.annualTax;
-    var displayMonths = monthlyPath ? row.count + ' مقفل' : 'توقعي';
-    var displayGross = monthlyPath ? row.gross : currentMath.annualGross;
-    var displayMonthly = monthlyPath ? row.monthly : currentMath.monthlyTax;
-    
-    totalGross += displayGross;
-    totalDed += (monthlyPath ? row.ded : currentMath.annualDed);
-    totalTaxable += (monthlyPath ? row.taxable : currentMath.annualTaxable);
-    totalAnnual += displayAnnTax;
-    
-    var sectorLabel = employee.sec === 'private' ? 'خاص' : 'حكومي';
-    var rowEl = document.createElement('tr');
-    rowEl.innerHTML = '<td>' + (index + 1) + '</td>' +
-      '<td style="font-weight:bold;">' + employee.name + '</td>' +
-      '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span></td>' +
-      '<td>' + formatNumber(Math.round(displayGross)) + '</td>' +
-      '<td>' + formatNumber(Math.round(displayMonthly)) + '</td>' + // The modified table structure
-      '<td style="color:#64748b;font-weight:bold;">' + displayMonths + '</td>' +
-      '<td>' + formatNumber(Math.round(displayMonthly)) + '</td>' +
-      '<td style="color:#28a745;font-weight:bold;">' + formatNumber(Math.round(displayAnnTax)) + '</td>' +
-      '<td style="white-space:nowrap;">' +
-      '<button class="btn btn-sm btn-info" onclick="openEmployeeModal(\'' + employee.id + '\')"><i class="fas fa-edit"></i></button> ' +
-      '<button class="btn btn-sm" onclick="printEmployeeDD4A(\'' + employee.id + '\')" title="استمارة ض.د/14" style="background:#dbeafe;color:#1d4ed8;border:none;border-radius:8px;padding:4px 9px;"><i class="fas fa-file-invoice"></i></button> ' +
-      '<button class="btn btn-sm btn-danger" onclick="removeExtEmployee(\'' + employee.id + '\')"><i class="fas fa-trash"></i></button>' +
-      '</td>';
-    tbody.appendChild(rowEl);
-  });
-  setText('tblTotGross', formatNumber(Math.round(totalGross)));
-  setText('tblTotDed', formatNumber(Math.round(totalDed)));
-  setText('tblTotTaxable', formatNumber(Math.round(totalTaxable)));
-  setText('tblTotAnnual', formatNumber(Math.round(totalAnnual)) + ' د.ع');
   if (typeof renderCorpStats === 'function') renderCorpStats();
+  if (typeof renderAnnualRegister === 'function') renderAnnualRegister();
+  if (typeof renderMonthlyEmployeeList === 'function') renderMonthlyEmployeeList();
 };
+
+window.renderAnnualRegister = function() {
+  var container = document.getElementById('annualRegisterContainer');
+  if (!container) return;
+  var cid = getActiveCompanyId();
+  var activeYear = String(getActiveYear());
+  var years = getAnnualRegisterYears(cid);
+  var out = '';
+  years.forEach(function(y) {
+    var emps = getMergedEmployeesForYear(y);
+    var isActive = String(y) === String(activeYear);
+    var agg = { gross: 0, ded: 0, taxable: 0, annual: 0 };
+    var rows = emps.map(function(employee, index) {
+      var row = calcYearRow(employee);
+      var math = doExcelMathForEmployee(employee);
+      var monthlyPath = row.count > 0 && row.monthly !== undefined;
+      var displayGross = monthlyPath ? row.gross : math.annualGross;
+      var displayDed = monthlyPath ? row.ded : (math.annualDedDisplayed !== undefined ? math.annualDedDisplayed : math.annualDed);
+      var displayTaxable = monthlyPath ? row.taxable : math.annualTaxable;
+      var displayAnnTax = monthlyPath ? row.tax : math.annualTax;
+      var displayMonths = monthlyPath ? row.count + ' مقفل' : (employee.months || 12);
+      var displayMonthly = monthlyPath ? row.monthly : math.monthlyTax;
+      agg.gross += displayGross; agg.ded += displayDed; agg.taxable += displayTaxable; agg.annual += displayAnnTax;
+      var sectorLabel = employee.sec === 'private' ? 'خاص' : 'حكومي';
+      var leaveBadge = employee.leaveYear ? ' <span class="status-badge" style="background:#fee2e2;color:#b91c1c;">ترك: ' + (employee.leaveMonth || '') + '/' + employee.leaveYear + '</span>' : '';
+      if (!employee) return '';
+      return '<tr>' +
+        '<td>' + (index + 1) + '</td>' +
+        '<td style="font-weight:bold;">' + (employee.name || '') + '</td>' +
+        '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span>' + leaveBadge + '</td>' +
+        '<td>' + formatNumber(Math.round(displayGross)) + '</td>' +
+        '<td>' + formatNumber(Math.round(displayMonthly)) + '</td>' +
+        '<td style="color:#64748b;font-weight:bold;">' + displayMonths + '</td>' +
+        '<td>' + formatNumber(Math.round(displayMonthly)) + '</td>' +
+        '<td style="color:#28a745;font-weight:bold;">' + formatNumber(Math.round(displayAnnTax)) + '</td>' +
+        '<td style="white-space:nowrap;">' +
+          '<button class="btn btn-sm btn-info" onclick="openAnnualRegisterEdit(\'' + employee.id + '\',\'' + y + '\')"><i class="fas fa-edit"></i></button> ' +
+          '<button class="btn btn-sm" onclick="openAnnualRegisterPrint(\'' + employee.id + '\',\'' + y + '\')" title="استمارات ض.د/14 لكل سنوات الخدمة" style="background:#dbeafe;color:#1d4ed8;border:none;border-radius:8px;padding:4px 9px;"><i class="fas fa-file-invoice"></i></button> ' +
+          '<button class="btn btn-sm" onclick="openAnnualRegisterLeave(\'' + employee.id + '\',\'' + y + '\')" title="ترك العمل" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:8px;padding:4px 9px;"><i class="fas fa-user-slash"></i></button> ' +
+          '<button class="btn btn-sm btn-danger" onclick="openAnnualRegisterDelete(\'' + employee.id + '\',\'' + y + '\')"><i class="fas fa-trash"></i></button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+    if (!rows) rows = '<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:18px;">لا يوجد موظفون مسجلون في سنة ' + y + '</td></tr>';
+    var tableHtml = '<div class="corp-table-wrap">' +
+        '<table class="data-table"' + (isActive ? ' id="newExcelEmployeeTable"' : '') + '>' +
+          '<thead><tr>' +
+            '<th>ت</th><th>اسم الموظف</th><th>القطاع والحالة</th><th>الدخل الإجمالي السنوي</th><th>الخصم الشهري</th><th>أشهر العمل</th><th>الضريبة الشهرية</th><th>الضريبة السنوية</th><th>إجراءات</th>' +
+          '</tr></thead>' +
+          '<tbody' + (isActive ? ' id="empTableBody"' : '') + '>' + rows + '</tbody>' +
+          '<tfoot><tr>' +
+            '<td class="total-label" colspan="3" style="text-align:left; font-weight:bold;">الإجمالي — سنة ' + y + '</td>' +
+            '<td id="tblTotGross" style="font-weight:bold;">' + formatNumber(Math.round(agg.gross)) + '</td>' +
+            '<td id="tblTotDed" style="font-weight:bold;">' + formatNumber(Math.round(agg.ded)) + '</td>' +
+            '<td id="tblTotTaxable" style="font-weight:bold; color:var(--danger);">' + formatNumber(Math.round(agg.taxable)) + '</td>' +
+            '<td>-</td>' +
+            '<td id="tblTotAnnual" style="font-weight:bold; color:var(--success); font-size:1.05rem;">' + formatNumber(Math.round(agg.annual)) + '</td>' +
+            '<td></td>' +
+          '</tr></tfoot>' +
+        '</table>' +
+      '</div>';
+    out += '<details style="margin-bottom:22px; border:1px solid #e2e8f0; border-radius:12px; background:#fff; overflow:hidden;"' + (isActive ? ' open' : '') + '>' +
+      '<summary style="cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:10px 14px; background:' + (isActive ? '#eef2ff' : '#f8fafc') + '; user-select:none;">' +
+        '<span style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">' +
+          '<span class="status-badge" style="background:#4f46e5;color:#fff;font-weight:800;padding:4px 12px;">سنة ' + y + '</span>' +
+          '<span style="font-size:.75rem; color:#64748b;">' + emps.length + ' موظف' + (isActive ? ' — السنة النشطة' : '') + '</span>' +
+        '</span>' +
+        '<span style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">' +
+          '<span style="font-size:.78rem; font-weight:700; color:#475569;">إجمالي الضريبة: ' + formatNumber(Math.round(agg.annual)) + ' د.ع</span>' +
+          '<i class="fas fa-chevron-down" style="color:#94a3b8; font-size:.7rem;"></i>' +
+          '<button class="corp-btn primary sm" onclick="event.preventDefault(); event.stopPropagation(); openAnnualRegisterAdd(\'' + y + '\')"><i class="fas fa-user-plus"></i> إضافة موظف</button>' +
+        '</span>' +
+      '</summary>' +
+      '<div style="padding:0 10px 12px;">' + tableHtml + '</div>' +
+    '</details>';
+  });
+  container.innerHTML = out;
+};
+
+function setYearContext(y) {
+  var cid = getActiveCompanyId();
+  setActiveYear(String(y));
+  ensureFiscalYear(cid, y);
+  if (typeof loadEmployeesForContext === 'function') loadEmployeesForContext();
+  var fys = document.getElementById('fiscalYearSelect');
+  if (fys && String(fys.value) !== String(y)) fys.value = String(y);
+}
+window.openAnnualRegisterAdd = function(y) { setYearContext(y); renderAnnualRegister(); openEmployeeModal(null, 'company', 'annual'); };
+window.openAnnualRegisterEdit = function(id, y) { setYearContext(y); renderAnnualRegister(); openEmployeeModal(id); };
+window.openAnnualRegisterPrint = function(id, y) {
+  var base = getEmployeeBase().find(function(b) { return String(b.id) === String(id); });
+  if (!base) {
+    showToast('تعذر العثور على بيانات الموظف', true);
+    return;
+  }
+  showEmployeeDD4A(base);
+  showToast('تم عرض استمارات ض.د/14 لكل سنوات الخدمة');
+};
+window.openAnnualRegisterLeave = function(id, y) { setYearContext(y); renderAnnualRegister(); openLeaveEmployeeModal(id); };
+window.openAnnualRegisterDelete = function(id, y) { setYearContext(y); renderAnnualRegister(); removeExtEmployee(id); };
 
 window.renderCorpStats = function() {
   var gross = document.getElementById('corpStatGross');
@@ -1909,7 +2401,8 @@ window.exportD14Excel = function() {
       "عدد الأولاد": emp.child || 0,
       "أشهر العمل": monthlyPath ? row.count : (emp.months || 12),
       "الراتب الاسمي الشهري": emp.salary || 0,
-      "المخصصات الشهرية الخاضعة": emp.allow || 0,
+      "كافة المخصصات الخاضعة (كلياً)": emp.allow || 0,
+      "مخصصات السكن والطعام والاقامة والخطورة والنقل والملابس (معفاة 30%)": (monthlyPath ? (row.privateExempt || 0) : ((math.privateExempt || 0) * (emp.months || 12))) || 0,
       "إجمالي الدخل السنوي": (monthlyPath ? row.gross : math.annualGross) || 0,
       "اجمالي المبالغ المنزلة (V+W)": (monthlyPath ? row.dedD : (math.annualDedDisplayed !== undefined ? math.annualDedDisplayed : math.annualDed)) || 0,
       "التنزيلات السنوية (تقاعد/تأمين)": (monthlyPath ? row.ded : math.annualDed) || 0,
@@ -1926,8 +2419,8 @@ window.exportD14Excel = function() {
   // Add some column widths
   ws['!cols'] = [
     { wch: 5 }, { wch: 25 }, { wch: 10 }, { wch: 10 }, { wch: 15 },
-    { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 20 }, { wch: 20 },
-    { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 20 },
+    { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 22 }, { wch: 30 },
+    { wch: 20 }, { wch: 25 }, { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 },
     { wch: 12 }, { wch: 25 }, { wch: 25 }
   ];
   var wb = XLSX.utils.book_new();
@@ -2147,10 +2640,11 @@ window.renderContractEmployeeList = function() {
     totalAnnual += displayAnnTax;
 
     var sectorLabel = employee.sec === 'private' ? 'خاص' : 'حكومي';
+    var leaveBadge = employee.leaveYear ? '<br><span class="status-badge" style="background:#fee2e2;color:#b91c1c;margin-top:3px;">ترك: ' + (employee.leaveMonth || '') + '/' + employee.leaveYear + '</span>' : '';
     var rowEl = document.createElement('tr');
     rowEl.innerHTML = '<td>' + (index + 1) + '</td>' +
       '<td style="font-weight:bold;">' + employee.name + '</td>' +
-      '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span></td>' +
+      '<td><span class="status-badge" style="background:#e0f2fe;color:#0369a1;">' + sectorLabel + '</span>' + leaveBadge + '</td>' +
       '<td>' + formatNumber(Math.round(displayGross)) + '</td>' +
       '<td>' + formatNumber(Math.round(displayMonthly)) + '</td>' + 
       '<td style="color:#64748b;font-weight:bold;">' + displayMonths + '</td>' +
@@ -2158,6 +2652,7 @@ window.renderContractEmployeeList = function() {
       '<td style="color:#28a745;font-weight:bold;">' + formatNumber(Math.round(displayAnnTax)) + '</td>' +
       '<td style="white-space:nowrap;">' +
       '<button class="btn btn-sm btn-info" onclick="openEmployeeModal(\'' + employee.id + '\', \'contract\')"><i class="fas fa-edit"></i></button> ' +
+      '<button class="btn btn-sm" onclick="openLeaveEmployeeModal(\'' + employee.id + '\')" title="ترك العمل" style="background:#fef3c7;color:#92400e;border:1px solid #f59e0b;border-radius:8px;padding:4px 9px;"><i class="fas fa-user-slash"></i></button> ' +
       '<button class="btn btn-sm btn-danger" onclick="removeContractExtEmployee(\'' + employee.id + '\')"><i class="fas fa-trash"></i></button>' +
       '</td>';
     tbody.appendChild(rowEl);
@@ -2191,15 +2686,14 @@ function removeCompanyEmployeeRow() {}
 
 
 function exportFormD14() {
-  var currentYear = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
-  var emps = getMergedEmployeesForYear(currentYear);
-  if (!emps.length) {
-    showToast('لا توجد بيانات موظفين أو لقطات لهذه السنة', true);
+  var html = '';
+  getAnnualRegisterYears(getActiveCompanyId()).forEach(function(y) {
+    getMergedEmployeesForYear(y).forEach(function(e) { html += buildEmployeeDD4AHtml(e, y); });
+  });
+  if (!html) {
+    showToast('لا توجد بيانات موظفين أو لقطات', true);
     return;
   }
-  var allHtml = emps.map(function(employee) { 
-    return buildEmployeeDD4AHtml(employee); 
-  }).join('');
 
   
   var printWindow = window.open('', '_blank');
@@ -2208,21 +2702,22 @@ function exportFormD14() {
     <html dir="rtl" lang="ar">
     <head>
       <meta charset="UTF-8">
-      <title>طباعة استمارات ض.د/14 للجميع (PDF)</title>
+      <title>طباعة استمارات ض.د/14 للجميع — كل السنوات (PDF)</title>
       <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
       <style>
         body { margin: 0; padding: 0; background: #fff; font-family: 'Tajawal', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
         @media print {
           @page { size: A4 portrait; margin: 0; }
           body { background: white; margin: 0; padding: 0; }
-          .page-break { page-break-after: always; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break { page-break-after: always; break-after: page; margin: 0 !important; border: none !important; box-shadow: none !important; overflow: hidden !important; }
+          .page-break:last-child { page-break-after: auto; break-after: auto; }
           div[style*="page-break-after:always"] { page-break-after: always; }
         }
         .page-break { box-sizing: border-box; }
       </style>
     </head>
     <body onload="setTimeout(function(){ window.print(); window.close(); }, 1500);">
-      ${allHtml}
+      ${html}
     </body>
     </html>
   `);
@@ -2500,35 +2995,33 @@ function buildAnnualStatementHtml(emps, year, company) {
       '<td style="border:1px solid #000; padding:3px; text-align:center; font-weight:700;">' + fmt(gTotal.liability) + '</td>' +
       '<td colspan="5" style="border:1px solid #000; padding:3px;"></td>' +
       '</tr>';
+    var isLastGroup = (i + GROUP_SIZE >= emps.length);
+    if (isLastGroup) {
+      t += '<tr>' +
+        '<td colspan="6" style="border:1px solid #000; padding:4px; font-weight:800; text-align:center; background:#eef2ff;">الجموع الكلي (' + grandCount + ' موظف)</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.income) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.deductions) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.taxable) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.liability) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandPaid) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandUnpaid) + '</td>' +
+        '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandExcess) + '</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:4px;"></td>' +
+        '</tr>' +
+        '<tr><td colspan="15" style="padding:6px;"></td></tr>' +
+        '<tr><td colspan="15" style="border:none;">' +
+          '<div style="display:flex; justify-content:space-between; margin-top:24px; font-size:11px; font-weight:700;">' +
+            '<div style="text-align:center;">توقيع المحاسب<br><span style="display:block; margin-top:20px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+            '<div style="text-align:center;">توقيع رئيس الحسابات<br><span style="display:block; margin-top:20px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+            '<div style="text-align:center;">توقيع صاحب العمل / المختص<br><span style="display:block; margin-top:20px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
+            '<div style="text-align:center;">ختم رب العمل</div>' +
+          '</div>' +
+        '</td></tr>';
+    }
     t += '</tbody></table>';
     pages += '<div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:9mm; background:#fff; color:#000; font-family:Arial,sans-serif; direction:rtl; box-sizing:border-box; page-break-after:always; position:relative; overflow:hidden;">' + t + '</div>';
     pageNum++;
   }
-
-  // صفحة الجموع الكلية والتوقيعات
-  var gt = pageHeader(pageNum) + tableHead() + '<tbody>' +
-    '<tr>' +
-      '<td colspan="6" style="border:1px solid #000; padding:4px; font-weight:800; text-align:center; background:#eef2ff;">الجموع الكلي (' + grandCount + ' موظف)</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.income) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.deductions) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.taxable) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandTotal.liability) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandPaid) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandUnpaid) + '</td>' +
-      '<td style="border:1px solid #000; padding:4px; text-align:center; font-weight:800;">' + fmt(grandExcess) + '</td>' +
-      '<td colspan="2" style="border:1px solid #000; padding:4px;"></td>' +
-      '</tr>' +
-      '<tr><td colspan="15" style="padding:10px;"></td></tr>' +
-      '<tr><td colspan="15" style="border:none;">' +
-        '<div style="display:flex; justify-content:space-between; margin-top:60px; font-size:11px; font-weight:700;">' +
-          '<div style="text-align:center;">توقيع المحاسب<br><span style="display:block; margin-top:28px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
-          '<div style="text-align:center;">توقيع رئيس الحسابات<br><span style="display:block; margin-top:28px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
-          '<div style="text-align:center;">توقيع صاحب العمل / المختص<br><span style="display:block; margin-top:28px; border-top:1px solid #000; padding-top:4px; width:130px;">الاسم: .......................</span></div>' +
-          '<div style="text-align:center;">ختم رب العمل</div>' +
-        '</div>' +
-      '</td></tr>' +
-    '</tbody></table>';
-  pages += '<div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:9mm; background:#fff; color:#000; font-family:Arial,sans-serif; direction:rtl; box-sizing:border-box; page-break-after:always; position:relative; overflow:hidden;">' + gt + '</div>';
 
   return pages;
 }
@@ -2542,7 +3035,8 @@ function openAnnualPrintWindow(html, title) {
     '<style>' +
       'body { margin:0; padding:0; background:#fff; font-family:Tajawal,Arial,sans-serif; display:flex; flex-direction:column; align-items:center; }' +
       '@media print { @page { size: A4 portrait; margin: 0; } body { background:white; margin:0; padding:0; }' +
-      '.page-break { page-break-after:always; margin:0 !important; border:none !important; box-shadow:none !important; overflow:hidden !important; } }' +
+      '.page-break { page-break-after:always; break-after:page; margin:0 !important; border:none !important; box-shadow:none !important; overflow:hidden !important; }' +
+      '.page-break:last-child { page-break-after:auto; break-after:auto; } }' +
       '.page-break { box-sizing:border-box; }' +
     '</style></head>' +
     '<body onload="setTimeout(function(){ window.print(); window.close(); }, 700);">' + html + '</body></html>');
@@ -2550,36 +3044,48 @@ function openAnnualPrintWindow(html, title) {
 }
 
 window.printAnnualStatement = function() {
-  var year = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
-  var emps = getMergedEmployeesForYear(year);
-  if (!emps.length) { showToast('لا توجد بيانات موظفين لهذه السنة', true); return; }
-  openAnnualPrintWindow(buildAnnualStatementHtml(emps, year, getActiveCompany()), 'طباعة الكشف السنوي ض.د/14 — ' + year);
-  addAuditEntry('طباعة الكشف السنوي', emps.length + ' موظف');
+  var html = buildAllYearsAnnualStatementsHtml();
+  if (!html) { showToast('لا توجد بيانات موظفين لهذه السنوات', true); return; }
+  openAnnualPrintWindow(html, 'طباعة الكشف السنوي ض.د/14 — كل السنوات');
+  addAuditEntry('طباعة الكشف السنوي (كل السنوات)', getAnnualRegisterYears(getActiveCompanyId()).length + ' سنة');
 };
 
 window.printAnnualStatementWithForms = function() {
-  var year = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
-  var emps = getMergedEmployeesForYear(year);
-  if (!emps.length) { showToast('لا توجد بيانات موظفين لهذه السنة', true); return; }
-  var html = buildAnnualStatementHtml(emps, year, getActiveCompany()) +
-    emps.map(function(e) { return buildEmployeeDD4AHtml(e); }).join('');
-  openAnnualPrintWindow(html, 'الكشف السنوي + استمارات ض.د/14 — ' + year);
-  addAuditEntry('طباعة الكشف السنوي مع استمارات ض.د/14', emps.length + ' موظف');
+  var company = getActiveCompany();
+  var html = '';
+  getAnnualRegisterYears(getActiveCompanyId()).forEach(function(y) {
+    var emps = getMergedEmployeesForYear(y);
+    if (!emps.length) return;
+    html += buildAnnualStatementHtml(emps, y, company);
+    emps.forEach(function(e) { html += buildEmployeeDD4AHtml(e, y); });
+  });
+  if (!html) { showToast('لا توجد بيانات موظفين لهذه السنوات', true); return; }
+  openAnnualPrintWindow(html, 'الكشف السنوي + استمارات ض.د/14 — كل السنوات');
+  addAuditEntry('طباعة الكشف السنوي مع استمارات ض.د/14 (كل السنوات)', getAnnualRegisterYears(getActiveCompanyId()).length + ' سنة');
 };
 
 window.previewAnnualStatement = function() {
-  var year = getActiveYear ? getActiveYear() : (document.getElementById('closeTaxYear_Year') ? document.getElementById('closeTaxYear_Year').value : new Date().getFullYear());
-  var emps = getMergedEmployeesForYear(year);
-  if (!emps.length) { showToast('لا توجد بيانات موظفين لهذه السنة', true); return; }
+  var html = buildAllYearsAnnualStatementsHtml();
+  if (!html) { showToast('لا توجد بيانات موظفين لهذه السنوات', true); return; }
   var printArea = document.getElementById('dd4aPrintableArea');
   var hint = document.getElementById('dd4aPreviewHint');
   if (!printArea) return;
   currentDd4aPreviewKind = 'annual';
-  printArea.innerHTML = buildAnnualStatementHtml(emps, year, getActiveCompany());
+  printArea.innerHTML = '<div class="dd4a-preview">' + html + '</div>';
   printArea.style.display = 'block';
-  if (hint) hint.innerHTML = '<i class="fas fa-table"></i> معاينة الكشف السنوي ' + year + ' (' + emps.length + ' موظف) — استخدم «طباعة فورية» أو «حفظ PDF» لطباعته، أو «الكشف + ض.د/14 معاً» لتضمين استمارات الموظفين.';
+  if (hint) hint.innerHTML = '<i class="fas fa-table"></i> معاينة الكشف السنوي لكل السنوات (' + getAnnualRegisterYears(getActiveCompanyId()).length + ' سنة) — استخدم «طباعة فورية» أو «حفظ PDF» لطباعته، أو «الكشف + ض.د/14 معاً» لتضمين استمارات الموظفين.';
   printArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
+
+function buildAllYearsAnnualStatementsHtml() {
+  var company = getActiveCompany();
+  var out = '';
+  getAnnualRegisterYears(getActiveCompanyId()).forEach(function(y) {
+    var emps = getMergedEmployeesForYear(y);
+    if (emps.length) out += buildAnnualStatementHtml(emps, y, company);
+  });
+  return out;
+}
 
 function normalizeMaritalStatus(val) {
   if (!val) return 'single';
@@ -5085,7 +5591,7 @@ var BULK_IMPORT_COLUMNS = [
   'تاريخ نهاية العمل', 'صاحب العمل الرئيسي', 'العنوان الوظيفي', 'اسم جهة العمل',
   'الرقم التعريفي لجهة العمل', 'المحافظة', 'المدينة', 'الحي/المحلة', 'الشارع',
   'الحالة الزوجية', 'اسم الزوج(ة)', 'عدد الأولاد', 'الموظف أتم 63 عاماً',
-  'الراتب الشهري الأساسي (د.ع)', 'المخصصات الشهرية الخاضعة (د.ع)'
+  'الراتب الشهري الأساسي (د.ع)', 'المخصصات الشهرية الخاضعة (د.ع)', 'السنة المالية / الفترة (اختياري)'
 ];
 var BULK_MARITAL_VALUES = ['أعزب', 'متزوج (الزوج/ة ربة بيت أو بدون دخل)', 'متزوج (الزوج/ة منتسب أو يعمل)', 'أرمل', 'مطلق'];
 var BULK_LIST_COLUMNS = {
@@ -5108,7 +5614,7 @@ var BULK_ALLOWED_ROWS = { 'A': 6, 'B': 3, 'C': 3, 'D': 3, 'E': 3, 'F': 3, 'G': 3
 function buildBulkImportWorkbook() {
   var ws = XLSX.utils.aoa_to_sheet([BULK_IMPORT_COLUMNS]);
   ws['!cols'] = BULK_IMPORT_COLUMNS.map(function() { return { wch: 24 }; });
-  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXY';
+  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var validations = [];
   BULK_IMPORT_COLUMNS.forEach(function(label, idx) {
     if (!BULK_LIST_REFS[label]) return;
@@ -5293,7 +5799,7 @@ window.exportBlankExcel = function() {
   }
   var wb = buildBulkImportWorkbook();
   var bytes = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
-  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXY';
+  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   var v = [];
   BULK_IMPORT_COLUMNS.forEach(function(label, idx) {
     if (!BULK_LIST_REFS[label]) return;
@@ -5309,11 +5815,11 @@ window.exportBlankExcel = function() {
   var blob = new Blob([patched], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'قالب_الاستيراد_الدفعي_25_عمود.xlsx';
+  a.download = 'قالب_الاستيراد_الدفعي.xlsx';
   document.body.appendChild(a);
   a.click();
   setTimeout(function() { URL.revokeObjectURL(a.href); if (a.parentNode) a.parentNode.removeChild(a); }, 1500);
-  showToast('تم تنزيل قالب الاستيراد الدفعي (25 عموداً) مع قوائم القيم المسموحة');
+  showToast('تم تنزيل قالب الاستيراد الدفعي (' + BULK_IMPORT_COLUMNS.length + ' عموداً) مع قوائم القيم المسموحة');
 };
 
 
@@ -5343,7 +5849,7 @@ function validateBulkRows(rows, headerRowIdx) {
   globalEmployees.concat(contractEmployees).forEach(function(e) {
     existingKeys[String(e.name || '').trim() + '|' + String(e.civilId || '').trim()] = true;
   });
-  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXY';
+  var colLetter = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   for (var r = headerRowIdx + 1; r < rows.length; r++) {
     var row = rows[r];
     if (!row || !row.length) continue;
@@ -5399,7 +5905,16 @@ function validateBulkRows(rows, headerRowIdx) {
     var children = parseInt(rec[BULK_IMPORT_COLUMNS[21]], 10);
     if (isNaN(children) || children < 0 || children > 6) { errors.push({ row: rowNum, col: 'عدد الأولاد', value: rec[BULK_IMPORT_COLUMNS[21]], reason: 'قيمة بين 0 و 6', allowed: '0 - 6' }); }
 
-    validRows.push({ rowNum: rowNum, rec: rec, name: name, civilId: civilId, marital: marital, res: res, sec: sec, salary: salary, allow: allow, children: children, nat: nat, gender: gender, mainEmp: mainEmp, over63: over63 });
+    var importYear = rec[BULK_IMPORT_COLUMNS[25]] || '';
+    if (importYear) {
+      if (!/^\d{4}$/.test(importYear)) { errors.push({ row: rowNum, col: 'السنة المالية / الفترة (اختياري)', value: importYear, reason: 'سنة مالية غير صالحة', allowed: '4 أرقام (مثال: 2026)' }); }
+      else {
+        var y = parseInt(importYear, 10);
+        if (y < 2000 || y > (new Date().getFullYear() + 5)) { errors.push({ row: rowNum, col: 'السنة المالية / الفترة (اختياري)', value: importYear, reason: 'خارج النطاق المسموح', allowed: '2000 - ' + (new Date().getFullYear() + 5) }); }
+      }
+    }
+
+    validRows.push({ rowNum: rowNum, rec: rec, name: name, civilId: civilId, marital: marital, res: res, sec: sec, salary: salary, allow: allow, children: children, nat: nat, gender: gender, mainEmp: mainEmp, over63: over63, year: importYear });
   }
   return { errors: errors, validRows: validRows };
 }
@@ -5465,6 +5980,7 @@ function showBulkImportPreview(validRows) {
     tr.innerHTML = '<td>' + (idx + 1) + '</td>' +
       '<td style="font-weight:bold;">' + (emp.name || '') + '</td>' +
       '<td>' + (emp.civilId || '') + '</td>' +
+      '<td>' + (vr.year || getActiveYear()) + '</td>' +
       '<td>' + formatNumber(Math.round(emp.salary || 0)) + '</td>' +
       '<td>' + formatNumber(Math.round(math.annualGross)) + '</td>' +
       '<td style="color:#b91c1c;font-weight:bold;">' + formatNumber(Math.round(math.monthlyTax)) + '</td>';
@@ -5489,15 +6005,34 @@ function confirmBulkImport() {
     showToast('مسار السنة ' + year + ' شهري (إقرار شهري). لا يمكن الاستيراد السنوي إلا في المسار السنوي — بدّل مسار السنة أولاً', true);
     return;
   }
+  var bases = getEmployeeBase();
   pendingBulkRows.forEach(function(vr) {
     var emp = Object.assign(bulkRowToEmployee(vr), doExcelMathForEmployee(bulkRowToEmployee(vr)));
     emp._v2type = 'company';
     emp.companyId = cid;
+    var importYear = vr.year || String(year);
+    emp.year = importYear;
     globalEmployees.push(emp);
+    var base = bases.find(function(b) { return String(b.id) === String(emp.id); });
+    if (!base) {
+      base = {};
+      V2_BASE_FIELDS.forEach(function(k) { if (emp[k] !== undefined) base[k] = emp[k]; });
+      base.id = emp.id; base.companyId = cid; base.type = emp._v2type || 'company';
+      bases.push(base);
+    } else {
+      V2_BASE_FIELDS.forEach(function(k) { if (emp[k] !== undefined) base[k] = emp[k]; });
+      base.companyId = cid;
+    }
+    var rec = {};
+    V2_YEAR_FIELDS.forEach(function(k) { if (emp[k] !== undefined) rec[k] = emp[k]; });
+    rec.id = rec.id || 'yr_' + Date.now() + '_' + emp.id; rec.employeeId = emp.id; rec.companyId = cid; rec.year = importYear; rec.updatedAt = new Date().toISOString();
+    upsertYearRecord(rec);
   });
+  saveEmployeeBase(bases);
+  /* مزامنة المفاتيح القديمة لضمان التوافق */
+  localStorage.setItem('companyEmployeesData', JSON.stringify(globalEmployees));
   var count = pendingBulkRows.length;
   pendingBulkRows = null;
-  saveStoredEmployees();
   renderEmployeeList();
   if (typeof renderContractEmployeeList === 'function') renderContractEmployeeList();
   closeBulkImportPreview();
@@ -5535,8 +6070,7 @@ function getMergedEmployeesForYear(year) {
   var bases = getEmployeeBase().filter(function(b) { return String(b.companyId) === String(cid); });
   // 1. Active employees for that year from base + year records — keep latest salary version per person
   bases.forEach(function(b) {
-    var rec = getYearRecord(b.id, year);
-    if (!rec) return;
+    if (!employeeWorksInYear(b, year)) return;
     var e = materializeEmployee(b, cid, year);
     if (!e) return;
     var key = e.origId || e.id;
@@ -5550,11 +6084,37 @@ function getMergedEmployeesForYear(year) {
     if (String(s.year) === String(year) && String(s.companyId || '') === String(cid)) {
       var key = s.origId || s.empId;
       if (!map[key]) {
-        map[key] = Object.assign({}, s.input);
+        map[key] = Object.assign({}, s.input, s.math || {});
         map[key].origId = key;
+        if (!map[key].id) map[key].id = key;
+        if (!map[key].months) map[key].months = Math.max(1, Math.min(12, (s.math && s.math.count) || parseInt(map[key].months, 10) || 12));
         map[key].isDeleted = true;
       }
     }
+  });
+  // 3. موظفون شهورية لا يملكون قيداً سنوياً — يُضمون للسجل السنوي حسب شهر مباشرتهم
+  var monthlyRecs = getMonthlyRecords().filter(function(r) {
+    return String(r.companyId || '') === String(cid) && String(r.year) === String(year);
+  });
+  var byEmp = {};
+  monthlyRecs.forEach(function(r) {
+    var key = String(r.employeeId);
+    if (!byEmp[key] || (Number(r.version) || 0) >= (Number(byEmp[key].version) || 0)) byEmp[key] = r;
+  });
+  Object.keys(byEmp).forEach(function(key) {
+    if (map[key]) return;
+    var recs = monthlyRecs.filter(function(r) { return String(r.employeeId) === key; });
+    if (!recs.length) return;
+    var base = bases.find(function(b) { return String(b.id) === key; });
+    if (!base) return;
+    if (!employeeWorksInYear(base, year)) return;
+    var latest = byEmp[key];
+    var minMonth = Math.min.apply(null, recs.map(function(r) { return Number(r.month) || 1; }));
+    var e = applyEmployeeLifecycle(Object.assign({}, base, latest), year);
+    e.months = Math.max(1, Math.min(12, recs.length));
+    if (!e.startDate) e.startDate = String(year) + '-' + ('0' + minMonth).slice(-2) + '-01';
+    if (!e.sec) { var c = getCompany(cid); if (c) e.sec = c.sector || 'private'; }
+    map[key] = Object.assign(e, doExcelMathForEmployee(e));
   });
   return Object.values(map);
 }
@@ -5710,12 +6270,23 @@ function setFiscalYear(companyId, year, data) {
   return rec;
 }
 function ensureFiscalYear(companyId, year) {
+  if (year === undefined || year === null || year === '') {
+    getFullFiscalYearRange().forEach(function(y) { ensureFiscalYear(companyId, y); });
+    return getFiscalYear(companyId, String(new Date().getFullYear()));
+  }
   var f = getFiscalYear(companyId, year);
   if (f) return f;
   var mode = 'annual';
   var hasSnaps = taxSnapshots.some(function(s) { return String(s.year) === String(year); });
   if (String(year) === String(new Date().getFullYear()) || hasSnaps) mode = 'monthly';
   return setFiscalYear(companyId, year, { mode: mode });
+}
+/* نطاق السنوات المالية الكامل الافتراضي: من 2010 إلى (السنة الحالية + 5) */
+function getFullFiscalYearRange() {
+  var now = new Date().getFullYear();
+  var years = [];
+  for (var y = 2010; y <= now + 5; y++) years.push(String(y));
+  return years;
 }
 function getAvailableFiscalYearsForCompany(companyId) {
   var map = {};
@@ -5729,7 +6300,28 @@ function getAvailableFiscalYearsForCompany(companyId) {
   taxSnapshots.forEach(function(s) {
     if (String(s.companyId || '') === String(companyId) && s.year && map[String(s.year)] === undefined) { map[String(s.year)] = true; years.push(String(s.year)); }
   });
+  if (!years.length) return getFullFiscalYearRange();
   return years.map(Number).sort(function(a, b) { return a - b; }).map(String);
+}
+/* سنوات «السجل السنوي»: كل سنة خدمة لكل موظف فعلي (مقصوصة عبر سنوات متعددة) + سنوات الفواتير النشطة */
+function getAnnualRegisterYears(cid) {
+  var map = {};
+  var bases = getEmployeeBase().filter(function(b) { return String(b.companyId) === String(cid); });
+  bases.forEach(function(b) {
+    var from = b.startDate ? Number(String(b.startDate).slice(0, 4)) : NaN;
+    var to = b.leaveYear ? Number(b.leaveYear) : Number(new Date().getFullYear());
+    if (!isFinite(from) || !from) from = b.minYear;
+    if (!isFinite(from) || !from) from = to;
+    for (var y = Math.max(2010, from); y <= to; y++) map[String(y)] = true;
+  });
+  getYearRecords().forEach(function(r) {
+    if (String(r.companyId) === String(cid) && map[String(r.year)] === undefined) map[String(r.year)] = true;
+  });
+  getAllFiscalYears().forEach(function(f) {
+    if (String(f.companyId) === String(cid) && map[String(f.year)] === undefined) map[String(f.year)] = true;
+  });
+  var years = Object.keys(map);
+  return years.length ? years.sort(function(a, b) { return Number(a) - Number(b); }) : [String(new Date().getFullYear())];
 }
 function isFiscalYearMonthly(companyId, year) {
   var f = getFiscalYear(companyId, year);
@@ -5745,6 +6337,20 @@ function getBaseEmployee(id) { return getEmployeeBase().find(function(b) { retur
 function getYearRecord(employeeId, year) {
   return getYearRecords().find(function(r) { return String(r.employeeId) === String(employeeId) && String(r.year) === String(year); }) || null;
 }
+/* القاعدة الحاسمة: فترة عمل تمتد عبر سنوات تُقطّع قيداً لكل سنة تقويمية.
+   عند عدم وجود قيد مباشر للسنة المطلوبة، يُرحّل أحدث قيد سابق (أحدث سنة <= السنة المطلوبة)
+   لضمان إدراج الموظف في كل سنة أثناء فترة عمله (من سنة المباشرة حتى سنة الترك أو السنة الحالية). */
+function getEffectiveYearRecord(employeeId, year, hasLifecycle) {
+  var direct = getYearRecord(employeeId, year);
+  if (direct) return direct;
+  if (!hasLifecycle) return null;
+  var candidates = getYearRecords().filter(function(r) {
+    return String(r.employeeId) === String(employeeId) && Number(r.year) <= Number(year);
+  });
+  if (!candidates.length) return null;
+  candidates.sort(function(a, b) { return Number(b.year) - Number(a.year); });
+  return candidates[0];
+}
 function upsertYearRecord(record) {
   var all = getYearRecords();
   var i = all.findIndex(function(r) { return String(r.employeeId) === String(record.employeeId) && String(r.year) === String(record.year); });
@@ -5752,9 +6358,85 @@ function upsertYearRecord(record) {
   saveYearRecords(all);
 }
 
+/* ---- السجل الشهري للموظفين (موظف + سنة + شهر) ---- */
+function getMonthlyRecords() { return v2JsonGet('taxEmployeeMonthly', []); }
+function saveMonthlyRecords(list) { v2JsonSet('taxEmployeeMonthly', list); }
+function getMonthlyRecord(employeeId, year, month) {
+  return getMonthlyRecords().find(function(r) { return String(r.employeeId) === String(employeeId) && String(r.year) === String(year) && String(r.month) === String(month); }) || null;
+}
+function upsertMonthlyRecord(record) {
+  var all = getMonthlyRecords();
+  var i = all.findIndex(function(r) { return String(r.employeeId) === String(record.employeeId) && String(r.year) === String(record.year) && String(r.month) === String(record.month); });
+  if (i >= 0) all[i] = record; else all.push(record);
+  saveMonthlyRecords(all);
+}
+function deleteMonthlyRecord(employeeId, year, month) {
+  saveMonthlyRecords(getMonthlyRecords().filter(function(r) { return !(String(r.employeeId) === String(employeeId) && String(r.year) === String(year) && String(r.month) === String(month)); }));
+}
+
+/* ---- دورة حياة الموظف: تاريخ المباشرة وترك العمل ---- */
+function getStartMonthForYear(e, year) {
+  if (!e || !e.startDate) return null;
+  var sy = Number(String(e.startDate).slice(0, 4));
+  var sm = Number(String(e.startDate).slice(5, 7));
+  if (!isFinite(sy) || !isFinite(sm)) return null;
+  if (sy > Number(year)) return null;
+  if (sy === Number(year)) return Math.max(1, Math.min(12, sm));
+  return 1;
+}
+function employeeWorksInYear(e, year) {
+  if (!e) return false;
+  if (e.leaveYear && Number(e.leaveYear) < Number(year)) return false;
+  /* من دون تاريخ ترك: الموظف مستمر حتى تاريخ اليوم فقط (لا يُدرج في سنوات مستقبلية) */
+  if (!e.leaveYear && Number(year) > Number(new Date().getFullYear())) return false;
+  if (e.startDate) {
+    var sy = Number(String(e.startDate).slice(0, 4));
+    if (isFinite(sy) && sy > Number(year)) return false;
+  }
+  return true;
+}
+function employeeActiveInMonth(e, year, month) {
+  if (!employeeWorksInYear(e, year)) return false;
+  var m = Number(month);
+  var sm = getStartMonthForYear(e, year);
+  if (sm !== null && m < sm) return false;
+  if (e.leaveYear && String(e.leaveYear) === String(year)) {
+    var lm = Number(e.leaveMonth);
+    if (isFinite(lm) && m > lm) return false;
+  }
+  return true;
+}
+function employeeMonthsForYear(e, year) {
+  var hasLifecycle = !!(e && (e.startDate || e.leaveYear));
+  if (!hasLifecycle) {
+    return Math.max(1, Math.min(12, parseInt(e.months, 10) || 12));
+  }
+  var sm = getStartMonthForYear(e, year);
+  var start = (sm === null) ? 1 : sm;
+  var end = 12;
+  if (e.leaveYear && String(e.leaveYear) === String(year)) {
+    var lm = Number(e.leaveMonth);
+    if (isFinite(lm)) end = Math.max(start, Math.min(12, lm));
+  }
+  return Math.max(1, Math.min(12, end - start + 1));
+}
+function applyEmployeeLifecycle(e, year) {
+  var out = Object.assign({}, e);
+  out.months = employeeMonthsForYear(out, year);
+  if (out.leaveYear && String(out.leaveYear) === String(year) && !out.endDate) {
+    var lm = String(Number(out.leaveMonth) || 1);
+    out.endDate = String(out.leaveYear) + '-' + ('0' + lm).slice(-2) + '-15';
+  } else if (!out.leaveYear) {
+    out.endDate = '';
+  }
+  return out;
+}
+
 /* ---- تحميل سياق (شركة + سنة) إلى المصفوفات الحية ---- */
 function materializeEmployee(base, cid, year) {
-  var rec = getYearRecord(base.id, year);
+  if (!employeeWorksInYear(base, year)) return null;
+  var hasLifecycle = !!(base && (base.startDate || base.leaveYear));
+  var rec = getEffectiveYearRecord(base.id, year, hasLifecycle);
   if (!rec) return null;
   var merged = Object.assign({}, base, {
     months: rec.months, salary: rec.salary, allow: rec.allow, cashHous: rec.cashHous,
@@ -5763,6 +6445,7 @@ function materializeEmployee(base, cid, year) {
     ins: rec.ins, alimony: rec.alimony, year: year
   });
   if (!merged.sec) { var c = getCompany(cid); if (c) merged.sec = c.sector || 'private'; }
+  merged = applyEmployeeLifecycle(merged, year);
   return Object.assign(merged, doExcelMathForEmployee(merged));
 }
 function loadEmployeesForContext() {
@@ -5775,6 +6458,28 @@ function loadEmployeesForContext() {
     .map(function(b) { return materializeEmployee(b, cid, year); }).filter(Boolean);
   contractEmployees = bases.filter(function(b) { return (b.type || 'company') === 'contract'; })
     .map(function(b) { return materializeEmployee(b, cid, year); }).filter(Boolean);
+  /* الموظفون الشهريون (بلا قيد سنوي) يُضمون للسجل السنوي حسب شهر مباشرتهم */
+  var monthlyRecs = getMonthlyRecords().filter(function(r) { return String(r.companyId || '') === String(cid) && String(r.year) === String(year); });
+  var byEmp = {};
+  monthlyRecs.forEach(function(r) {
+    var key = String(r.employeeId);
+    if (!byEmp[key] || (Number(r.version) || 0) >= (Number(byEmp[key].version) || 0)) byEmp[key] = r;
+  });
+  Object.keys(byEmp).forEach(function(key) {
+    var base = bases.find(function(b) { return String(b.id) === key; });
+    if (!base) return;
+    if (!employeeWorksInYear(base, year)) return;
+    var arr = (base.type || 'company') === 'contract' ? contractEmployees : globalEmployees;
+    if (arr.some(function(e) { return String(e.origId || e.id) === key; })) return;
+    var recs = monthlyRecs.filter(function(r) { return String(r.employeeId) === key; });
+    var latest = byEmp[key];
+    var minMonth = Math.min.apply(null, recs.map(function(r) { return Number(r.month) || 1; }));
+    var e = applyEmployeeLifecycle(Object.assign({}, base, latest), year);
+    e.months = Math.max(1, Math.min(12, recs.length));
+    if (!e.startDate) e.startDate = String(year) + '-' + ('0' + minMonth).slice(-2) + '-01';
+    if (!e.sec) { var c = getCompany(cid); if (c) e.sec = c.sector || 'private'; }
+    arr.push(Object.assign(e, doExcelMathForEmployee(e)));
+  });
 }
 function ensureActiveCompany() {
   var cid = getActiveCompanyId();
@@ -5923,6 +6628,7 @@ function renderCompaniesPanel() {
           '<div class="corp-company-name">' + c.name + '</div>' +
           '<div class="corp-company-meta">' +
             (c.taxId ? '<span><i class="fas fa-id-card" style="margin-left:6px;color:#94a3b8;"></i>الرقم الضريبي: <b>' + c.taxId + '</b></span>' : '') +
+            (c.ownerName ? '<span><i class="fas fa-user-tie" style="margin-left:6px;color:#94a3b8;"></i>صاحب الشركة: <b>' + c.ownerName + '</b></span>' : '') +
             '<span><i class="fas fa-users" style="margin-left:6px;color:#94a3b8;"></i>الموظفون: <b>' + count + '</b></span>' +
             (years.length ? '<span><i class="fas fa-calendar-alt" style="margin-left:6px;color:#94a3b8;"></i>السنوات: <b>' + years.join('، ') + '</b></span>' : '<span style="color:#94a3b8;">لا توجد سنوات بعد</span>') +
           '</div>' +
@@ -5944,18 +6650,21 @@ function openCompanyModal(editId) {
   var modal = document.getElementById('companyModal');
   if (!modal) return;
   var c = editId ? getCompany(editId) : null;
-  document.getElementById('companyModalTitle').textContent = c ? 'تعديل الشركة' : 'إضافة شركة جديدة';
-  document.getElementById('companyModalId').value = c ? c.id : '';
-  document.getElementById('companyModalName').value = c ? (c.name || '') : '';
-  document.getElementById('companyModalTaxId').value = c ? (c.taxId || '') : '';
-  document.getElementById('companyModalSector').value = c ? (c.sector || 'private') : 'private';
-  document.getElementById('companyModalActivity').value = c ? (c.activityType || '') : '';
-  document.getElementById('companyModalProvince').value = c ? (c.province || '') : '';
-  document.getElementById('companyModalCity').value = c ? (c.city || '') : '';
-  document.getElementById('companyModalAddress').value = c ? ((c.neighborhood || '') + (c.street ? ' / ' + c.street : '') + (c.houseNo ? ' / ' + c.houseNo : '')) : '';
-  document.getElementById('companyModalSignatory').value = c ? (c.signatoryName || '') : '';
-  document.getElementById('companyModalPhone').value = c ? (c.phone || '') : '';
-  document.getElementById('companyModalEmail').value = c ? (c.email || '') : '';
+  var set = function(id, val) { var el = document.getElementById(id); if (el) el.value = (val === undefined || val === null) ? '' : val; };
+  var title = document.getElementById('companyModalTitle');
+  if (title) title.textContent = c ? 'تعديل الشركة' : 'إضافة شركة جديدة';
+  set('companyModalId', c ? c.id : '');
+  set('companyModalName', c ? c.name : '');
+  set('companyModalOwner', c ? c.ownerName : '');
+  set('companyModalTaxId', c ? c.taxId : '');
+  set('companyModalSector', c ? (c.sector || 'private') : 'private');
+  set('companyModalActivity', c ? c.activityType : '');
+  set('companyModalProvince', c ? c.province : '');
+  set('companyModalCity', c ? c.city : '');
+  set('companyModalAddress', c ? ((c.neighborhood || '') + (c.street ? ' / ' + c.street : '') + (c.houseNo ? ' / ' + c.houseNo : '')) : '');
+  set('companyModalSignatory', c ? c.signatoryName : '');
+  set('companyModalPhone', c ? c.phone : '');
+  set('companyModalEmail', c ? c.email : '');
   modal.style.display = 'flex';
 }
 
@@ -5972,6 +6681,8 @@ function saveCompanyFromModal() {
   var editId = document.getElementById('companyModalId').value;
   var raw = getAllCompaniesRaw();
   var address = (document.getElementById('companyModalAddress').value || '').split('/');
+  var ownerName = (document.getElementById('companyModalOwner') ? document.getElementById('companyModalOwner').value : '').trim();
+  var savedId = null;
   if (editId) {
     var c = raw.find(function(x) { return String(x.id) === String(editId); });
     if (c) {
@@ -5980,8 +6691,10 @@ function saveCompanyFromModal() {
       c.province = document.getElementById('companyModalProvince').value; c.city = document.getElementById('companyModalCity').value;
       c.neighborhood = (address[0] || '').trim(); c.street = (address[1] || '').trim(); c.houseNo = (address[2] || '').trim();
       c.signatoryName = document.getElementById('companyModalSignatory').value;
+      c.ownerName = ownerName;
       c.phone = document.getElementById('companyModalPhone').value; c.email = document.getElementById('companyModalEmail').value;
       c.updatedAt = new Date().toISOString();
+      savedId = c.id;
     }
   } else {
     var nc = { id: 'cmp_' + Date.now(), name: name, taxId: taxId, sector: document.getElementById('companyModalSector').value,
@@ -5989,10 +6702,12 @@ function saveCompanyFromModal() {
       province: document.getElementById('companyModalProvince').value, city: document.getElementById('companyModalCity').value,
       neighborhood: (address[0] || '').trim(), street: (address[1] || '').trim(), houseNo: (address[2] || '').trim(),
       signatoryName: document.getElementById('companyModalSignatory').value,
+      ownerName: ownerName,
       phone: document.getElementById('companyModalPhone').value, email: document.getElementById('companyModalEmail').value,
       createdAt: new Date().toISOString(), deletedAt: null };
     raw.push(nc);
-    if (!getActiveCompanyId()) setActiveCompanyId(nc.id);
+    setActiveCompanyId(nc.id);
+    savedId = nc.id;
   }
   saveCompanies(raw);
   closeCompanyModal();
@@ -6000,6 +6715,7 @@ function saveCompanyFromModal() {
   if (typeof loadEmployeesForContext === 'function') loadEmployeesForContext();
   renderEmployeeList();
   if (typeof renderContractEmployeeList === 'function') renderContractEmployeeList();
+  if (typeof ensureFiscalYear === 'function') ensureFiscalYear(savedId || getActiveCompanyId());
   showToast(editId ? 'تم تحديث بيانات الشركة' : 'تمت إضافة الشركة بنجاح');
 }
 
@@ -6044,6 +6760,8 @@ function openCompanyProfile(id, silent) {
   if (profile) profile.style.display = '';
   var nameEl = document.getElementById('profileCompanyName');
   if (nameEl) nameEl.textContent = c.name;
+  var ownerEl = document.getElementById('profileCompanyOwner');
+  if (ownerEl) ownerEl.textContent = c.ownerName ? ('صاحب الشركة: ' + c.ownerName) : 'الإدارة الذكية لموظفي الشركة والسنوات المالية والاستمارات الرسمية الجاهزة للتسليم';
   renderFiscalYearSelector();
   renderEmployeeList();
   if (typeof renderContractEmployeeList === 'function') renderContractEmployeeList();
@@ -6138,6 +6856,8 @@ function onFiscalYearChange() {
   ensureFiscalYear(cid, y);
   var yearSel = document.getElementById('closeTaxYear_Year');
   if (yearSel && yearSel.value !== y) yearSel.value = y;
+  var mSel = document.getElementById('monthlyRegYear');
+  if (mSel && !mSel.dataset.userPicked) mSel.value = y;
   if (typeof loadEmployeesForContext === 'function') loadEmployeesForContext();
   renderPathBadge();
   renderPathStatus();

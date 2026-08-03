@@ -23,6 +23,7 @@
 <input type="hidden" id="companyModalId" value="" />
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:14px;">
 <div style="grid-column:1 / -1;"><label style="font-weight:700;">اسم الشركة (رب العمل) <span style="color:#dc2626;">*</span></label><input id="companyModalName" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px;" /></div>
+<div style="grid-column:1 / -1;"><label style="font-weight:700;">اسم صاحب الشركة</label><input id="companyModalOwner" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="الاسم الرباعي لصاحب الشركة" /></div>
 <div><label style="font-weight:700;">الرقم الضريبي (الرقم التعريفي)</label><input id="companyModalTaxId" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px;" placeholder="10 أرقام" maxlength="10" /></div>
 <div><label style="font-weight:700;">القطاع</label><select id="companyModalSector" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px;"><option value="private">خاص</option><option value="government">حكومي</option><option value="mixed">مختلط</option></select></div>
 <div><label style="font-weight:700;">نوع النشاط</label><input id="companyModalActivity" style="width:100%; padding:9px; border:1px solid #cbd5e1; border-radius:8px;" /></div>
@@ -46,7 +47,7 @@
 <p id="bulkTotals" style="margin:0 0 15px 0; color:#4b5563; font-size:13px;"></p>
 <div style="overflow-x:auto; max-height:400px; border:1px solid #e2e8f0; border-radius:8px;">
 <table class="data-table" style="width:100%; font-size:12px; min-width:640px;">
-<thead><tr><th>#</th><th>الاسم</th><th>الهوية</th><th>الراتب الشهري</th><th>Q (المبلغ الخاضع)</th><th>Y (الضريبة الشهرية)</th></tr></thead>
+<thead><tr><th>#</th><th>الاسم</th><th>الهوية</th><th>السنة</th><th>الراتب الشهري</th><th>Q (المبلغ الخاضع)</th><th>Y (الضريبة الشهرية)</th></tr></thead>
 <tbody id="bulkPreviewBody"></tbody>
 </table>
 </div>
@@ -888,6 +889,27 @@
 <!-- Content -->
 <div class="emp-modal-content">
 <input id="empModEditId" type="hidden" value=""/>
+<div id="empRegContext" style="display:none; align-items:center; flex-wrap:wrap; gap:10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:10px 14px; margin-bottom:14px;">
+<span id="empRegModeLabel" style="font-weight:800; color:#9a3412; font-size:.85rem;"><i class="fas fa-calendar-week"></i> تسجيل موظف شهر</span>
+<label style="font-size:.8rem; font-weight:700; color:#475569;">السنة:</label>
+<select id="empModTargetYear" onchange="updateEmpRegContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;"></select>
+<label style="font-size:.8rem; font-weight:700; color:#475569;">الشهر:</label>
+<select id="empModTargetMonth" onchange="updateEmpRegContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;">
+<option value="1">1 — كانون الثاني</option>
+<option value="2">2 — شباط</option>
+<option value="3">3 — آذار</option>
+<option value="4">4 — نيسان</option>
+<option value="5">5 — أيار</option>
+<option value="6">6 — حزيران</option>
+<option value="7">7 — تموز</option>
+<option value="8">8 — آب</option>
+<option value="9">9 — أيلول</option>
+<option value="10">10 — تشرين الأول</option>
+<option value="11">11 — تشرين الثاني</option>
+<option value="12">12 — كانون الأول</option>
+</select>
+<span id="empRegContextHint" style="font-size:.78rem; color:#b45309; font-weight:700;"></span>
+</div>
 <!-- Step 1 -->
 <div class="emp-step-pane active" id="empStep1">
 <div class="emp-form-card">
@@ -916,9 +938,10 @@
 <div class="emp-field"><label>اسم صاحب العمل</label><input id="empModEmployerName" placeholder="اسم الشركة أو الدائرة" type="text"/></div>
 <div class="emp-field"><label>الرقم التعريفي لصاحب العمل</label><input id="empModEmployerId" placeholder="إن وجد" type="text"/></div>
 <div class="emp-field"><label>صاحب العمل الرئيسي؟</label><select id="empModMainEmployer"><option value="yes">نعم (يتم احتساب السماحات المباشرة)</option><option value="no">كلا (وظيفية ثانوية للاستقطاع)</option></select></div>
-<div class="emp-field"><label>قطاع العمل</label><select id="empModSec" onchange="calcEmpModalPreview()"><option value="government">عام / حكومي</option><option value="private">خاص</option></select></div>
-<div class="emp-field"><label>تاريخ المباشرة</label><input id="empModStartDate" type="date"/></div>
-<div class="emp-field"><label>تاريخ الترك (إن وجد)</label><input id="empModEndDate" type="date"/></div>
+<div class="emp-field"><label>قطاع العمل (إلزامي)</label><select id="empModSec" onchange="calcEmpModalPreview()"><option value="">— اختر القطاع —</option><option value="private">خاص</option><option value="government">عام / حكومي</option></select></div>
+<div class="emp-field"><label>تاريخ المباشرة</label><input id="empModStartDate" type="date" onchange="calcEmpModalPreview()"/></div>
+<div class="emp-field"><label>الحالة الوظيفية</label><select id="empModWorkStatus" onchange="toggleEmpModLeaveDate()"><option value="active">مستمر في العمل</option><option value="left">ترك العمل</option></select></div>
+<div class="emp-field" id="empModLeaveDateWrap" style="display:none;"><label>تاريخ ترك العمل</label><input id="empModLeaveDate" type="date" onchange="calcEmpModalPreview()"/></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>العنوان الوظيفي</label><input id="empModJobTitle" placeholder="مثال: محاسب، مهندس، الخ..." type="text"/></div>
 </div>
 </div>
@@ -977,10 +1000,10 @@
 <div class="emp-form-card">
 <h3><i class="fas fa-coins"></i> الدخل والرواتب</h3>
 <div class="emp-grid-2">
-<div class="emp-field" style="display:none;"><label>عدد أشهر العمل (معطل للاقفال)</label><input type="hidden" id="empModMonths" value="1"></div>
+<div class="emp-field" id="empModMonthsWrap" style="display:none;"><label>عدد أشهر العمل في السنة (1-12)</label><input id="empModMonths" type="number" min="1" max="12" value="12" oninput="calcEmpModalPreview()"></div>
 <div class="emp-field"><label>الراتب الاسمي الشهري (د.ع)</label><input id="empModSalary" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
 <div class="emp-field"><label>كافة المخصصات الخاضعة كلياً (الخطورة/النقل/الملابس/المنصب...)</label><input id="empModAllow" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
-<div class="emp-field"><label>مخصصات السكن والطعام النقدية فقط (مؤهلة لإعفاء ٣٠٪)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
+<div class="emp-field"><label>مخصصات السكن والطعام والاقامة والخطورة والنقل والملابس (معفاة 30%)</label><input id="empModCashHous" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>السكن العيني الموفر من الشركة</label><select id="empModInKind" onchange="calcEmpModalPreview()"><option value="none">لا يوجد سكن عيني</option><option value="unfurnished">غير مؤثث (تضاف 15% من الراتب)</option><option value="furnished">مؤثث (تضاف 20% من الراتب)</option><option value="employerPart">مساهمة جهة العمل (تضاف 10% من الراتب)</option><option value="hotel">فندقي (تضاف 20% من الراتب)</option><option value="caravan">كرفانات (تضاف 5% من الراتب)</option></select></div>
 <div class="emp-field" style="grid-column: 1 / -1;"><label>الإيجار الفعلي الشهري للسكن العيني (اختياري — يُقيّد بحد السقف)</label><input id="empModActualRent" class="money-input" oninput="calcEmpModalPreview()" type="text" value="0" onkeyup="formatRealTime(this)" / ></div>
 </div>
@@ -999,9 +1022,13 @@
 <div class="emp-summary-box">
 <h3 style="margin-top:0; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:12px; margin-bottom:20px; font-weight:700;"><i class="fas fa-chart-pie"></i> ملخص الحساب الضريبي السنوي المحتسب تلقائياً</h3>
 <div class="emp-summary-grid">
-<div class="emp-summary-item"><label>إجمالي الدخل الخاضع</label><strong id="livePreviewGross">0 د.ع</strong></div>
-<div class="emp-summary-item"><label>التنزيلات والسماحات</label><strong id="livePreviewDed">0 د.ع</strong></div>
-<div class="emp-summary-item"><label>الوعاء الضريبي (الصافي)</label><strong id="livePreviewTaxable">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>1) إجمالي الدخل (رواتب + كافة المخصصات الخاضعة)</label><strong id="livePreviewGross">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>2 أ) مجموع السماح القانوني (أعزب/متزوج/أولاد/63+ سنة)</label><strong id="livePreviewAllowance">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>2 ب) التوقيفات التقاعدية والضمان الاجتماعي</label><strong id="livePreviewRetirement">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>2 ج) تنزيلات المادة (8): أقساط التأمين + النفقة الشرعية</label><strong id="livePreviewInsAlim">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>2 د) مخصصات السكن والطعام والاقامة والخطورة والنقل والملابس (معفاة 30%)</label><strong id="livePreviewExempt30">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>(2) إجمالي التنزيلات والسماحات</label><strong id="livePreviewDed">0 د.ع</strong></div>
+<div class="emp-summary-item"><label>(3) الوعاء الضريبي (الصافي)</label><strong id="livePreviewTaxable">0 د.ع</strong></div>
 <div class="emp-summary-item" style="background:rgba(255,255,255,0.2);"><label>الضريبة السنوية المستحقة</label><strong id="livePreviewTax" style="color:#fff;">0 د.ع</strong></div>
 </div>
 </div>
@@ -1019,6 +1046,49 @@
 <button class="btn btn-secondary" id="empPrevBtn" onclick="nextEmpStep(-1)" style="display:none;"><i class="fas fa-arrow-right"></i> السابق</button>
 <button class="btn btn-primary" id="empNextBtn" onclick="nextEmpStep(1)">التالي <i class="fas fa-arrow-left"></i></button>
 <button class="btn btn-success" id="empSaveBtn" onclick="saveEmployeeFromModal()" style="display:none;"><i class="fas fa-save"></i> حفظ الاستمارة</button>
+</div>
+</div>
+</div>
+</div>
+<!-- ===== نافذة ترك العمل ===== -->
+<div class="emp-modal-overlay" id="leaveEmployeeModal" style="display:none;">
+<div class="emp-modal-wrapper" style="max-width:440px;">
+<div class="emp-modal-header">
+<h2><i class="fas fa-user-slash"></i> ترك العمل</h2>
+<button class="emp-modal-close" onclick="closeLeaveEmployeeModal()"><i class="fas fa-times"></i></button>
+</div>
+<div class="emp-modal-body" style="padding:20px 24px;">
+<p id="leaveModalName" style="font-weight:800; color:#0f172a; margin:0 0 12px; font-size:1rem;"></p>
+<p style="font-size:.82rem; color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:9px 11px; margin:0 0 16px;">سيُحتسب الموظف عن أشهر العمل قبل ترك العمل فقط، ولن يُجلب في الجداول الشهرية بعد شهر الترك.</p>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+<div class="emp-field">
+<label>سنة ترك العمل</label>
+<select id="leaveModalYear" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; font-family:inherit; font-weight:700;"></select>
+</div>
+<div class="emp-field">
+<label>شهر ترك العمل</label>
+<select id="leaveModalMonth" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px 10px; font-family:inherit; font-weight:700;">
+<option value="1">1 — كانون الثاني</option>
+<option value="2">2 — شباط</option>
+<option value="3">3 — آذار</option>
+<option value="4">4 — نيسان</option>
+<option value="5">5 — أيار</option>
+<option value="6">6 — حزيران</option>
+<option value="7">7 — تموز</option>
+<option value="8">8 — آب</option>
+<option value="9">9 — أيلول</option>
+<option value="10">10 — تشرين الأول</option>
+<option value="11">11 — تشرين الثاني</option>
+<option value="12">12 — كانون الأول</option>
+</select>
+</div>
+</div>
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:14px 24px; border-top:1px solid #e2e8f0;">
+<button class="btn btn-sm" id="leaveModalCancelLeave" onclick="clearLeaveEmployee()" style="display:none; background:#fee2e2; color:#b91c1c; border:none; border-radius:8px; padding:8px 12px; font-weight:700;"><i class="fas fa-undo"></i> إلغاء الترك</button>
+<div style="display:flex; gap:8px; margin-right:auto;">
+<button class="btn btn-sm" onclick="closeLeaveEmployeeModal()" style="background:#e2e8f0; color:#334155; border:none; border-radius:8px; padding:8px 14px; font-weight:700;">إلغاء</button>
+<button class="btn btn-sm" onclick="saveLeaveEmployee()" style="background:#b91c1c; color:#fff; border:none; border-radius:8px; padding:8px 14px; font-weight:700;"><i class="fas fa-check"></i> تسجيل الترك</button>
 </div>
 </div>
 </div>
@@ -1114,6 +1184,9 @@
   .corp-empty-text { color:#64748b; font-size:.88rem; line-height:1.9; }
 
   .dd4a-shell { padding:20px 22px; }
+  .dd4a-preview { display:block; }
+  .dd4a-preview .page-break { margin:16px auto !important; background:#fff !important; box-shadow:0 10px 30px rgba(15,27,77,.22); border-radius:3px; }
+  @media print { .dd4a-preview .page-break { margin:0 auto !important; box-shadow:none !important; } }
   @media (max-width:1024px){ .corp-stat-grid { grid-template-columns:repeat(2,1fr); } .corp-lock-grid { grid-template-columns:1fr; } }
   @media (max-width:600px){ .corp-stat-grid { grid-template-columns:1fr; } .corp-hero { padding:20px; } }
 </style>
@@ -1129,7 +1202,7 @@
     <div>
       <div class="corp-hero-eyebrow"><i class="fas fa-briefcase"></i> ضريبة الدخل لموظفي الشركة</div>
       <h3 class="corp-hero-title"><span class="corp-hero-avatar"><i class="fas fa-users"></i></span> <span id="profileCompanyName">—</span></h3>
-      <p class="corp-hero-sub">الإدارة الذكية لموظفي الشركة والسنوات المالية والاستمارات الرسمية الجاهزة للتسليم</p>
+      <p class="corp-hero-sub"><span id="profileCompanyOwner"></span></p>
     </div>
     <div class="corp-hero-actions">
       <button class="corp-btn ghost" onclick="backToCompanies()"><i class="fas fa-arrow-right"></i> الشركات</button>
@@ -1224,34 +1297,28 @@
       </div>
       <div id="corpEmpCount" style="font-size:.8rem; font-weight:700; color:#64748b;"></div>
     </div>
-    <div class="corp-table-wrap">
-      <table class="data-table" id="newExcelEmployeeTable">
-        <thead>
-          <tr>
-            <th>ت</th>
-            <th>اسم الموظف</th>
-            <th>القطاع والحالة</th>
-            <th>الدخل الإجمالي السنوي</th>
-            <th>الخصم الشهري</th>
-            <th>أشهر سابقة</th>
-            <th>الضريبة الشهرية</th>
-            <th>المُسدد (تراكمي)</th>
-            <th>إجراءات</th>
-          </tr>
-        </thead>
-        <tbody id="empTableBody"></tbody>
-        <tfoot>
-          <tr>
-            <td class="total-label" colspan="3" style="text-align:left; font-weight:bold;">الإجمالي لجميع الموظفين</td>
-            <td id="tblTotGross" style="font-weight:bold;">0</td>
-            <td id="tblTotDed" style="font-weight:bold;">0</td>
-            <td id="tblTotTaxable" style="font-weight:bold; color:var(--danger);">0</td>
-            <td>-</td>
-            <td id="tblTotAnnual" style="font-weight:bold; color:var(--success); font-size:1.05rem;">0</td>
-            <td></td>
-          </tr>
-        </tfoot>
-      </table>
+    <div style="padding:18px 22px 6px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div>
+          <h4 style="margin:0; font-weight:800; color:#0f172a; font-size:1rem;"><i class="fas fa-calendar-alt"></i> سجل الموظفين السنوي</h4>
+          <p style="margin:4px 0 0; font-size:.78rem; color:#64748b;">سجل مستقل لكل سنة مالية — كل سنة تُظهر موظفيها فقط حسب قيد السنة وشهر المباشرة/الترك، مع زر إضافة خاص بكل سنة</p>
+        </div>
+      </div>
+      <div id="annualRegisterContainer"></div>
+    </div>
+    <div style="padding:22px; border-top:1px dashed #e2e8f0; margin-top:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+        <div>
+          <h4 style="margin:0; font-weight:800; color:#0f172a; font-size:1rem;"><i class="fas fa-calendar-week"></i> سجل موظفين الشهر (الشهري)</h4>
+          <p style="margin:4px 0 0; font-size:.78rem; color:#64748b;">12 جدولاً — كل شهر يضم موظفيه تلقائياً من شهر مباشرتهم حتى شهر ترك العمل، مع إمكانية إضافة سجل شهري يدوي لأي شهر</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <label style="font-size:.8rem; font-weight:700; color:#475569;">السنة:</label>
+          <select id="monthlyRegYear" onchange="this.dataset.userPicked='1'; renderMonthlyRegister()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;"></select>
+          <button class="corp-btn gold" onclick="openEmployeeModal(null, 'company', 'monthly')"><i class="fas fa-user-plus"></i> إضافة موظف شهر</button>
+        </div>
+      </div>
+      <div id="monthlyRegisterContainer"></div>
     </div>
     <div style="display:flex; gap:10px; flex-wrap:wrap; padding:18px 22px 22px;">
       <button class="corp-btn primary" onclick="exportFormD14()"><i class="fas fa-file-pdf"></i> استمارة ض.د14 للجميع (PDF)</button>
@@ -1273,7 +1340,7 @@
     </div>
     <div class="dd4a-shell">
       <p id="dd4aPreviewHint" style="margin:0 0 12px; color:var(--text-secondary); font-size:.9rem;"><i class="fas fa-info-circle"></i> اضغط على زر «استمارة» بجانب أي موظف لعرض استمارة ض.د/14، أو «معاينة الكشف» لعرض الكشف السنوي هنا.</p>
-      <div class="dd4a-form-container" id="dd4aPrintableArea" style="direction:rtl; background:#f3f4f6; padding:8px; color:#000; display:none; border:0; border-radius:8px; overflow:auto;"></div>
+      <div class="dd4a-form-container" id="dd4aPrintableArea" style="direction:rtl; background:#eef2f7; padding:16px; color:#000; display:none; border:0; border-radius:12px; overflow:auto;"></div>
     </div>
   </div>
 
@@ -3087,7 +3154,7 @@
 </div>
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
-<script src="js/app.js?v=1785587100"></script>
+<script src="js/app.js?v=1785798945"></script>
 
 <script>
 // Format currency wrapper
