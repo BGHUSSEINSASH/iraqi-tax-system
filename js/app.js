@@ -866,7 +866,8 @@ function loadStoredEmployees() {
 function saveStoredEmployees() {
   try {
     var cid = getActiveCompanyId();
-    var year = getActiveYear();
+    var activeYear = getActiveYear();
+    var currentYear = new Date().getFullYear();
     var bases = getEmployeeBase();
     var all = globalEmployees.concat(contractEmployees);
     all.forEach(function(e) {
@@ -880,10 +881,19 @@ function saveStoredEmployees() {
         V2_BASE_FIELDS.forEach(function(k) { if (e[k] !== undefined) base[k] = e[k]; });
         base.companyId = cid;
       }
-      var rec = {};
-      V2_YEAR_FIELDS.forEach(function(k) { if (e[k] !== undefined) rec[k] = e[k]; });
-      rec.id = rec.id || 'yr_' + Date.now() + '_' + e.id; rec.employeeId = e.id; rec.companyId = cid; rec.year = year; rec.updatedAt = new Date().toISOString();
-      upsertYearRecord(rec);
+      /* تحديد السنوات التي يعمل فيها الموظف: من سنة المباشرة حتى سنة الترك أو السنة الحالية */
+      var startYear = e.startDate ? Number(String(e.startDate).slice(0, 4)) : activeYear;
+      var endYear = e.leaveYear ? Number(e.leaveYear) : currentYear;
+      if (!isFinite(startYear) || startYear < 2010) startYear = activeYear;
+      if (!isFinite(endYear) || endYear < startYear) endYear = startYear;
+      var recBase = {};
+      V2_YEAR_FIELDS.forEach(function(k) { if (e[k] !== undefined) recBase[k] = e[k]; });
+      for (var y = startYear; y <= endYear; y++) {
+        var rec = Object.assign({}, recBase);
+        rec.id = rec.id || 'yr_' + Date.now() + '_' + e.id + '_' + y;
+        rec.employeeId = e.id; rec.companyId = cid; rec.year = String(y); rec.updatedAt = new Date().toISOString();
+        upsertYearRecord(rec);
+      }
     });
     saveEmployeeBase(bases);
     /* مزامنة المفاتيح القديمة لضمان التوافق */
@@ -997,7 +1007,25 @@ function getEmpModalInputs() {
     child: childCount,
     childNames: childNames,
     over63: document.getElementById('empMod63').value,
-    months: Math.max(1, Math.min(12, parseInt(document.getElementById('empModMonths').value, 10) || 12)),
+    months: (function() {
+      var sd = document.getElementById('empModStartDate').value;
+      var workStatus = (document.getElementById('empModWorkStatus') || {}).value || 'active';
+      var leaveDate = (document.getElementById('empModLeaveDate') || {}).value || '';
+      if (!sd) return 12;
+      var sy = Number(String(sd).slice(0, 4));
+      var sm = Number(String(sd).slice(5, 7));
+      if (!isFinite(sy) || !isFinite(sm) || sm < 1 || sm > 12) return 12;
+      var ey = sy;
+      var em = 12;
+      if (workStatus === 'left' && leaveDate) {
+        ey = Number(String(leaveDate).slice(0, 4));
+        em = Number(String(leaveDate).slice(5, 7));
+        if (!isFinite(ey) || !isFinite(em) || em < 1 || em > 12) { ey = sy; em = 12; }
+      }
+      if (ey < sy) ey = sy;
+      if (ey === sy) { return Math.max(1, Math.min(12, em - sm + 1)); }
+      return 12;
+    })(),
     salary: parseArabicNumber(document.getElementById('empModSalary').value) || 0,
     allow: parseArabicNumber(document.getElementById('empModAllow').value) || 0,
     cashHous: parseArabicNumber(document.getElementById('empModCashHous').value) || 0,
@@ -1304,9 +1332,10 @@ window.saveEmployeeFromModal = function() {
   if (!inputs.sec) { showToast('يرجى تحديد قطاع العمل (خاص / حكومي) إجبارياً', true); switchEmpStep(2); return; }
   var nameParts = String(inputs.name || '').trim().split(/\s+/).filter(Boolean);
   if (nameParts.length < 4) { showToast('يرجى إدخال الاسم الرباعي (4 أسماء على الأقل) إجبارياً', true); switchEmpStep(1); return; }
-  if (!inputs.birthDate) { showToast('يرجى تحديد تاريخ الميلاد إجبارياً', true); switchEmpStep(1); return; }
-  var age = computeAge(inputs.birthDate);
-  if (age === null || age < 18) { showToast('عمر الموظف يجب أن يكون 18 سنة أو أكثر (حسب قانون العمل)', true); switchEmpStep(1); return; }
+  if (inputs.birthDate) {
+    var age = computeAge(inputs.birthDate);
+    if (age === null || age < 18) { showToast('عمر الموظف يجب أن يكون 18 سنة أو أكثر (حسب قانون العمل)', true); switchEmpStep(1); return; }
+  }
   if (inputs.civilId && !/^\d{10}$/.test(String(inputs.civilId).trim())) { showToast('الرقم المدني يجب أن يكون 10 أرقام', true); switchEmpStep(1); return; }
   
   var math = doExcelMathForEmployee(inputs);
@@ -1523,6 +1552,116 @@ function collectMonthlyMonthRows(cid, year, m) {
   return { rows: rows, taxable: taxable, tax: tax, count: rows.length };
 }
 
+function buildWithholdingTaxDeclarationHtml(cid, year, month) {
+  var company = getCompany(cid);
+  var monthNames = ['كانون الثاني', 'شباط', 'آذار', 'نيسان', 'أيار', 'حزيران', 'تموز', 'آب', 'أيلول', 'تشرين الأول', 'تشرين الثاني', 'كانون الأول'];
+  var m = Number(month);
+  var data = collectMonthlyMonthRows(cid, year, m);
+
+  var totalIncome = Math.round(data.rows.reduce(function(s, r) {
+    return s + (Number(r.e.salary) || 0) + (Number(r.e.allow) || 0) + (Number(r.e.cashHous) || 0);
+  }, 0));
+  var totalTax = Math.round(data.tax);
+  var taxedCount = data.rows.filter(function(r) { return Math.round(r.math.annualTax) > 0; }).length;
+  var untaxedCount = data.count - taxedCount;
+
+  var addrParts = [];
+  if (company && company.province) addrParts.push(company.province);
+  if (company && company.city) addrParts.push(company.city);
+  if (company && company.neighborhood) addrParts.push(company.neighborhood);
+  if (company && company.street) addrParts.push(company.street);
+  if (company && company.houseNo) addrParts.push(company.houseNo);
+  var address = addrParts.join(' - ');
+
+  var box = 'style="border:1px solid #000; padding:5px 8px; min-width:80px; display:inline-block; font-weight:700;"';
+  var line = 'style="border-bottom:1px solid #000; padding:0 10px 2px; min-width:90px; display:inline-block; font-weight:700;"';
+
+  var html = '<div class="page-break" style="width:210mm; min-height:296mm; margin:0 auto; padding:9mm; background:#fff; color:#000; font-family:Arial,sans-serif; direction:rtl; box-sizing:border-box; position:relative;">' +
+    '<div style="text-align:center; font-size:12px; font-weight:800; margin-bottom:2px;">وزارة المالية</div>' +
+    '<div style="text-align:center; font-size:12px; font-weight:800; margin-bottom:2px;">الهيئة العامة للضرائب</div>' +
+    '<div style="text-align:center; font-size:15px; font-weight:800; margin-bottom:4px;">التصريح الشهري لضريبة الاستقطاع المباشر</div>' +
+    '<div style="text-align:center; font-size:10px; margin-bottom:12px;">(للاستخدام الرسمي فقط)</div>' +
+
+    '<table style="width:100%; border-collapse:collapse; font-size:12px;">' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px; width:38%;">[1] الفقرة الضريبية</td>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">الشهر: <span ' + box + '>' + m + ' — ' + monthNames[m - 1] + '</span></td>' +
+        '<td style="border:1px solid #000; padding:6px; text-align:center;">السنة: <span ' + box + '>' + year + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[2] رقم رب العمل التعريفي</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + (company ? (company.taxId || '') : '') + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[3] اسم رب العمل</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + (company ? (company.name || '') : '') + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[4] عنوان رب العمل</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + (address || '') + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[5] ضع علامة (×) في أحد الخانتين اللتين تنطبقان على هذا التصريح</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;">' +
+          '<span style="display:inline-block; width:16px; height:16px; border:1px solid #000; text-align:center; line-height:14px; font-weight:800; margin-left:4px;">×</span> تصريح أصلي (أ)' +
+          ' &nbsp;&nbsp;&nbsp;&nbsp; ' +
+          '<span style="display:inline-block; width:16px; height:16px; border:1px solid #000; text-align:center; line-height:14px; margin-left:4px;"></span> تصريح معدل (ب)' +
+        '</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[6] دخل المستخدمين الكلي للشهر</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + formatNumber(totalIncome) + '</span> دينار</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[7] الضريبة المستقطعة للشهر</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + formatNumber(totalTax) + '</span> دينار</td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[8] العدد الكلي للمستخدمين للشهر</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + data.count + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[9] العدد الكلي للمستخدمين الذين استُقطعت ضريبتهم</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + taxedCount + '</span></td>' +
+      '</tr>' +
+      '<tr>' +
+        '<td style="border:1px solid #000; padding:6px;">[10] العدد الكلي للمستخدمين الذين لم تُستقطع ضريبتهم</td>' +
+        '<td colspan="2" style="border:1px solid #000; padding:6px; text-align:center;"><span ' + box + '>' + untaxedCount + '</span></td>' +
+      '</tr>' +
+    '</table>' +
+
+    '<div style="margin-top:14px; font-size:12px; line-height:1.8;">' +
+      'أقر أنا الموقع أدناه، وليكن في علمي أن المعلومات المقدمة في هذا التصريح صحيحة ومطابقة للواقع وفق أحكام ضريبة الاستقطاع المباشر، وأن الضريبة المستقطعة عن الشهر أعلاه ستُودع لدى الهيئة العامة للضرائب خلال المدة القانونية، علماً بأن تقديم تصريح غير صحيح يعرضني للمساءلة القانونية.' +
+    '</div>' +
+
+    '<div style="display:flex; justify-content:space-between; margin-top:24px; font-size:12px; font-weight:700;">' +
+      '<div>اسم الشخص المعني: <span style="border-bottom:1px solid #000; display:inline-block; width:170px; text-align:center;">&nbsp;</span></div>' +
+      '<div>التوقيع: <span style="border-bottom:1px solid #000; display:inline-block; width:120px; text-align:center;">&nbsp;</span></div>' +
+    '</div>' +
+    '<div style="display:flex; justify-content:space-between; margin-top:24px; font-size:12px; font-weight:700;">' +
+      '<div>اليوم: <span style="border-bottom:1px solid #000; display:inline-block; width:70px; text-align:center;">&nbsp;</span></div>' +
+      '<div>الشهر: <span style="border-bottom:1px solid #000; display:inline-block; width:90px; text-align:center;">&nbsp;</span></div>' +
+      '<div>السنة: <span style="border-bottom:1px solid #000; display:inline-block; width:90px; text-align:center;">&nbsp;</span></div>' +
+    '</div>' +
+
+    '<div style="margin-top:26px; border:1px solid #000; padding:10px;">' +
+      '<div style="font-size:12px; font-weight:800; margin-bottom:8px;">للاستخدام الرسمي فقط</div>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; font-size:12px;">' +
+        '<div>تاريخ استلام التصريح: <span style="border-bottom:1px solid #000; display:inline-block; width:140px; text-align:center;">&nbsp;</span></div>' +
+        '<div style="text-align:center;">الختم الرسمي<br><br><span style="display:inline-block; width:120px; height:60px; border:1px dashed #000;"></span></div>' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="margin-top:18px; font-size:10px; line-height:1.7; border-top:1px solid #000; padding-top:8px;">' +
+      '<div style="font-weight:800; margin-bottom:4px;">تعليمات حول كيفية إملاء التصريح الشهري:</div>' +
+      '<div>1. عند تقديم التصريح لأول مرة ضع علامة (×) في الخانة (أ)، وعند تعديل أي تصريح سابق ضع العلامة في الخانة (ب).</div>' +
+      '<div>2. يجب أن يُودع التصريح الشهري لدى الهيئة العامة للضرائب في موعد أقصاه نهاية الشهر التالي لشهر الاستقطاع، مع إرفاق الشهادة أو إيصال الإيداع.</div>' +
+      '<div>3. يجب إرفاق قائمة بأسماء المستخدمين الذين استُقطعت ضريبتهم وقائمة بأسماء الذين لم تُستقطع ضريبتهم خلال الشهر مع بيان الأسباب.</div>' +
+    '</div>' +
+  '</div>';
+  return html;
+}
+
 window.printMonthlyRegisterMonth = function(year, month) {
   var cid = getActiveCompanyId();
   var company = getActiveCompany();
@@ -1577,6 +1716,11 @@ window.printMonthlyRegisterMonth = function(year, month) {
       '<div style="text-align:center;">ختم رب العمل</div>' +
     '</div>' +
   '</div>';
+  
+  // Add withholding tax declaration form as second page
+  var declarationHtml = buildWithholdingTaxDeclarationHtml(cid, year, month);
+  var fullHtml = html + declarationHtml;
+  
   var printWindow = window.open('', '_blank');
   printWindow.document.write('<!DOCTYPE html>' +
     '<html dir="rtl" lang="ar"><head><meta charset="UTF-8">' +
@@ -1585,10 +1729,11 @@ window.printMonthlyRegisterMonth = function(year, month) {
     '<style>' +
       'body { margin:0; padding:0; background:#fff; font-family:Tajawal,Arial,sans-serif; display:flex; flex-direction:column; align-items:center; }' +
       '@media print { @page { size: A4 portrait; margin: 0; } body { background:white; margin:0; padding:0; }' +
-      '.page-break { page-break-after:auto; margin:0 !important; border:none !important; box-shadow:none !important; overflow:hidden !important; } }' +
+      '.page-break { page-break-after:always; margin:0 !important; border:none !important; box-shadow:none !important; overflow:hidden !important; } }' +
       '.page-break { box-sizing:border-box; }' +
+      '.page-break:last-child { page-break-after: auto; }' +
     '</style></head>' +
-    '<body onload="setTimeout(function(){ window.print(); window.close(); }, 500);">' + html + '</body></html>');
+    '<body onload="setTimeout(function(){ window.print(); window.close(); }, 500);">' + fullHtml + '</body></html>');
   printWindow.document.close();
   if (typeof addAuditEntry === 'function') addAuditEntry('طباعة سجل شهري', m + '/' + year);
 };
@@ -1714,7 +1859,8 @@ function buildEmployeeDD4AHtml(employee, fiscalYear) {
   }
 
   /* فترة العمل في السنة المالية: من تاريخ المباشرة (أو أول السنة) إلى نهاية العمل أو 31/12 */
-  var periodStart = employee.startDate || (String(currentYear) + '-01-01');
+  var sy = employee.startDate ? Number(String(employee.startDate).slice(0, 4)) : currentYear;
+  var periodStart = (currentYear === sy) ? (employee.startDate || (String(currentYear) + '-01-01')) : (String(currentYear) + '-01-01');
   var periodEnd = employee.endDate || (String(currentYear) + '-12-31');
 
   var childRows = '';
@@ -2959,7 +3105,11 @@ function buildAnnualStatementHtml(emps, year, company) {
     group.forEach(function(e) {
       var calc = calcYTDForRow(e);
       var absIdx = i + group.indexOf(e);
-      var workPeriod = (e.startDate || '') + ' الى ' + (e.endDate || '');
+      /* فترة العمل لكل سنة: السنة الأولى من تاريخ المباشرة، السنوات الوسطى من 1/1، السنة الأخيرة حتى تاريخ الترك */
+      var sy = e.startDate ? Number(String(e.startDate).slice(0, 4)) : year;
+      var periodStart = (year === sy) ? (e.startDate || (String(year) + '-01-01')) : (String(year) + '-01-01');
+      var periodEnd = e.endDate || (String(year) + '-12-31');
+      var workPeriod = periodStart + ' إلى ' + periodEnd;
       var regNumber = 'DD14-' + year + '-' + String(absIdx + 1).padStart(3, '0');
       var unpaid = Math.max(0, calc.liability - calc.paid);
       var excess = Math.max(0, calc.paid - calc.liability);
