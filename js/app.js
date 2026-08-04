@@ -321,11 +321,11 @@ function showApp(session) {
   document.getElementById('packagesScreen').style.display = 'none';
   document.getElementById('appContainer').style.display = 'flex';
   // Update user info
-  document.getElementById('userDisplayName').textContent = session.name;
-  document.getElementById('userRole').textContent = session.role;
-  document.getElementById('userAvatar').textContent = session.avatar;
-  document.getElementById('headerAvatar').textContent = session.avatar;
-  document.getElementById('welcomeName').textContent = session.name.split(' ')[0];
+  if(document.getElementById('userDisplayName')) document.getElementById('userDisplayName').textContent = session.name;
+  if(document.getElementById('userRole')) document.getElementById('userRole').textContent = session.role;
+  if(document.getElementById('userAvatar')) document.getElementById('userAvatar').textContent = session.avatar;
+  if(document.getElementById('headerAvatar')) document.getElementById('headerAvatar').textContent = session.avatar;
+  if(document.getElementById('welcomeName')) document.getElementById('welcomeName').textContent = session.name.split(' ')[0];
   // Sync stored users into USERS
   var stored = localStorage.getItem('taxUsers');
   if (stored) { var u = JSON.parse(stored); Object.keys(u).forEach(function(k) { USERS[k] = u[k]; }); }
