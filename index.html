@@ -398,155 +398,110 @@
 <!-- ====== MAIN APP ====== -->
 <div class="app-container" id="appContainer" style="display:none;">
 <!-- ====== SIDEBAR ====== -->
-
-<aside class="sidebar" id="sidebar" style="background-color: #0f172a !important; padding:0; display:flex; flex-direction:column; box-shadow: 2px 0 15px rgba(0,0,0,0.1);">
-  <div class="sidebar-header" style="padding: 25px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); background:transparent;">
-    <div style="background: linear-gradient(135deg, #f59e0b, #eab308); width: 42px; height: 42px; border-radius: 12px; display:flex; justify-content:center; align-items:center; box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3);">
-        <i class="fas fa-chart-line" style="color: #fff; font-size: 1.2rem;"></i>
-    </div>
-    <div>
-        <h2 style="color: #fff; margin: 0; font-size: 1.4rem; font-weight: 800;">المكلف</h2>
-        <p style="color: #94a3b8; margin: 0; font-size: 0.8rem;">منصة إدارة الضرائب</p>
-    </div>
-    <div class="sidebar-package-badge" id="sidebarPackageBadge" style="display:none;"></div>
-  </div>
-
-  <nav class="sidebar-nav" style="padding: 20px 15px; flex-grow: 1; overflow-y:auto; overflow-x:hidden;">
-    <div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')" style="padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; color: #cbd5e1; display:flex; align-items:center; gap:12px; cursor:pointer; transition: 0.2s;">
-      <i class="fas fa-home" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-      <span style="font-weight:600;">لوحة التحكم</span>
-    </div>
-
-    <!-- Accordion Category 1 -->
-    <div style="margin-top: 15px;">
-        <div style="padding: 8px 15px; color: #64748b; font-size: 0.85rem; font-weight: 700; display:flex; align-items:center; gap:12px;">
-            <i class="fas fa-calculator" style="width:20px; text-align:center;"></i> الضريبة
-        </div>
-        
-        <div class="nav-accordion open" style="margin-top:5px;">
-            <div class="nav-item" style="padding: 12px 15px; border-radius: 8px; margin-bottom: 5px; color: #fff; background: rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="this.parentElement.classList.toggle('open')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <i class="fas fa-percent" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-                    <span style="font-weight:600;">ضريبة الدخل</span>
-                </div>
-                <i class="fas fa-chevron-up accordion-arrow" style="font-size:0.8rem; color:#94a3b8; transition:transform 0.3s;"></i>
-            </div>
-            
-            <div class="nav-accordion-content" style="padding-right: 25px; display:flex; flex-direction:column; gap:5px; margin-top:5px;">
-                <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')" style="padding: 10px; color: #94a3b8; cursor:pointer; font-weight:500; font-size: 0.95rem; border-radius:6px; transition:0.2s;">
-                    ضريبة الشركات
-                </div>
-                
-                <div class="nav-sub-item-group" style="margin-top:5px;">
-                    <div style="padding: 10px; color: #cbd5e1; font-weight:600; font-size: 0.95rem; display:flex; align-items:center; justify-content:space-between; cursor:pointer;" onclick="this.parentElement.classList.toggle('open')">
-                        ضريبة الموظفين <i class="fas fa-chevron-up" style="font-size:0.7rem; color:#64748b;"></i>
-                    </div>
-                    <div class="nav-sub-content open" style="padding-right: 20px; display:flex; flex-direction:column; gap:3px;">
-                        <div class="nav-item active" data-page="corporate" onclick="navigateTo('corporate'); setTimeout(() => switchTab(event, 'tab-corp-employees'), 100);" style="padding: 8px 10px; color: #eab308; cursor:pointer; font-weight:700; font-size: 0.9rem; border-radius:6px; background:rgba(234, 179, 8, 0.05); display:flex; align-items:center; gap: 8px; position: relative;">
-                            <div style="position: absolute; right: -5px; width: 6px; height: 6px; background: #eab308; border-radius: 50%;"></div>
-                            ضريبة الموظفين الشهرية
-                        </div>
-                        <div class="nav-item" onclick="printAnnualStatement()" style="padding: 8px 10px; color: #94a3b8; cursor:pointer; font-weight:500; font-size: 0.9rem; border-radius:6px; transition:0.2s;">
-                            ضريبة الموظفين السنوية
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="nav-item" data-page="property" onclick="navigateTo('property')" style="padding: 12px 15px; margin-top: 5px; color: #94a3b8; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-building" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-                <span style="font-weight:500;">ضريبة العقار</span>
-            </div>
-            <i class="fas fa-lock" style="font-size:0.8rem; color:#475569;"></i>
-        </div>
-        
-        <div class="nav-item" data-page="profession" onclick="navigateTo('profession')" style="padding: 12px 15px; margin-top: 2px; color: #94a3b8; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:0.2s;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-user-md" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-                <span style="font-weight:500;">ضريبة المهن</span>
-            </div>
-        </div>
-    </div>
-    
-    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
-        <div class="nav-item" data-page="documents" onclick="navigateTo('documents')" style="padding: 12px 15px; color: #94a3b8; display:flex; align-items:center; gap:12px; cursor:pointer; transition: 0.2s;">
-            <i class="fas fa-file-invoice" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-            <span style="font-weight:500;">التقارير</span>
-        </div>
-        <div class="nav-item" data-page="notifications" onclick="navigateTo('notifications')" style="padding: 12px 15px; color: #94a3b8; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition: 0.2s;">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <i class="fas fa-bell" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-                <span style="font-weight:500;">الإشعارات</span>
-            </div>
-            <div style="background:var(--danger); color:#fff; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:bold;">3</div>
-        </div>
-        <div class="nav-item" data-page="settings" onclick="navigateTo('settings')" style="padding: 12px 15px; color: #94a3b8; display:flex; align-items:center; gap:12px; cursor:pointer; transition: 0.2s;">
-            <i class="fas fa-cog" style="font-size:1.1rem; width:20px; text-align:center;"></i>
-            <span style="font-weight:500;">الإعدادات</span>
-        </div>
-    </div>
-  </nav>
-
-  <div style="padding: 20px;">
-      <div style="background: rgba(30,41,59, 1); border-radius: 12px; padding: 20px; text-align:center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-          <div style="width: 48px; height: 48px; background: rgba(59, 130, 246, 0.1); border-radius: 50%; display:flex; align-items:center; justify-content:center; margin: 0 auto 10px auto;">
-              <i class="fas fa-headset" style="color: #60a5fa; font-size: 1.4rem;"></i>
-          </div>
-          <h4 style="color: #fff; margin: 0 0 5px 0; font-size: 0.95rem; font-weight:700;">تحتاج مساعدة؟</h4>
-          <p style="color: #94a3b8; margin: 0 0 15px 0; font-size: 0.75rem;">فريق الدعم جاهز لمساعدتك</p>
-          <button style="width: 100%; background: #eab308; color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(234,179,8,0.3);">تواصل معنا</button>
-      </div>
-  </div>
-  
-  <div class="sidebar-footer" id="userDisplayName" style="display:none;"></div>
-  <div id="userRole" style="display:none;"></div>
-  <div id="userAvatar" style="display:none;"></div>
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<div class="logo"><i class="fas fa-landmark"></i></div>
+<h2>نظام الضرائب العراقي</h2>
+<p>الهيئة العامة للضرائب</p>
+<div class="sidebar-package-badge" id="sidebarPackageBadge"></div>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-section-title">القائمة الرئيسية</div>
+<div class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+<i class="fas fa-th-large"></i>
+<span>لوحة التحكم</span>
+</div>
+<div class="nav-section-title">وحدات الضرائب</div>
+<div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')">
+<i class="fas fa-building"></i>
+<span>ضريبة الشركات</span>
+</div>
+<div class="nav-item" data-page="land" onclick="navigateTo('land')">
+<i class="fas fa-map-marked-alt"></i>
+<span>ضريبة العرصات</span>
+</div>
+<div class="nav-item" data-page="property" onclick="navigateTo('property')">
+<i class="fas fa-home"></i>
+<span>ضريبة العقار</span>
+</div>
+<div class="nav-item" data-page="profession" onclick="navigateTo('profession')">
+<i class="fas fa-user-tie"></i>
+<span>ضريبة المهنة</span>
+</div>
+<div class="nav-section-title">إدارة النظام</div>
+<div class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+<i class="fas fa-folder-open"></i>
+<span>المستندات</span>
+</div>
+<div class="nav-item" data-page="notifications" onclick="navigateTo('notifications')">
+<i class="fas fa-bell"></i>
+<span>الإشعارات</span>
+</div>
+<div class="nav-section-title">أدوات متقدمة</div>
+<div class="nav-item" data-page="penalties" onclick="navigateTo('penalties')">
+<i class="fas fa-gavel"></i>
+<span>حاسبة الغرامات</span>
+</div>
+<div class="nav-item" data-page="appointments" onclick="navigateTo('appointments')">
+<i class="fas fa-calendar-check"></i>
+<span>المواعيد</span>
+</div>
+<div class="nav-section-title">الأمان والنظام والإعدادات</div>
+<div class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+<i class="fas fa-cog"></i>
+<span>الإعدادات</span>
+</div>
+</nav>
+<div class="sidebar-footer">
+<div class="user-avatar" id="userAvatar">م</div>
+<div class="user-info">
+<h4 id="userDisplayName">محمد أحمد</h4>
+<p id="userRole">محاسب ضريبي</p>
+</div>
+<button class="header-btn" onclick="handleLogout()" style="width:32px;height:32px;color:rgba(255,255,255,0.5);" title="تسجيل الخروج">
+<i class="fas fa-sign-out-alt"></i>
+</button>
+</div>
 </aside>
-
 <!-- ====== OVERLAY ====== -->
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <!-- ====== MAIN CONTENT ====== -->
-<main class="main-content" style="background:#f8fafc;">
-
-<header style="background: #fff; padding: 10px 30px; display:flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; height: 75px; flex-shrink:0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); z-index: 100;">
-    <!-- Company Left Side -->
-    <div style="display:flex; align-items:center; gap: 25px;">
-        <button class="menu-toggle" onclick="toggleSidebar()" style="background:none; border:none; font-size:1.2rem; display:none;"><i class="fas fa-bars"></i></button>
-        <div style="display:flex; align-items:center; gap: 12px;">
-            <div style="width: 44px; height: 44px; background: #0f172a; border-radius: 50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                <div style="width:16px; height:16px; background:#fff; border-radius:50%; clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);"></div>
-            </div>
-            <div style="text-align: right;">
-                <h3 style="margin: 0; font-size: 0.95rem; color: #0f172a; font-weight: 800;">شركة المستقبل للتجارة والمقاولات</h3>
-                <p style="margin: 0; font-size: 0.75rem; color: #64748b; font-weight:600;">رقم المكلف: 300123456789</p>
-            </div>
-        </div>
-    </div>
-    
-    <!-- User / Breadcrumbs Right Side -->
-    <div style="display:flex; align-items:center; gap: 20px;">
-        <!-- Breadcrumbs -->
-        <div style="display:flex; gap:8px; font-size:0.85rem; color:#64748b; margin-left: 20px;">
-            <span style="cursor:pointer; color:#94a3b8;" onclick="navigateTo('dashboard')">الرئيسية</span> <i class="fas fa-chevron-left" style="font-size:0.6rem; margin-top:5px; color:#cbd5e1;"></i> 
-            <span style="cursor:pointer; color:#94a3b8;">ضريبة الدخل</span> <i class="fas fa-chevron-left" style="font-size:0.6rem; margin-top:5px; color:#cbd5e1;"></i> 
-            <span style="color:#0f172a; font-weight:700;"><span id="breadcrumb">ضريبة الموظفين الشهرية</span></span>
-            <span id="page-title" style="display:none;"></span>
-        </div>
-
-        <button style="background:none; border:none; color:#64748b; font-size:1.1rem; cursor:pointer; position:relative;">
-            <i class="fas fa-bell"></i>
-            <div style="position:absolute; top:-2px; right:-2px; background:var(--warning); width:14px; height:14px; border-radius:50%; border:2px solid #fff; display:flex; align-items:center; justify-content:center; font-size:8px; color:#fff; font-weight:bold;">3</div>
-        </button>
-        <button style="background:none; border:none; color:#64748b; font-size:1.1rem; cursor:pointer;" onclick="navigateTo('settings')">
-            <i class="fas fa-cog"></i>
-        </button>
-        
-        <div class="header-user-avatar" id="headerAvatar" onclick="handleLogout()" title="تسجيل الخروج" style="cursor:pointer; width:36px; height:36px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:bold;">م</div>
-    </div>
+<main class="main-content">
+<header class="top-header">
+<div class="header-right">
+<button class="menu-toggle" onclick="toggleSidebar()">
+<i class="fas fa-bars"></i>
+</button>
+<div>
+<h1 id="page-title">لوحة التحكم</h1>
+<span class="breadcrumb" id="breadcrumb">الرئيسية</span>
+</div>
+</div>
+<div class="header-left">
+<button class="header-btn" onclick="navigateTo('notifications')" title="الإشعارات">
+<i class="fas fa-bell"></i>
+<span class="notif-count">3</span>
+</button>
+<button class="header-btn" onclick="openSearchModal()" title="بحث">
+<i class="fas fa-search"></i>
+</button>
+<button class="header-btn dark-mode-toggle" onclick="toggleDarkMode()" title="الوضع الليلي">
+<i class="fas fa-moon" id="darkModeIcon"></i>
+</button>
+<button class="header-btn" onclick="exportToPDF()" title="تصدير PDF">
+<i class="fas fa-file-pdf"></i>
+</button>
+<button class="header-btn" onclick="exportToExcel()" title="تصدير Excel">
+<i class="fas fa-file-excel"></i>
+</button>
+<button class="header-btn" onclick="window.print()" title="طباعة">
+<i class="fas fa-print"></i>
+</button>
+<div class="header-user" onclick="handleLogout()">
+<div class="header-user-avatar" id="headerAvatar">م</div>
+</div>
+</div>
 </header>
-
 <div class="page-content">
 <!-- ==================== DASHBOARD ==================== -->
 <section class="page-section active" id="page-dashboard">
@@ -783,12 +738,12 @@
 </div>
 </div>
 <div class="tabs-container stylish-tabs" style="margin-bottom: 25px; display: flex; gap: 10px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); justify-content: center;">
-<button class="tab" onclick="switchTab(event,'tab-corp-profits')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-chart-line"></i> ضريبة أرباح الشركة</button>
-<button class="tab active" onclick="switchTab(event,'tab-corp-employees')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-users"></i> ضريبة موظفي الشركة</button>
+<button class="tab active" onclick="switchTab(event,'tab-corp-profits')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-chart-line"></i> ضريبة أرباح الشركة</button>
+<button class="tab" onclick="switchTab(event,'tab-corp-employees')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-users"></i> ضريبة موظفي الشركة</button>
 <button class="tab" onclick="switchTab(event,'tab-corp-contracts')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-file-contract"></i> ضريبة عقود الشركة</button>
 </div>
 <!-- ===== تاب ضريبة أرباح الشركة ===== -->
-<div class="tab-panel animate-in" id="tab-corp-profits">
+<div class="tab-panel active animate-in" id="tab-corp-profits">
 <div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
 <div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
 <h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-chart-pie" style="color: var(--accent);"></i> احتساب ضريبة أرباح الشركات</h3>
@@ -1139,7 +1094,7 @@
 </div>
 </div>
 <!-- ===== تاب ضريبة موظفي الشركة (لوحة عصرية) ===== -->
-<div class="tab-panel active animate-in" id="tab-corp-employees">
+<div class="tab-panel animate-in" id="tab-corp-employees">
 <style>
   .corp-dash { display:flex; flex-direction:column; gap:20px; }
   .corp-hero { position:relative; overflow:hidden; border-radius:18px; padding:26px 28px; color:#fff; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:18px; background:linear-gradient(135deg,#0f1b4d 0%,#1a2980 55%,#2541b2 100%); box-shadow:0 18px 40px -18px rgba(15,27,77,.55); }
@@ -3199,7 +3154,7 @@
 </div>
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
-<script src="js/app.js?v=1785883500"></script>
+<script src="js/app.js?v=1785840765"></script>
 
 <script>
 // Format currency wrapper
