@@ -494,6 +494,16 @@ function navigateTo(page) {
   if (page === 'loginhistory') renderLoginHistory();
   if (page === 'backup') renderBackups();
   if (page === 'api') renderApiDashboard();
+  if (page === 'corporate') {
+    if (typeof renderEmployeeList === 'function') renderEmployeeList();
+    if (typeof renderAnnualRegister === 'function') renderAnnualRegister();
+    if (typeof renderMonthlyRegister === 'function') renderMonthlyRegister();
+    // Auto-switch to monthly tab when navigating to corporate
+    var activeTab = document.querySelector('#page-corporate .tab-panel.active');
+    if (!activeTab || activeTab.id === 'tab-corp-employees') {
+      switchTab(null, 'tab-corp-monthly');
+    }
+  }
   // Re-init AOS
   if (typeof AOS !== 'undefined') AOS.refresh();
 }
@@ -504,12 +514,16 @@ function toggleSidebar() {
 }
 
 function switchTab(event, tabId) {
-  var container = event.target.closest('.page-section');
+  var container = event && event.target ? event.target.closest('.page-section') : document.getElementById('page-corporate');
+  if (!container) return;
   container.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
   container.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
-  event.target.classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
   var panel = document.getElementById(tabId);
   if (panel) panel.classList.add('active');
+  // Trigger monthly/annual render when switching tabs
+  if (tabId === 'tab-corp-monthly' && typeof renderMonthlyRegister === 'function') renderMonthlyRegister();
+  if (tabId === 'tab-corp-annual' && typeof renderAnnualRegister === 'function') renderAnnualRegister();
 }
 
 // ========== UTILITIES ==========
