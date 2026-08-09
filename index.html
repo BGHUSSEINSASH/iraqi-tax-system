@@ -4,10 +4,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>نظام احتساب الضرائب العراقي</title>
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<title>المكـلف — منصة إدارة الضرائب | TAX IQ</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&amp;family=Tajawal:wght@300;400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet"/>
 <link href="css/style.css" rel="stylesheet"/>
+<link href="css/taxiq.css" rel="stylesheet"/>
 <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -77,10 +78,10 @@
 <div class="splash-ring ring-1"></div>
 <div class="splash-ring ring-2"></div>
 <div class="splash-ring ring-3"></div>
-<div class="splash-logo-inner"><i class="fas fa-landmark"></i></div>
+<div class="splash-logo-inner"><i class="fas fa-chart-column"></i></div>
 </div>
-<h1 class="splash-title-anim">نظام الضرائب العراقي</h1>
-<p class="splash-sub-anim">الهيئة العامة للضرائب — وزارة المالية</p>
+<h1 class="splash-title-anim">المكـلف</h1>
+<p class="splash-sub-anim">منصة إدارة الضرائب — TAX IQ</p>
 <div class="splash-loader"><div class="splash-bar"></div></div>
 <div class="splash-dots">
 <span></span><span></span><span></span>
@@ -109,9 +110,9 @@
 <div class="auth-wrapper">
 <div class="auth-brand-panel">
 <div class="auth-brand-content">
-<div class="auth-brand-logo"><i class="fas fa-landmark"></i></div>
-<h1>نظام الضرائب العراقي</h1>
-<p class="auth-brand-sub">الهيئة العامة للضرائب — وزارة المالية</p>
+<div class="auth-brand-logo"><i class="fas fa-chart-column"></i></div>
+<h1>المكـلف — TAX IQ</h1>
+<p class="auth-brand-sub">منصة إدارة الضرائب العراقية</p>
 <div class="auth-features-list">
 <div class="auth-feature-item"><i class="fas fa-shield-alt"></i><span>نظام آمن ومشفر بالكامل</span></div>
 <div class="auth-feature-item"><i class="fas fa-calculator"></i><span>احتساب ضريبي دقيق وفق القانون</span></div>
@@ -124,7 +125,7 @@
 <div class="auth-stat-item"><strong>+١٠٠٠</strong><span>مستخدم</span></div>
 </div>
 </div>
-<div class="auth-brand-footer">© ٢٠٢٦ الهيئة العامة للضرائب — جمهورية العراق</div>
+<div class="auth-brand-footer">© ٢٠٢٦ المكـلف — منصة إدارة الضرائب (TAX IQ)</div>
 </div>
 <div class="auth-form-panel">
 <div class="auth-form-scroll">
@@ -398,134 +399,94 @@
 <!-- ====== MAIN APP ====== -->
 <div class="app-container" id="appContainer" style="display:none;">
 <!-- ====== SIDEBAR ====== -->
-<aside class="sidebar" id="sidebar" style="background:#0f172a !important; padding:0; display:flex; flex-direction:column; overflow:hidden;">
-  <!-- Logo -->
-  <div class="sidebar-header" style="padding:20px 18px; background:transparent; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:12px;">
-    <div style="background:linear-gradient(135deg,#f59e0b,#eab308); width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(234,179,8,0.4); flex-shrink:0;">
-      <i class="fas fa-chart-line" style="color:#fff; font-size:1.1rem;"></i>
-    </div>
-    <div>
-      <h2 style="color:#fff; margin:0; font-size:1.3rem; font-weight:800; line-height:1.2;">المكلف</h2>
-      <p style="color:#64748b; margin:0; font-size:0.72rem;">منصة إدارة الضرائب</p>
+<aside class="sidebar" id="sidebar">
+  <!-- الشعار -->
+  <div class="sidebar-header">
+    <div class="sidebar-logo"><i class="fas fa-chart-column"></i></div>
+    <div class="sidebar-brand">
+      <h2>المكـلف</h2>
+      <p>منصة إدارة الضرائب</p>
     </div>
     <div class="sidebar-package-badge" id="sidebarPackageBadge" style="display:none;"></div>
   </div>
 
-  <!-- Nav -->
-  <nav class="sidebar-nav" style="padding:16px 10px; flex:1; overflow-y:auto; overflow-x:hidden;">
+  <!-- القائمة -->
+  <nav class="sidebar-nav" aria-label="القائمة الرئيسية">
 
-    <!-- Dashboard -->
-    <div class="nav-item" data-page="dashboard" onclick="navigateTo('dashboard')"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; gap:11px; cursor:pointer; transition:background 0.15s;">
-      <i class="fas fa-home" style="width:18px; text-align:center;"></i>
-      <span style="font-weight:600; font-size:0.92rem;">لوحة التحكم</span>
+    <!-- لوحة التحكم -->
+    <div class="nav-item" data-page="dashboard" onclick="navigateTo('dashboard')">
+      <i class="fas fa-home"></i><span>لوحة التحكم</span>
     </div>
 
-    <!-- الضريبة Section -->
-    <div style="padding:10px 13px 4px; color:#475569; font-size:0.75rem; font-weight:700; letter-spacing:0.5px; display:flex; align-items:center; gap:8px; margin-top:8px;">
-      <i class="fas fa-calculator" style="font-size:0.8rem;"></i> الضريبة
-    </div>
+    <!-- الضريبة -->
+    <div class="nav-label"><i class="fas fa-calculator"></i> الضريبة</div>
 
-    <!-- ضريبة الدخل accordion -->
-    <div class="nav-accordion" style="margin-bottom:2px;">
-      <div style="padding:11px 13px; border-radius:8px; color:#cbd5e1; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:space-between; cursor:pointer; margin-bottom:3px;"
-           onclick="this.parentElement.classList.toggle('open')">
-        <div style="display:flex; align-items:center; gap:11px;">
-          <i class="fas fa-percent" style="width:18px; text-align:center;"></i>
-          <span style="font-weight:600; font-size:0.92rem;">ضريبة الدخل</span>
-        </div>
-        <i class="fas fa-chevron-up" style="font-size:0.72rem; color:#475569; transition:transform 0.25s;"></i>
+    <!-- ضريبة الدخل (قابلة للطي) -->
+    <div class="nav-accordion open">
+      <div class="nav-accordion-toggle" onclick="this.parentElement.classList.toggle('open')" aria-expanded="true">
+        <span class="nav-acc-title"><i class="fas fa-percent"></i> ضريبة الدخل</span>
+        <i class="fas fa-chevron-up nav-acc-arrow"></i>
       </div>
-      <div class="nav-accordion-content" style="padding-right:38px;">
-        <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')"
-             style="padding:9px 10px; color:#94a3b8; cursor:pointer; font-size:0.88rem; border-radius:6px; transition:background 0.15s;">
-          ضريبة الشركات
+      <div class="nav-accordion-content">
+        <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate')">
+          <i class="fas fa-building"></i><span>ضريبة الشركات</span>
         </div>
-        <!-- ضريبة الموظفين sub-group -->
-        <div style="padding:9px 10px 4px; color:#475569; font-size:0.82rem; font-weight:700;">ضريبة الموظفين</div>
-        <div class="nav-item active" data-page="corporate" onclick="navigateTo('corporate'); setTimeout(function(){switchTab(null,'tab-corp-monthly')},120);"
-             style="padding:8px 10px; cursor:pointer; font-size:0.86rem; border-radius:6px; color:#eab308; background:rgba(234,179,8,0.07); position:relative; display:flex; align-items:center; gap:7px;">
-          <span style="position:absolute; right:-3px; width:6px; height:6px; background:#eab308; border-radius:50%;"></span>
-          ضريبة الموظفين الشهرية
+        <div class="nav-sub-label">ضريبة الموظفين</div>
+        <div class="nav-item active" data-page="corporate" onclick="navigateTo('corporate'); setTimeout(function(){switchTab(null,'tab-corp-monthly')},120)">
+          <span class="nav-active-dot"></span><span>ضريبة الموظفين الشهرية</span>
         </div>
-        <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate'); setTimeout(function(){switchTab(null,'tab-corp-annual')},120);"
-             style="padding:8px 10px; color:#94a3b8; cursor:pointer; font-size:0.86rem; border-radius:6px; transition:background 0.15s;">
-          ضريبة الموظفين السنوية
+        <div class="nav-item" data-page="corporate" onclick="navigateTo('corporate'); setTimeout(function(){switchTab(null,'tab-corp-annual')},120)">
+          <span class="nav-active-dot"></span><span>ضريبة الموظفين السنوية</span>
         </div>
       </div>
     </div>
 
     <!-- ضريبة العقار -->
-    <div class="nav-item" data-page="property" onclick="navigateTo('property')"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#64748b; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-      <div style="display:flex; align-items:center; gap:11px;">
-        <i class="fas fa-building" style="width:18px; text-align:center;"></i>
-        <span style="font-weight:500; font-size:0.92rem;">ضريبة العقار</span>
-      </div>
-      <i class="fas fa-lock" style="font-size:0.75rem; color:#334155;"></i>
+    <div class="nav-item" data-page="property" onclick="navigateTo('property')">
+      <i class="fas fa-building"></i><span>ضريبة العقار</span><i class="fas fa-chevron-left nav-more"></i>
     </div>
 
     <!-- ضريبة المهن -->
-    <div class="nav-item" data-page="profession" onclick="navigateTo('profession')"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; gap:11px; cursor:pointer; transition:background 0.15s;">
-      <i class="fas fa-user-md" style="width:18px; text-align:center;"></i>
-      <span style="font-weight:500; font-size:0.92rem;">ضريبة المهن</span>
+    <div class="nav-item" data-page="profession" onclick="navigateTo('profession')">
+      <i class="fas fa-user-md"></i><span>ضريبة المهن</span><i class="fas fa-chevron-left nav-more"></i>
     </div>
 
     <!-- ضريبة المبيعات -->
-    <div class="nav-item"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#64748b; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
-      <div style="display:flex; align-items:center; gap:11px;">
-        <i class="fas fa-shopping-cart" style="width:18px; text-align:center;"></i>
-        <span style="font-weight:500; font-size:0.92rem;">ضريبة المبيعات</span>
-      </div>
-      <i class="fas fa-lock" style="font-size:0.75rem; color:#334155;"></i>
+    <div class="nav-item" data-page="sales" onclick="navigateTo('sales')">
+      <i class="fas fa-shopping-cart"></i><span>ضريبة المبيعات</span><i class="fas fa-chevron-left nav-more"></i>
     </div>
 
-    <div style="border-top:1px solid rgba(255,255,255,0.05); margin:12px 0;"></div>
+    <div class="nav-sep"></div>
 
     <!-- التقارير -->
-    <div class="nav-item"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; gap:11px; cursor:pointer; transition:background 0.15s;">
-      <i class="fas fa-file-invoice" style="width:18px; text-align:center;"></i>
-      <span style="font-weight:500; font-size:0.92rem;">التقارير</span>
+    <div class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+      <i class="fas fa-file-invoice"></i><span>التقارير</span>
     </div>
 
     <!-- المرفوعات -->
-    <div class="nav-item"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; gap:11px; cursor:pointer; transition:background 0.15s;">
-      <i class="fas fa-cloud-upload-alt" style="width:18px; text-align:center;"></i>
-      <span style="font-weight:500; font-size:0.92rem;">المرفوعات</span>
+    <div class="nav-item" data-page="documents" onclick="navigateTo('documents')">
+      <i class="fas fa-cloud-upload-alt"></i><span>المرفوعات</span>
     </div>
 
     <!-- الإشعارات -->
-    <div class="nav-item" data-page="notifications" onclick="navigateTo('notifications')"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; justify-content:space-between; cursor:pointer; transition:background 0.15s;">
-      <div style="display:flex; align-items:center; gap:11px;">
-        <i class="fas fa-bell" style="width:18px; text-align:center;"></i>
-        <span style="font-weight:500; font-size:0.92rem;">الإشعارات</span>
-      </div>
-      <div style="background:#ef4444; color:#fff; border-radius:50%; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:bold;">3</div>
+    <div class="nav-item" data-page="notifications" onclick="navigateTo('notifications')">
+      <i class="fas fa-bell"></i><span>الإشعارات</span><span class="nav-badge">3</span>
     </div>
 
     <!-- الإعدادات -->
-    <div class="nav-item" data-page="settings" onclick="navigateTo('settings')"
-         style="padding:11px 13px; border-radius:8px; margin-bottom:4px; color:#94a3b8; display:flex; align-items:center; gap:11px; cursor:pointer; transition:background 0.15s;">
-      <i class="fas fa-cog" style="width:18px; text-align:center;"></i>
-      <span style="font-weight:500; font-size:0.92rem;">الإعدادات</span>
+    <div class="nav-item" data-page="settings" onclick="navigateTo('settings')">
+      <i class="fas fa-cog"></i><span>الإعدادات</span>
     </div>
 
   </nav>
 
-  <!-- Bottom support box -->
-  <div style="padding:16px; border-top:1px solid rgba(255,255,255,0.05);">
-    <div style="background:#1e293b; border-radius:12px; padding:18px; text-align:center;">
-      <div style="width:44px; height:44px; background:rgba(59,130,246,0.12); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 10px auto;">
-        <i class="fas fa-headset" style="color:#60a5fa; font-size:1.3rem;"></i>
-      </div>
-      <h4 style="color:#fff; margin:0 0 4px 0; font-size:0.9rem; font-weight:700;">تحتاج مساعدة؟</h4>
-      <p style="color:#64748b; margin:0 0 14px 0; font-size:0.72rem;">فريق الدعم جاهز لمساعدتك</p>
-      <button onclick="navigateTo('contact')" style="width:100%; background:#eab308; color:#fff; border:none; padding:9px; border-radius:8px; font-weight:700; cursor:pointer; font-family:inherit; font-size:0.88rem; box-shadow:0 2px 8px rgba(234,179,8,0.3);">تواصل معنا</button>
+  <!-- بطاقة الدعم -->
+  <div class="sidebar-support">
+    <div class="support-box">
+      <div class="support-icon"><i class="fas fa-headset"></i></div>
+      <h4>تحتاج مساعدة؟</h4>
+      <p>فريق الدعم جاهز لمساعدتك</p>
+      <button onclick="navigateTo('contact')">تواصل معنا</button>
     </div>
   </div>
 
@@ -538,35 +499,33 @@
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 <!-- ====== MAIN CONTENT ====== -->
 <main class="main-content">
-<header style="background:#fff; padding:0 30px; display:flex; justify-content:space-between; align-items:center; height:70px; border-bottom:1px solid #e2e8f0; box-shadow:0 1px 4px rgba(0,0,0,0.03); flex-shrink:0; position:sticky; top:0; z-index:99;">
-  <!-- Left: company info -->
-  <div style="display:flex; align-items:center; gap:14px;">
-    <button class="menu-toggle" onclick="toggleSidebar()" style="background:none; border:none; color:#64748b; font-size:1.2rem; cursor:pointer; padding:6px; border-radius:6px; display:none;"><i class="fas fa-bars"></i></button>
-    <div style="width:40px; height:40px; background:#0f172a; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-      <div style="width:14px; height:14px; background:#fff; border-radius:50%; clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);"></div>
-    </div>
-    <div>
-      <h3 style="margin:0; font-size:0.9rem; color:#0f172a; font-weight:800;">شركة المستقبل للتجارة والمقاولات</h3>
-      <p style="margin:0; font-size:0.72rem; color:#64748b; font-weight:600;">رقم المكلف: 300123456789</p>
+<header class="topbar">
+  <!-- يمين: معلومات الجهة -->
+  <div class="topbar-left">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="فتح القائمة الجانبية"><i class="fas fa-bars"></i></button>
+    <div class="topbar-avatar"><i class="fas fa-chart-column"></i></div>
+    <div class="topbar-company">
+      <h3>شركة المستقبل للتجارة والمقاولات</h3>
+      <p>رقم المكلف: 300123456789</p>
     </div>
   </div>
-  <!-- Right: breadcrumbs + icons + user -->
-  <div style="display:flex; align-items:center; gap:18px;">
-    <div style="display:flex; gap:7px; font-size:0.82rem; color:#64748b; align-items:center;">
-      <span style="color:#94a3b8; cursor:pointer;" onclick="navigateTo('dashboard')">الرئيسية</span>
-      <i class="fas fa-chevron-left" style="font-size:0.55rem; color:#cbd5e1;"></i>
-      <span style="color:#94a3b8;">ضريبة الدخل</span>
-      <i class="fas fa-chevron-left" style="font-size:0.55rem; color:#cbd5e1;"></i>
-      <span style="color:#0f172a; font-weight:700;" id="breadcrumb">ضريبة الشركات</span>
+  <!-- يسار: مسار التنقل + أيقونات + المستخدم -->
+  <div class="topbar-right">
+    <nav class="breadcrumb" aria-label="مسار التنقل">
+      <span onclick="navigateTo('dashboard')">الرئيسية</span>
+      <i class="fas fa-chevron-left"></i>
+      <span>ضريبة الدخل</span>
+      <i class="fas fa-chevron-left"></i>
+      <span class="breadcrumb-current" id="breadcrumb">ضريبة الشركات</span>
       <span id="page-title" style="display:none;"></span>
-    </div>
-    <button onclick="navigateTo('notifications')" style="background:none; border:none; color:#64748b; font-size:1.05rem; cursor:pointer; position:relative; padding:6px; border-radius:6px;">
+    </nav>
+    <button class="topbar-icon" onclick="navigateTo('notifications')" aria-label="الإشعارات">
       <i class="fas fa-bell"></i>
-      <div style="position:absolute; top:2px; right:2px; background:#f97316; width:13px; height:13px; border-radius:50%; border:2px solid #fff; font-size:8px; color:#fff; font-weight:bold; display:flex; align-items:center; justify-content:center;">3</div>
+      <span class="topbar-badge">3</span>
     </button>
-    <button onclick="navigateTo('settings')" style="background:none; border:none; color:#64748b; font-size:1.05rem; cursor:pointer; padding:6px; border-radius:6px;"><i class="fas fa-cog"></i></button>
-    <div id="headerAvatar" onclick="handleLogout()" title="تسجيل الخروج"
-         style="width:36px; height:36px; border-radius:50%; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-weight:bold; cursor:pointer; font-family:inherit; font-size:0.95rem; color:#334155;">م</div>
+    <button class="topbar-icon" onclick="navigateTo('settings')" aria-label="الإعدادات"><i class="fas fa-cog"></i></button>
+    <button class="topbar-icon" onclick="toggleDarkMode()" title="الوضع الليلي" aria-label="تبديل الوضع الليلي"><i class="fas fa-moon" id="darkModeIcon"></i></button>
+    <div id="headerAvatar" class="topbar-user" onclick="handleLogout()" title="تسجيل الخروج">م</div>
   </div>
 </header>
 <div class="page-content">
@@ -960,9 +919,9 @@
 <div id="empRegContext" style="display:none; align-items:center; flex-wrap:wrap; gap:10px; background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:10px 14px; margin-bottom:14px;">
 <span id="empRegModeLabel" style="font-weight:800; color:#9a3412; font-size:.85rem;"><i class="fas fa-calendar-week"></i> تسجيل موظف شهر</span>
 <label style="font-size:.8rem; font-weight:700; color:#475569;">السنة:</label>
-<select id="empModTargetYear" onchange="updateEmpRegContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;"></select>
+<select id="empModTargetYear" onchange="updateEmpRegisterContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;"></select>
 <label style="font-size:.8rem; font-weight:700; color:#475569;">الشهر:</label>
-<select id="empModTargetMonth" onchange="updateEmpRegContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;">
+<select id="empModTargetMonth" onchange="updateEmpRegisterContext()" style="border:1px solid #cbd5e1; border-radius:8px; padding:6px 10px; font-family:inherit; font-weight:700; color:#334155;">
 <option value="1">1 — كانون الثاني</option>
 <option value="2">2 — شباط</option>
 <option value="3">3 — آذار</option>
@@ -1164,52 +1123,156 @@
 <!-- ===== تاب ضريبة موظفي الشركة (لوحة عصرية) ===== -->
 <!-- ===== تاب الموظفين الشهري ===== -->
 <div class="tab-panel animate-in active" id="tab-corp-monthly">
-  <div class="corp-dash" style="padding:10px 0; display:flex; flex-direction:column; gap:20px;">
+  <div class="corp-dash">
 
-    <!-- Hero / summary strip -->
-    <div class="corp-hero">
+    <!-- 1) عنوان الصفحة -->
+    <div class="page-head">
+      <div class="page-head-title">
+        <div class="page-head-icon"><i class="fas fa-users"></i></div>
+        <div>
+          <h2>ضريبــة الموظفين الشهرية</h2>
+          <p>الاقتطاع الشهري من رواتب الموظفين وتقديمه إلى الهيئة وفق أحكام قانون ضريبة الدخل</p>
+        </div>
+      </div>
+      <div class="fiscal-badge"><i class="fas fa-calendar-alt"></i> السنة المالية <span id="headFiscalYear">2026</span></div>
+    </div>
+
+    <!-- 2) بطاقة الفلترة -->
+    <div class="filter-card">
+      <div class="filter-field">
+        <label for="filterMonth"><i class="fas fa-calendar-day"></i> الشهر</label>
+        <select id="filterMonth" onchange="filterMonthlyRegister()">
+          <option value="0" selected>جميع الأشهر</option>
+          <option value="1">كانون الثاني</option>
+          <option value="2">شباط</option>
+          <option value="3">آذار</option>
+          <option value="4">نيسان</option>
+          <option value="5">أيار</option>
+          <option value="6">حزيران</option>
+          <option value="7">تموز</option>
+          <option value="8">آب</option>
+          <option value="9">أيلول</option>
+          <option value="10">تشرين الأول</option>
+          <option value="11">تشرين الثاني</option>
+          <option value="12">كانون الأول</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <label for="monthlyRegYear"><i class="fas fa-calendar-alt"></i> السنة</label>
+        <select id="monthlyRegYear" onchange="this.dataset.userPicked='1'; renderMonthlyRegister(); var fb=document.getElementById('headFiscalYear'); if(fb) fb.textContent=this.value;"></select>
+      </div>
+      <div class="filter-field filter-search">
+        <label for="empSearchInput"><i class="fas fa-search"></i> البحث في الموظفين</label>
+        <input type="search" id="empSearchInput" placeholder="ابحث عن موظف بالاسم ..." oninput="filterMonthlyRegister()">
+      </div>
+      <div class="filter-actions">
+        <button type="button" class="btn btn-primary" onclick="openMonthlyEmployeeModal()"><i class="fas fa-user-plus"></i> إضافة موظف</button>
+      </div>
+    </div>
+
+    <!-- 3) مؤشرات الأداء -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon ki-blue"><i class="fas fa-coins"></i></div>
+        <div class="kpi-meta">
+          <span class="kpi-label">الدخل الإجمالي</span>
+          <strong class="kpi-value" id="corpStatGross">0</strong>
+          <span class="kpi-unit">د.ع</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon ki-gold"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="kpi-meta">
+          <span class="kpi-label">إجمالي الخصومات</span>
+          <strong class="kpi-value" id="corpStatDed">0</strong>
+          <span class="kpi-unit">د.ع</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon ki-emerald"><i class="fas fa-scale-balanced"></i></div>
+        <div class="kpi-meta">
+          <span class="kpi-label">الوعاء الضريبي</span>
+          <strong class="kpi-value" id="corpStatTaxable">0</strong>
+          <span class="kpi-unit">د.ع</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon ki-red"><i class="fas fa-landmark"></i></div>
+        <div class="kpi-meta">
+          <span class="kpi-label">ضريبة الموظفين الشهرية</span>
+          <strong class="kpi-value" id="corpStatAnnual">0</strong>
+          <span class="kpi-unit">د.ع</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4) التنبيه القانوني -->
+    <div class="legal-note">
+      <i class="fas fa-scale-balanced"></i>
       <div>
-        <div class="corp-hero-eyebrow"><i class="fas fa-calendar-day"></i> الضريبة الشهرية</div>
-        <h3 class="corp-hero-title"><div class="corp-hero-avatar"><i class="fas fa-users"></i></div> ضريبة موظفي الشركة — إدارة شهرية</h3>
-        <p class="corp-hero-sub">إضافة وإدارة الموظفين شهرياً · كل شهر يتم قفله يُضاف إلى الكشف السنوي التراكمي</p>
-      </div>
-      <div class="corp-hero-actions">
-        <button class="corp-btn gold" onclick="document.getElementById('empModal').style.display='flex'"><i class="fas fa-user-plus"></i> إضافة موظف</button>
-        <button class="corp-btn" style="background:rgba(255,255,255,0.12); color:#fff;" onclick="exportBlankExcel()"><i class="fas fa-file-excel"></i> تنزيل نموذج</button>
-        <button class="corp-btn" style="background:rgba(255,255,255,0.12); color:#fff;" onclick="exportToExcel()"><i class="fas fa-download"></i> تنزيل بيانات</button>
-        <label for="empExcelUpload" class="corp-btn" style="background:rgba(255,255,255,0.12); color:#fff; margin:0; cursor:pointer;"><i class="fas fa-file-import"></i> استيراد
-          <input type="file" id="empExcelUpload" accept=".xlsx,.xls" style="display:none;" onchange="importFromExcel(event)"></label>
-        <button class="corp-btn" style="background:rgba(255,255,255,0.12); color:#fff;" onclick="exportFormD14()"><i class="fas fa-print"></i> طباعة ض.د/14</button>
+        <strong>سند قانوني:</strong> تُقتطع ضريبة الموظفين من صافي الرواتب وفق أحكام المواد (60) و(61) من قانون ضريبة الدخل رقم (113) لسنة 1982 وتعديلاته، وتُسدد إلى الهيئة خلال 15 يوماً من نهاية الشهر الذي حصل فيه الاقتطاع.
       </div>
     </div>
 
-    <!-- Monthly lock controls -->
-    <div style="background:#fff; border-radius:14px; padding:18px 22px; border:1px solid #e2e8f0; box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
-          <i class="fas fa-lock" style="color:#0f172a; font-size:1.3rem;"></i>
-          <div>
-            <h4 style="margin:0; color:#0f172a; font-size:1rem; font-weight:800;">إدارة الإقفال الضريبي</h4>
-            <p style="margin:0; font-size:0.78rem; color:#64748b;">قم بإقفال الشهر الحالي لتجميد قيم الضريبة وإضافتها إلى السجل السنوي</p>
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-          <select id="closeTaxYear_Year" style="border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; font-weight:700; color:#334155; outline:none; background:#f8fafc;">
-            <option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option>
-          </select>
-          <select id="closeTaxMonth_Month" style="border:1px solid #cbd5e1; border-radius:8px; padding:8px 12px; font-weight:700; color:#334155; outline:none; background:#f8fafc;">
-            <option value="1">كانون الثاني</option><option value="2">شباط</option><option value="3">آذار</option><option value="4">نيسان</option><option value="5">أيار</option><option value="6">حزيران</option><option value="7">تموز</option><option value="8">آب</option><option value="9">أيلول</option><option value="10">تشرين الأول</option><option value="11">تشرين الثاني</option><option value="12">كانون الأول</option>
-          </select>
-          <button class="corp-btn primary" onclick="closeMonthlyTax()"><i class="fas fa-lock"></i> إقفال الشهر</button>
-          <button class="corp-btn" style="background:#fef3c7; color:#92400e; border:1px solid #fde68a;" onclick="closeTaxYear()"><i class="fas fa-calendar-check"></i> إقفال السنة</button>
-          <button class="corp-btn" style="background:#fee2e2; color:#b91c1c; border:1px solid #fecaca;" onclick="clearAllSnapshots()"><i class="fas fa-trash-restore"></i> مسح الأرشفة</button>
-        </div>
+    <!-- 5) الإجراءات السريعة -->
+    <div class="quick-actions">
+      <div class="quick-action" role="button" tabindex="0" onclick="exportBlankExcel()">
+        <span class="qa-icon"><i class="fas fa-file-excel"></i></span>
+        <span class="qa-title">تنزيل نموذج</span>
+        <span class="qa-sub">نموذج إدخال الموظفين</span>
       </div>
+      <div class="quick-action" role="button" tabindex="0" onclick="exportToExcel()">
+        <span class="qa-icon"><i class="fas fa-download"></i></span>
+        <span class="qa-title">تنزيل البيانات</span>
+        <span class="qa-sub">تصدير الكشف الحالي</span>
+      </div>
+      <div class="quick-action" role="button" tabindex="0" onclick="document.getElementById('empExcelUpload').click()">
+        <span class="qa-icon"><i class="fas fa-file-import"></i></span>
+        <span class="qa-title">استيراد ملف</span>
+        <span class="qa-sub">إدخال جماعي من Excel</span>
+      </div>
+      <div class="quick-action" role="button" tabindex="0" onclick="exportFormD14()">
+        <span class="qa-icon"><i class="fas fa-print"></i></span>
+        <span class="qa-title">طباعة ض.د/14</span>
+        <span class="qa-sub">استمارة التقديم الشهرية</span>
+      </div>
+      <div class="quick-action" role="button" tabindex="0" onclick="openMonthlyEmployeeModal()">
+        <span class="qa-icon"><i class="fas fa-user-plus"></i></span>
+        <span class="qa-title">إضافة موظف</span>
+        <span class="qa-sub">موظف جديد للشهر الحالي</span>
+      </div>
+      <input type="file" id="empExcelUpload" accept=".xlsx,.xls" style="display:none;" onchange="importAnnualStatement(this)">
     </div>
 
-    <!-- Employee table container -->
-    <div style="background:#fff; border-radius:14px; overflow:hidden; border:1px solid #e2e8f0; box-shadow:0 1px 4px rgba(0,0,0,0.02);">
-      <div id="monthlyRegisterContainer" style="overflow-x:auto; padding:10px;"></div>
+    <!-- 6) جدول الموظفين -->
+    <div class="table-card">
+      <div class="table-head">
+        <div class="table-title"><i class="fas fa-users"></i> سجل الموظفين الشهري</div>
+        <div class="table-actions">
+          <span id="corpEmpCount" class="emp-count"></span>
+          <button type="button" class="btn btn-outline" onclick="exportToExcel()"><i class="fas fa-download"></i> تصدير</button>
+        </div>
+      </div>
+      <div id="monthlyRegisterContainer" class="table-wrap"></div>
+    </div>
+
+    <!-- 7) إدارة الإقفال -->
+    <div class="lock-card">
+      <div class="lock-head">
+        <div class="lock-title"><i class="fas fa-lock"></i><div><h4>إدارة الإقفال الضريبي</h4><p>قم بإقفال الشهر الحالي لتجميد قيم الضريبة وإضافتها إلى الكشف السنوي التراكمي</p></div></div>
+      </div>
+      <div class="lock-body">
+        <select id="closeTaxYear_Year">
+          <option value="2023">2023</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026" selected>2026</option>
+        </select>
+        <select id="closeTaxMonth_Month">
+          <option value="1">كانون الثاني</option><option value="2">شباط</option><option value="3">آذار</option><option value="4">نيسان</option><option value="5">أيار</option><option value="6">حزيران</option><option value="7">تموز</option><option value="8">آب</option><option value="9">أيلول</option><option value="10">تشرين الأول</option><option value="11">تشرين الثاني</option><option value="12">كانون الأول</option>
+        </select>
+        <button type="button" class="btn btn-primary" onclick="closeMonthlyTax()"><i class="fas fa-lock"></i> إقفال الشهر</button>
+        <button type="button" class="btn btn-warning" onclick="closeTaxYear()"><i class="fas fa-calendar-check"></i> إقفال السنة</button>
+        <button type="button" class="btn btn-danger" onclick="clearAllSnapshots()"><i class="fas fa-trash-restore"></i> مسح الأرشفة</button>
+      </div>
+      <div id="monthLockStatus" class="lock-status"></div>
     </div>
 
   </div>
@@ -1232,44 +1295,1906 @@
       </div>
     </div>
 
+    <!-- Fiscal year context -->
+    <div class="corp-context">
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span class="corp-context-label"><i class="fas fa-calendar-alt"></i> السنة المالية:</span>
+        <select id="fiscalYearSelect" style="border:1px solid #c7d2fe; border-radius:8px; padding:8px 12px; font-weight:700; color:#0f1b4d; background:#fff; outline:none;"></select>
+        <span id="fiscalPathBadge" class="corp-path-pill"></span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button class="corp-btn primary" id="convertPathBtn" onclick="convertFiscalYearPath()"><i class="fas fa-exchange-alt"></i> <span id="convertPathLabel">تحويل المسار</span></button>
+        <span id="pathStatusMsg" style="font-size:.8rem; color:#64748b;"></span>
+      </div>
+    </div>
+
+    <div id="yearLockStatus" style="display:flex; align-items:center; gap:8px; font-size:.85rem; font-weight:700; padding:10px 14px; border-radius:10px; background:#f8fafc; border:1px solid #eef2ff;"></div>
+
     <!-- annual register -->
     <div id="annualRegisterContainer"></div>
 
-    <!-- hidden add/edit for annual register compat -->
-    <div id="annualRegisterEditModal" style="display:none; position:fixed; inset:0; background:rgba(15,27,77,0.5); z-index:2900; align-items:center; justify-content:center;">
-      <div style="max-width:600px; width:95%; background:#fff; border-radius:14px; padding:24px; direction:rtl; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="margin:0 0 18px; color:#0f172a; font-size:1.15rem;"><i class="fas fa-user-edit" style="color:#4f46e5;"></i> تعديل بيانات الموظف السنوية</h3>
-        <div id="annualRegisterEditBody" style="max-height:60vh; overflow-y:auto;"></div>
-        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
-          <button class="btn btn-success" onclick="saveAnnualRegisterEdit()"><i class="fas fa-save"></i> حفظ</button>
-          <button class="btn btn-outline" onclick="document.getElementById('annualRegisterEditModal').style.display='none'">إلغاء</button>
+    <!-- DD/4A preview & print -->
+    <div class="corp-card">
+      <div class="corp-card-head">
+        <div>
+          <h3 class="corp-card-title"><i class="fas fa-file-invoice"></i> المعاينة والطباعة — استمارة ض.د/14 والكشف السنوي</h3>
+          <p class="corp-card-sub">اعرض استمارة أي موظف أو الكشف السنوي الكامل، واطبعهما معاً في مستند واحد</p>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="corp-btn outline sm" onclick="previewAnnualStatement()"><i class="fas fa-eye"></i> معاينة الكشف</button>
+          <button class="corp-btn outline sm" onclick="printCurrentEmployeeDD4A()"><i class="fas fa-print"></i> طباعة فورية</button>
+          <button class="corp-btn green sm" onclick="exportCurrentEmployeeDD4APdf()"><i class="fas fa-download"></i> حفظ PDF</button>
         </div>
       </div>
-    </div>
-    <div id="annualRegisterLeaveModal" style="display:none; position:fixed; inset:0; background:rgba(15,27,77,0.5); z-index:2900; align-items:center; justify-content:center;">
-      <div style="max-width:460px; width:95%; background:#fff; border-radius:14px; padding:24px; direction:rtl; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <h3 style="margin:0 0 14px; color:#0f172a;"><i class="fas fa-user-slash" style="color:#dc2626;"></i> تسجيل ترك العمل</h3>
-        <input type="hidden" id="leaveEmpId"><input type="hidden" id="leaveEmpYear">
-        <div id="leaveEmpNameDisplay" style="font-weight:700; color:#1e3a8a; margin-bottom:12px;"></div>
-        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
-          <div style="flex:1; min-width:120px;">
-            <label style="font-weight:700; font-size:0.85rem;">الشهر</label>
-            <select id="leaveMonth" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; outline:none;">
-              <option value="1">كانون الثاني</option><option value="2">شباط</option><option value="3">آذار</option><option value="4">نيسان</option><option value="5">أيار</option><option value="6">حزيران</option><option value="7">تموز</option><option value="8">آب</option><option value="9">أيلول</option><option value="10">تشرين الأول</option><option value="11">تشرين الثاني</option><option value="12">كانون الأول</option>
-            </select>
-          </div>
-          <div style="flex:1; min-width:120px;">
-            <label style="font-weight:700; font-size:0.85rem;">اليوم</label>
-            <input type="number" id="leaveDay" min="1" max="31" value="31" style="width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:8px; outline:none;">
-          </div>
-        </div>
-        <div style="display:flex; justify-content:flex-end; gap:10px;">
-          <button class="btn btn-sm" onclick="saveLeaveEmployee()" style="background:#b91c1c;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-weight:700;"><i class="fas fa-check"></i> تسجيل الترك</button>
-          <button class="btn btn-outline btn-sm" onclick="document.getElementById('annualRegisterLeaveModal').style.display='none'">إلغاء</button>
-        </div>
+      <div class="dd4a-shell">
+        <p id="dd4aPreviewHint" style="margin:0 0 12px; color:#64748b; font-size:.9rem;"><i class="fas fa-info-circle"></i> اضغط زر «استمارة» بجانب أي موظف لعرض ض.د/14، أو «معاينة الكشف» لمعاينة الكشف السنوي الكامل قبل الطباعة.</p>
+        <div class="dd4a-form-container" id="dd4aPrintableArea" style="display:none; direction:rtl; background:#eef2f7; padding:16px; color:#000; border:0; border-radius:12px; overflow:auto;"></div>
       </div>
     </div>
+
+    
+    
   </div>
+</div>
+<div class="tab-panel animate-in" id="tab-corp-contracts">
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-file-signature" style="color: var(--accent);"></i> احتساب ضريبة عقود الشركات</h3>
+</div>
+<div class="card-body" style="padding: 25px;">
+<div class="tabs-container stylish-tabs" style="margin-bottom: 25px; display: flex; gap: 10px; background: #fff; padding: 8px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); justify-content: center;">
+<button class="tab active" onclick="switchContractSubTab(event,'subtab-contract-tax')" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;"><i class="fas fa-file-contract"></i> ضريبة العقد</button>
+<button class="tab" onclick="switchContractSubTab(event,'subtab-contract-employees')" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;"><i class="fas fa-hard-hat"></i> ضريبة موظفي العقد</button>
+<button class="tab" onclick="switchContractSubTab(event,'subtab-contract-deductions')" style="border-radius: 8px; font-weight: 700; padding: 10px 20px; transition: all 0.3s;"><i class="fas fa-hand-holding-usd"></i> استقطاع الأمانات الضريبية</button>
+</div>
+<!-- ضريبة العقد -->
+<div class="contract-subtab active animate-in" id="subtab-contract-tax">
+<div class="info-banner" style="background: linear-gradient(to right, #fffbeb, #fef3c7); border-right: 4px solid #f59e0b; border-radius: 8px; padding: 18px 20px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px;">
+<i class="fas fa-file-contract" style="color: #d97706; font-size: 1.5rem; margin-left: 10px;"></i>
+<div>
+<strong style="color: #92400e; font-size: 1rem; display: block; margin-bottom: 5px;">ضريبة عقود المقاولات والتجهيز:</strong>
+<p style="color: #b45309; font-size: 0.95rem; margin: 0; line-height: 1.6;">تُحتسب الضريبة بناءً على نوع العقد والنسب القانونية المحددة (مثال: العقود الإنشائية ٣.٣٪، الاستشارات ٧٪).</p>
+</div>
+</div>
+<div class="form-grid" style="gap: 20px;">
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-industry" style="color: var(--text-muted); margin-left: 5px;"></i> اسم الشركة / المقاول</label>
+<input id="contractCompany" placeholder="أدخل اسم الجهة المتعاقدة" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;" type="text"/>
+</div>
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-list-alt" style="color: var(--text-muted); margin-left: 5px;"></i> نوع العقد</label>
+<select id="contractType" onchange="updateContractTaxRate()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;">
+<option value="">اختر التصنيف القانوني للعقد</option>
+<option value="construction">مقاولات إنشائية (٣.٣٪)</option>
+<option value="supply">عقد تجهيز/توريد (٣.٣٪)</option>
+<option value="services">عقد تقديم خدمات (٣.٣٪)</option>
+<option value="consulting">عقد استشارات (٧٪)</option>
+<option value="transport">عقد نقل (٣.٣٪)</option>
+<option value="maintenance">عقد صيانة (٣.٣٪)</option>
+<option value="rent_equipment">تأجير آليات ومعدات (١٠٪)</option>
+<option value="foreign">عقد شركة أجنبية (٧٪)</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-money-check-alt" style="color: var(--success); margin-left: 5px;"></i> إجمالي قيمة العقد (د.ع)</label>
+<input id="contractValue" placeholder="مثال: ١٥,٠٠٠,٠٠٠" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; font-weight: 700; width: 100%; box-sizing: border-box;" type="text"/>
+</div>
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-calendar-alt" style="color: var(--text-muted); margin-left: 5px;"></i> تاريخ توقيع العقد</label>
+<input id="contractSignDate" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;" type="date"/>
+</div>
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-calendar-check" style="color: var(--text-muted); margin-left: 5px;"></i> تاريخ الانتهاء المتوقع</label>
+<input id="contractEndDate" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;" type="date"/>
+</div>
+<div class="form-group">
+<label style="font-weight: 700;"><i class="fas fa-percent" style="color: var(--text-muted); margin-left: 5px;"></i> النسبة الضريبية المقررة</label>
+<input id="contractTaxRateDisplay" placeholder="تُحدد تلقائياً حسب نوع العقد" readonly="" style="border: 2px solid transparent; background: var(--bg-secondary); border-radius: 10px; padding: 12px 16px; font-size: 1rem; font-weight: 700; color: var(--primary); width: 100%; box-sizing: border-box;" type="text"/>
+</div>
+</div>
+<div style="margin-top: 30px; text-align: left;">
+<button class="btn btn-primary" onclick="calculateContractTax()" style="padding: 14px 30px; font-size: 1.1rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(26,41,128,0.3);"><i class="fas fa-calculator" style="margin-left: 8px;"></i> استخراج ضريبة العقد</button>
+</div>
+<div class="result-box animate-in" id="contractTaxResult" style="margin-top:30px; display:none; background: #fff; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+<div style="background: var(--bg-secondary); padding: 15px 25px; border-bottom: 2px dashed var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+<h4 style="margin: 0; font-size: 1.1rem; color: var(--primary);"><i class="fas fa-receipt"></i> نتيجة الاحتساب</h4>
+<span style="background: rgba(37,99,235,0.1); color: #2563eb; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">رسمي</span>
+</div>
+<div style="padding: 25px;">
+<div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+<span style="color: var(--text-secondary);">نوع وتصنيف العقد:</span>
+<strong id="contractTypeResult" style="color: var(--text-primary);">-</strong>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+<span style="color: var(--text-secondary);">قيمة العقد الكلية:</span>
+<strong id="contractValueResult" style="color: var(--text-primary);">-</strong>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1.05rem;">
+<span style="color: var(--text-secondary);">النسبة الضريبية:</span>
+<strong id="contractRateResult" style="background: var(--primary-light); color: #fff; padding: 2px 10px; border-radius: 12px;">-</strong>
+</div>
+<div style="display: flex; justify-content: space-between; margin-bottom: 16px; font-size: 1.05rem; padding-bottom: 12px; border-bottom: 1px solid var(--border-light);">
+<span style="color: var(--text-secondary);">مدة وكفاءة العقد:</span>
+<strong id="contractDurationResult" style="color: var(--text-primary);">-</strong>
+</div>
+<div style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; padding: 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(16,185,129,0.3);">
+<span style="font-size: 1.1rem; font-weight: 700;">ضريبة العقد (إجمالي):</span>
+<strong id="contractTaxDue" style="font-size: 1.6rem; font-weight: 900;">-</strong>
+</div>
+</div>
+</div>
+</div>
+<!-- ضريبة موظفي العقد -->
+<div class="contract-subtab" id="subtab-contract-employees" style="display:none;">
+<div class="card" style="box-shadow:none;border:1px solid var(--border); border-radius: 12px; margin-top: 15px;">
+<div class="card-header" style="background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff;">
+<h3 style="color: #fff;"><i class="fas fa-hard-hat"></i> ضريبة موظفي العقد (نفس السجل الشامل)</h3>
+<div class="btn-group">
+<button class="btn btn-sm" onclick="openContractEmpModal()" style="background:#fff;color:#1e40af;border:none;"><i class="fas fa-user-plus"></i> إضافة موظف عقد</button>
+</div>
+</div>
+<div class="card-body">
+<div class="info-banner" style="background: linear-gradient(to right, #eff6ff, #dbeafe); border-right: 4px solid #3b82f6; border-radius: 8px; padding: 16px;">
+<p style="color: #1e3a8a; margin:0;"><i class="fas fa-info-circle"></i> يتم إضافة بيانات موظفي العقد وحساب ضريبتهم بنفس آلية موظفي الشركة.</p>
+</div>
+<div class="table-container" style="overflow-x:auto;">
+<table class="data-table" style="width:100%; min-width:800px;">
+<thead style="background:#f1f5f9;">
+<tr>
+<th>ت</th>
+<th>اسم الموظف</th>
+<th>القطاع والحالة</th>
+<th>الدخل السنوي</th>
+<th>الخصم الشهري</th>
+<th>الوعاء الضريبي</th>
+<th>الضريبة الشهرية</th>
+<th>المُسدد (تراكمي)</th>
+<th>إجراءات</th>
+</tr>
+</thead>
+<tbody id="contEmpTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- استقطاع الأمانات الضريبية -->
+<div class="contract-subtab" id="subtab-contract-deductions" style="display:none;">
+<div class="card" style="box-shadow:none;border:1px solid var(--border);">
+<div class="card-header"><h3><i class="fas fa-hand-holding-usd"></i> استقطاع الأمانات الضريبية الخاصة بالعقد</h3></div>
+<div class="card-body">
+<div class="info-banner" style="background:linear-gradient(135deg,#fef2f2,#fecaca);border:1px solid #fca5a5;border-radius:10px;padding:16px;margin-bottom:20px;">
+<p style="color:#991b1b;font-size:13px;"><i class="fas fa-info-circle" style="margin-left:6px;"></i> يتم استقطاع الأمانات الضريبية من كل دفعة مستحقة للمقاول وفق النسب المقررة قانونياً.</p>
+</div>
+<div class="form-grid">
+<div class="form-group"><label>قيمة الدفعة المستحقة (د.ع)</label><input id="deductionPayment" placeholder="٠" type="text"/></div>
+<div class="form-group"><label>نسبة الاستقطاع (٪)</label>
+<select id="deductionRate">
+<option value="3.3">3.3% — استقطاع قياسي</option>
+<option value="7">7% — عقود استشارية وأجنبية</option>
+<option value="10">10% — تأجير معدات</option>
+</select>
+</div>
+<div class="form-group"><label>رقم الدفعة</label><input id="deductionNumber" placeholder="مثال: الدفعة رقم ١" type="text"/></div>
+</div>
+<div class="btn-group" style="margin-top:16px;">
+<button class="btn btn-primary" onclick="calculateDeduction()"><i class="fas fa-calculator"></i> احتساب الاستقطاع</button>
+</div>
+<div class="result-box" id="deductionResult" style="margin-top:20px;display:none;">
+<div class="result-details" style="display:block;">
+<div class="result-row"><span>قيمة الدفعة:</span><strong id="deductionPaymentResult">-</strong></div>
+<div class="result-row"><span>نسبة الاستقطاع:</span><strong id="deductionRateResult">-</strong></div>
+<div class="result-row total"><span>مبلغ الاستقطاع:</span><strong id="deductionAmountResult">-</strong></div>
+<div class="result-row"><span>المبلغ الصافي بعد الاستقطاع:</span><strong id="deductionNetResult">-</strong></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-profession">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#5b21b6;--hero-c2:#7c3aed;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-file-invoice-dollar"></i>
+</div>
+<div class="section-hero-text">
+<h2>ضريبة الدخل (الاستقطاع المباشر)</h2>
+<p>الاحتساب الذكي لضريبة الدخل الشخصي والمهني مع الأسانيد القانونية</p>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-calculator"></i> نموذج احتساب الضريبة والأسانيد (PRD)</h3></div>
+<div class="card-body">
+<div class="info-banner" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe);border:1px solid #ddd6fe;border-radius:10px;padding:16px;margin-bottom:20px;">
+<p style="color:#5b21b6;font-size:13px;"><i class="fas fa-check-circle" style="margin-left:6px;"></i> <strong>توجيه:</strong> أدخل التنزيلات والسماحات والمخصصات لاحتساب الوعاء الضريبي والشرائح التصاعدية.</p>
+</div>
+<!-- Section 1: Demographic and Social Data -->
+<div class="form-card" id="profStep1" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-user"></i> القسم 1: البيانات الاجتماعية والسماحات</h4>
+<div class="form-grid">
+<div class="form-group">
+<label style="font-weight:bold;">هل الإقامة في العراق؟ (غير المقيم لا يُشمل بالسماح)</label>
+<select id="profRes" onchange="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+<option selected="" value="resident">مقيم</option>
+<option value="nonresident">غير مقيم</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">العمر تجاوز 63 عاماً؟</label>
+<select id="profAge63" onchange="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+<option selected="" value="no">لا</option>
+<option value="yes">نعم (يضاف 25,000 د.ع)</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">الحالة الاجتماعية للموظف/المكلف</label>
+<select id="profMarital" onchange="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+<option selected="" value="single">أعزب</option>\n<option value="widowed">أرمل</option>\n<option value="divorced">مطلق</option>
+<option value="married_spouse_no_income">متزوج (الزوج/ة ربة بيت أو دُمج دخلها)</option>
+<option value="married_spouse_income">متزوج (الزوج/ة يحاسب ضريبياً مستقلاً)</option>
+<option value="married_female_disabled_husband">مرأة متزوجة (زوجها عاجز كلياً وليس له مورد)</option>
+<option value="widow_divorced">أرملة أو مطلقة (مستقلة)</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">عدد الأولاد (المستحقين للسماح)</label>
+<input id="profChildren" min="0" oninput="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="number" value="0"/>
+</div>
+</div>
+</div>
+<!-- Section 2: Financials (Income) -->
+<div class="form-card" id="profStep2" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-coins"></i> القسم 2: الدخل والمخصصات</h4>
+<div class="form-grid">
+<div class="form-group">
+<label style="font-weight:bold;">الراتب الاسمي أو الأجر الأساسي (شهرياً)</label>
+<input id="profBaseSalary" class="money-input" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">إجمالي المخصصات النقدية الخاضعة (شهرياً)</label>
+<input id="profAllowances" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">المنافع العينية (السكن)</label>
+<select id="profHouseKind" onchange="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;">
+<option selected="" value="0">بدون منفعة سكن عيني</option>
+<option value="0.15">سكن غير مؤثث (يضاف 15% من الراتب)</option>
+<option value="0.20">سكن مؤثث (يضاف 20% من الراتب)</option>
+<option value="0.10">سكن مشترك (يضاف 10% من الراتب)</option>
+<option value="0.20_hotel">فندق (يضاف 20% من الراتب)</option>
+<option value="0.05">كرفانات (يضاف 5% من الراتب)</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">المنافع العينية (الطعام)</label>
+<input id="profFoodKindVal" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="أدخل كلفة الطعام الفعلية (أو ٠)" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+<small style="color:var(--text-muted);display:block;margin-top:4px;">سيحسب النظام 10% من الراتب أو الكلفة الفعلية أيهما أقل تلقائياً.</small>
+</div>
+</div>
+</div>
+<!-- Section 3: Legal Deductions -->
+<div class="form-card" id="profStep3" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+<h4 style="color: var(--primary); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-hand-holding-usd"></i> القسم 3: الاستقطاعات القانونية</h4>
+<div class="form-grid">
+<div class="form-group">
+<label style="font-weight:bold;">التوقيفات التقاعدية / اشتراك الضمان (شهرياً)</label>
+<input id="profSocialSec" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">أقساط التأمين المعتمدة (شهرياً)</label>
+<input id="profLifeIns" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+</div>
+<div class="form-group">
+<label style="font-weight:bold;">النفقة الشرعية المحكوم بها (شهرياً)</label>
+<input id="profAlimony" oninput="this.value = formatInputNumber(this.value); calculateProfTax()" placeholder="٠" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="text" onkeyup="formatRealTime(this)" / >
+</div>
+</div>
+</div>
+<!-- Section 5: Admin Penalties -->
+<div class="form-card" id="profStep5" style="border: 1px solid var(--border); padding: 20px; border-radius: 10px;">
+<h4 style="color: var(--danger); margin-top: 0; margin-bottom: 15px;"><i class="fas fa-gavel"></i> القسم 5: غرامات الشركات (اختياري لمدير العمل)</h4>
+<div class="form-group" style="margin-bottom:15px;">
+<label style="font-weight:bold;">تأخير توريد الضريبة للجهة المالية (أيام)</label>
+<input id="profDelayDays" min="0" oninput="calculateProfTax()" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="number" value="0"/>
+</div>
+<!-- Optional: Interest rate -->
+<div class="form-group" style="display:none;">
+<label style="font-weight:bold;">نسبة الفائدة المصرفية (سنوياً)</label>
+<input id="profInterestRate" step="0.01" style="padding:10px; width:100%; border:1px solid var(--border); border-radius:8px;" type="number" value="0.04"/>
+</div>
+</div>
+<div class="result-box" id="profResultBox" style="margin-top:20px; display:none;">
+<div class="result-icon"><i class="fas fa-receipt"></i></div>
+<h2>التقرير الضريبي التفصيلي المرفق بالأسانيد القانونية</h2>
+<div class="result-details" id="profResultDetails" style="display:block;">
+<!-- Breakdowns -->
+<div class="result-row"><span>الدخل الكلي الخاضع:</span><strong id="profResGross">-</strong></div>
+<div class="result-row"><span>السند القانوني:</span><strong id="profResGrossLegal" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
+<!-- 30% Exemption -->
+<div class="result-row" style="margin-top:10px;"><span>تصفية المخصصات (قاعدة الإعفاء 30%):</span><strong id="profResExempt30">-</strong></div>
+<div class="result-row"><span>السند القانوني والتوضيح:</span><strong id="profResExempt30Legal" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
+<!-- Deductions -->
+<div class="result-row" style="margin-top:10px;"><span>التنزيلات القانونية للاستقطاعات:</span><strong id="profResDeductions">-</strong></div>
+<div class="result-row"><span>السند القانوني للتنزيلات:</span><strong id="profResDeductionsLegal" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
+<!-- Statutory Allowances -->
+<div class="result-row" style="margin-top:10px;"><span>إجمالي السماح القانوني الممنوح:</span><strong id="profResAllowances">-</strong></div>
+<div class="result-row"><span>السند القانوني للسماحات:</span><strong id="profResAllowancesLegal" style="color:var(--text-secondary);font-size:0.85rem;">-</strong></div>
+<!-- Taxable Base -->
+<div class="result-row" style="margin-top:10px;border-top:1px solid var(--border);padding-top:10px;"><span>الدخل الصافي الخاضع للضريبة:</span><strong id="profResTaxable" style="color:var(--danger);">-</strong></div>
+<!-- Progressive Brackets Breakdown -->
+<div style="background:#fef2f2;padding:15px;border-radius:10px;margin-top:15px;border:1px solid #fecaca;">
+<h5 style="color:#dc2626;margin:0 0 10px;">توزيع الشرائح الضريبية (على الأساس الشهري)</h5>
+<div id="profBracketsHtml" style="font-size:13px;line-height:1.6;"></div>
+<div style="font-size:12px;color:var(--text-secondary);margin-top:8px;">السند القانوني: المادة (8) - ثانياً.</div>
+</div>
+<!-- Delay penalties -->
+<div id="profPenaltiesSection" style="display:none;background:#fffbeb;padding:15px;border-radius:10px;margin-top:15px;border:1px solid #fde68a;">
+<h5 style="color:#92400e;margin:0 0 10px;">غرامات التوريد المتأخر (حساب أصحاب العمل)</h5>
+<div id="profPenHtml" style="font-size:13px;line-height:1.6;"></div>
+</div>
+<div class="result-row total" style="margin-top:15px;"><span>الضريبة الاستقطاعية النهائية (شهرياً):</span><strong id="profResFinalTax">-</strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== SALES TAX ==================== -->
+<section class="page-section" id="page-notifications">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#d97706;--hero-c2:#f59e0b;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-bell"></i>
+</div>
+<div class="section-hero-text">
+<h2>الإشعارات والتنبيهات</h2>
+<p>متابعة التحديثات القانونية والمدد الضريبية</p>
+</div>
+</div>
+</div>
+<div class="tabs-container stylish-tabs" style="margin-bottom: 25px; display: flex; gap: 10px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); justify-content: center;">
+<button class="tab active" onclick="switchTab(event,'tab-notif-deadlines')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-calendar-alt"></i> المدد القانونية الضريبية</button>
+<button class="tab" onclick="switchTab(event,'tab-notif-legal')" style="border-radius: 8px; font-weight: 700; padding: 12px 24px; transition: all 0.3s;"><i class="fas fa-balance-scale"></i> القوانين والتعليمات</button>
+</div>
+<div class="tab-panel active animate-in" id="tab-notif-deadlines">
+<div class="card" style="border-radius:16px; border:none; box-shadow:0 8px 25px rgba(0,0,0,0.05);">
+<div class="card-header" style="background: linear-gradient(135deg, #1e40af, #2563eb); color:#fff;">
+<h3><i class="fas fa-clock"></i> المدد القانونية الضريبية</h3>
+</div>
+<div class="card-body">
+<div class="notification-item" style="padding:20px; border-bottom:1px solid var(--border); display:flex; gap:15px; align-items:center;">
+<div class="notification-icon" style="background:#fee2e2; color:#ef4444; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:1.5rem;"><i class="fas fa-building"></i></div>
+<div class="notification-content">
+<h4 style="margin:0 0 5px; color:#1e3a8a;">ضريبة أرباح الشركات (البيانات المالية)</h4>
+<p style="margin:0; color:#475569; font-size:14px;">الموعد النهائي لتقديم البيانات المالية للشركات هو قبل تاريخ <strong>31/5</strong> من السنة اللاحقة. <br/><small style="color:#64748b;">(مثال: يجب تقديم حسابات 2025 قبل تاريخ 31/5/2026)</small></p>
+</div>
+</div>
+<div class="notification-item" style="padding:20px; border-bottom:1px solid var(--border); display:flex; gap:15px; align-items:center;">
+<div class="notification-icon" style="background:#ffedf5; color:#f59e0b; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:1.5rem;"><i class="fas fa-users"></i></div>
+<div class="notification-content">
+<h4 style="margin:0 0 5px; color:#1e3a8a;">ضريبة موظفي الشركات (الاستقطاع الشهري)</h4>
+<p style="margin:0; color:#475569; font-size:14px;">يجب الدفع خلال الـ <strong>15 يوم</strong> التالية من الشهر المعني.<br/><small style="color:#64748b;">(مثال: ضريبة شهر 1 تدفع قبل 15/2 وإلا تبدأ غرامات التأخير)</small></p>
+</div>
+</div>
+<div class="notification-item" style="padding:20px; border-bottom:1px solid var(--border); display:flex; gap:15px; align-items:center;">
+<div class="notification-icon" style="background:#e0e7ff; color:#4f46e5; width:50px; height:50px; border-radius:50%; display:flex; justify-content:center; align-items:center; font-size:1.5rem;"><i class="fas fa-file-invoice"></i></div>
+<div class="notification-content">
+<h4 style="margin:0 0 5px; color:#1e3a8a;">التحاسب السنوي واستمارات (ض.د/14)</h4>
+<p style="margin:0; color:#475569; font-size:14px;">الموعد النهائي لتقديم الكشوفات والاستمارات السنوية هو <strong>31/3</strong> من السنة اللاحقة. <br/><small style="color:#64748b;">(مثال: بيانات 2025 تقدم خلال الفترة 1/1/2026 إلى 31/3/2026)</small></p>
+</div>
+</div>
+<div style="background:var(--bg-secondary); padding:15px; border-radius:10px; margin-top:20px; display:flex; align-items:center; gap:10px; border-right:4px solid #64748b;">
+<i class="fas fa-info-circle" style="color:#64748b; font-size:1.2rem;"></i>
+<p style="margin:0; font-size:14px; color:#334155; font-weight:bold;">ملاحظة هامة: للسلطة المالية الحق والصلاحية في أن تمنح تمديداً لهذه الفترات القانونية حسب المصلحة العامة.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-panel animate-in" id="tab-notif-legal">
+<div class="card" style="border-radius:16px; border:none; box-shadow:0 8px 25px rgba(0,0,0,0.05);">
+<div class="card-header" style="background: linear-gradient(135deg, #047857, #10b981); color:#fff;">
+<h3><i class="fas fa-balance-scale"></i> تبليغات وإشعارات السلطة المالية</h3>
+</div>
+<div class="card-body">
+<div class="notification-item" style="padding:20px; border-bottom:1px solid var(--border); display:flex; gap:15px; align-items:start;">
+<div class="notification-icon" style="background:#e0f2fe; color:#0284c7; width:45px; height:45px; border-radius:10px; display:flex; justify-content:center; align-items:center; font-size:1.2rem;"><i class="fas fa-book"></i></div>
+<div class="notification-content">
+<h4 style="margin:0 0 5px; color:#0f172a;">تنبيه إلى كافة الشركات (تعليمات الاستقطاع المباشر)</h4>
+<p style="margin:0; color:#475569; font-size:14px; line-height:1.6;">نؤكد على ضرورة الالتزام بإرسال الاستقطاع المباشر من رواتب الموظفين في مواعيدها المحددة. سيتم تفعيل المراجعات الآلية وفرض الجزاءات وفق أحكام المادة (56) من القانون للجهات المخالفة، مع التأكد من إرفاق برونت السجل الشامل مع كل معاملة شهرية.</p>
+<span style="font-size:12px; color:#94a3b8; display:block; margin-top:8px;">صادر بتاريخ: 2026/01/10</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="page-section" id="page-land">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#10b981;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-map-marked-alt"></i>
+</div>
+<div class="section-hero-text">
+<h2>ضريبة العرصات</h2>
+<p>احتساب ضريبة الأراضي غير المبنية في المناطق البلدية وفق قانون ضريبة العرصات رقم 26 لسنة 1962</p>
+</div>
+</div>
+</div>
+<div class="card" style="border:none; box-shadow:0 8px 25px rgba(6,95,70,0.08); border-radius:16px; margin-bottom:25px;">
+<div class="card-header" style="background: linear-gradient(135deg, #065f46, #10b981); color:#fff; border-radius:16px 16px 0 0; padding:20px 24px;">
+<h3 style="margin:0; display:flex; align-items:center; gap:10px; font-size:1.25rem;"><i class="fas fa-map-marker-alt" style="color:#a7f3d0;"></i> اختيار المحافظة</h3>
+</div>
+<div class="card-body" style="padding:30px;">
+<div class="form-group">
+<label><i class="fas fa-globe-asia" style="color:#065f46; margin-left:6px;"></i> المحافظة</label>
+<select id="landProvince" onchange="updateLandDistricts()" style="border:2px solid var(--border-light); border-radius:10px; padding:12px 16px; font-size:1rem; width:100%; font-weight:700; box-sizing:border-box;">
+<option value="">اختر المحافظة</option>
+<option value="baghdad">بغداد</option>
+<option value="basra">البصرة</option>
+<option value="nineveh">نينوى</option>
+<option value="erbil">أربيل</option>
+<option value="najaf">النجف</option>
+<option value="karbala">كربلاء</option>
+<option value="kirkuk">كركوك</option>
+<option value="sulaymaniyah">السليمانية</option>
+<option value="dhiqar">ذي قار</option>
+<option value="babel">بابل</option>
+<option value="diyala">ديالى</option>
+<option value="anbar">الأنبار</option>
+<option value="wasit">واسط</option>
+<option value="maysan">ميسان</option>
+<option value="muthanna">المثنى</option>
+<option value="qadisiyyah">القادسية</option>
+<option value="saladin">صلاح الدين</option>
+<option value="duhok">دهوك</option>
+</select>
+</div>
+<div id="landDistrictsList" class="chips-group" style="margin-top:16px;"></div>
+</div>
+</div>
+<div class="card" style="border:none; box-shadow:0 8px 25px rgba(6,95,70,0.08); border-radius:16px;">
+<div class="card-header" style="background: linear-gradient(135deg, #065f46, #10b981); color:#fff; border-radius:16px 16px 0 0; padding:20px 24px;">
+<h3 style="margin:0; display:flex; align-items:center; gap:10px; font-size:1.25rem;"><i class="fas fa-calculator" style="color:#a7f3d0;"></i> أداة احتساب ضريبة العرصات</h3>
+</div>
+<div class="card-body" style="padding:30px;">
+<div class="info-banner" style="background: linear-gradient(to right, #ecfdf5, #d1fae5); border-right:4px solid #10b981; border-radius:8px; padding:18px 20px; margin-bottom:25px; display:flex; align-items:center; gap:15px;">
+<i class="fas fa-landmark" style="color:#047857; font-size:1.5rem; margin-left:10px;"></i>
+<div>
+<strong style="color:#064e3b; font-size:1rem; display:block; margin-bottom:5px;">كيفية الاحتساب قانونياً:</strong>
+<p style="color:#065f46; font-size:0.95rem; margin:0; line-height:1.6;">تُحتسب الضريبة بنسبة <strong>2%</strong> من القيمة الخاضعة للعرصة، مع خصم الإعفاء القانوني للمساحة (800 م²) للأصحاء البالغين، وتطبيق شروط الإعفاء التام المنصوص عليها في القانون.</p>
+</div>
+</div>
+<div class="form-group">
+<label><i class="fas fa-tag" style="color:#065f46; margin-left:6px;"></i> حالة العرصة</label>
+<select id="landExemptionCode" onchange="handleLandStep1()" style="border:2px solid var(--border-light); border-radius:10px; padding:12px 16px; font-size:1rem; width:100%; font-weight:700; box-sizing:border-box;">
+<option value="">-- اختر حالة العرصة --</option>
+<option value="none">لا يوجد إعفاء</option>
+<option value="state">مملوكة للدولة أو الوقف أو مخصصة للنفع العام</option>
+<option value="family">دار سكن للمالك (مسكن عائلي مشمول بالإعفاء)</option>
+<option value="other">حالة أخرى تستوجب الإعفاء التام بموجب القانون</option>
+</select>
+</div>
+<div id="landStep2" style="display:none;">
+<div class="form-group" style="margin-top:18px;">
+<label><i class="fas fa-user-shield" style="color:#065f46; margin-left:6px;"></i> بيانات المالك</label>
+<select id="landIsMinor" onchange="handleLandStep2()" style="border:2px solid var(--border-light); border-radius:10px; padding:12px 16px; font-size:1rem; width:100%; font-weight:700; box-sizing:border-box;">
+<option value="">هل المالك قاصر؟</option>
+<option value="yes">نعم</option>
+<option value="no">لا</option>
+</select>
+</div>
+</div>
+<div id="landStep3" style="display:none;">
+<div class="form-row" style="margin-top:18px;">
+<div class="form-group">
+<label><i class="fas fa-ruler-combined" style="color:#065f46; margin-left:6px;"></i> المساحة الكلية</label>
+<input id="landTotalArea" type="text" placeholder="المساحة الكلية بالمتر المربع" style="border:2px solid var(--border-light); border-radius:10px; padding:12px 16px; font-size:1rem; width:100%; font-weight:700; box-sizing:border-box;"/>
+</div>
+<div class="form-group">
+<label><i class="fas fa-coins" style="color:#065f46; margin-left:6px;"></i> القيمة الكلية للعرصة</label>
+<input id="landTotalValue" type="text" placeholder="القيمة الكلية للعرصة (د.ع)" onkeyup="formatRealTime(this)" style="border:2px solid var(--border-light); border-radius:10px; padding:12px 16px; font-size:1rem; width:100%; font-weight:700; box-sizing:border-box;"/>
+</div>
+</div>
+</div>
+<div id="landCalculateBtnGroup" style="display:none; text-align:center; margin-top:26px;">
+<button class="btn btn-primary btn-lg" onclick="calculateNewLandTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+</div>
+<div id="landNewResultBox" class="result-box" style="display:none; margin-top:20px;">
+<div class="result-icon"><i class="fas fa-check-double"></i></div>
+<h2>نتيجة احتساب ضريبة العرصات</h2>
+<p>تفاصيل العرصة والضريبة السنوية المستحقة وفق أحكام القانون</p>
+<div id="landExemptMessage" style="display:none; background:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:18px; color:#065f46; font-weight:700; text-align:right; z-index:1; position:relative;"><i class="fas fa-check-circle"></i> <span id="landExemptText"></span></div>
+<div id="landNewResultDetails" style="display:none; z-index:1; position:relative;">
+<div class="result-row"><span>المساحة الكلية</span><strong id="landResTotalArea"></strong></div>
+<div class="result-row"><span>القيمة الكلية</span><strong id="landResTotalValue"></strong></div>
+<div class="result-row"><span>قيمة المتر المربع</span><strong id="landResMeterValue"></strong></div>
+<div class="result-row" style="flex-direction:column; align-items:flex-start; gap:8px; background:#f0fdf4; border-radius:8px; margin:4px 0;"><span style="font-weight:800; color:#065f46;">حالة الإعفاء</span><strong id="landResExemptStatus" style="font-size:0.9rem; font-weight:600; line-height:1.7;"></strong></div>
+<div class="result-row"><span>المساحة الخاضعة</span><strong id="landResTaxableArea"></strong></div>
+<div class="result-row"><span>القيمة الخاضعة</span><strong id="landResTaxableValue"></strong></div>
+<div class="result-row total"><span>الضريبة السنوية المستحقة</span><strong id="landResFinalTax"></strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-provinces">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1a2980;--hero-c2:#0f1b4d;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-map"></i>
+</div>
+<div class="section-hero-text">
+<h2>محافظات العراق</h2>
+<p>اختيار المحافظة وتوجيه مباشر إلى احتساب ضريبة العرصات</p>
+</div>
+</div>
+</div>
+<div class="provinces-grid" id="provincesGrid"></div>
+</section>
+
+
+<section class="page-section" id="page-property">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#7c2d12;--hero-c2:#f97316;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-home"></i>
+</div>
+<div class="section-hero-text">
+<h2>ضريبة العقار</h2>
+<p>احتساب ضريبة العقار عند البيع أو الإيجار وفق قانون ضريبة العقار رقم 162 لسنة 1959 وتعديلاته</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(124,45,18,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, #7c2d12, #ea580c); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-home" style="color: #fdba74;"></i> المعاملات العقارية</h3>
+</div>
+<div class="card-body" style="padding: 30px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-building" style="color: var(--text-muted); margin-left: 5px;"></i> صفة العقار</label>
+<select id="propExemptType1" onchange="handlePropStep1()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff;">
+<option value="">-- اختر صفة العقار --</option>
+<option value="none">عقار خاضع للضريبة</option>
+<option value="state">دور الدولة والأوقاف والنفع العام</option>
+<option value="religious">الأماكن الدينية</option>
+<option value="diplomatic">البعثات الدبلوماسية</option>
+</select>
+</div>
+<div id="propStep2" style="display:none; margin-top: 20px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-people-roof" style="color: var(--text-muted); margin-left: 5px;"></i> دار سكن العائلة</label>
+<select id="propExemptType2" onchange="handlePropStep2()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff;">
+<option value="">-- هل هو دار سكن للعائلة؟ --</option>
+<option value="none">كلا — غير معفى</option>
+<option value="family">نعم — دار سكن المالك وأقاربه</option>
+</select>
+</div>
+</div>
+<div id="propStep3" style="display:none; margin-top: 20px;">
+<div class="form-row" style="gap: 16px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-hammer" style="color: var(--text-muted); margin-left: 5px;"></i> حالة البناء</label>
+<select id="propIsNew" onchange="togglePropNewDate()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff;">
+<option value="">هل العقار مشيد حديثاً؟</option>
+<option value="yes">نعم</option>
+<option value="no">لا</option>
+</select>
+</div>
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-door-open" style="color: var(--text-muted); margin-left: 5px;"></i> حالة الإشغال</label>
+<select id="propIsEmpty" onchange="togglePropEmptyMonths()" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff;">
+<option value="">هل العقار شاغر؟</option>
+<option value="yes">نعم</option>
+<option value="no">لا</option>
+</select>
+</div>
+</div>
+<div id="propNewDateGroup" style="display:none; margin-top: 16px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-calendar-day" style="color: var(--warning); margin-left: 5px;"></i> تاريخ إتمام البناء</label>
+<input id="propNewDate" type="date" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff;"/>
+</div>
+</div>
+<div id="propEmptyMonthsGroup" style="display:none; margin-top: 16px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-hourglass-half" style="color: var(--warning); margin-left: 5px;"></i> مدة الخلو</label>
+<input id="propEmptyMonths" type="number" min="0" placeholder="عدد أشهر الخلو" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box;"/>
+</div>
+</div>
+</div>
+<div id="propStep4" style="display:none; margin-top: 20px;">
+<div class="form-group">
+<label style="font-weight: 700; color: var(--text-primary);"><i class="fas fa-money-bill-wave" style="color: var(--success); margin-left: 5px;"></i> الإيراد السنوي للعقار (د.ع)</label>
+<input id="propAnnualRent" type="text" placeholder="الإيراد السنوي للعقار (د.ع)" onkeyup="formatRealTime(this)" style="border: 2px solid var(--border-light); border-radius: 10px; padding: 12px 16px; font-size: 1rem; width: 100%; box-sizing: border-box; font-weight: 700;"/>
+</div>
+</div>
+<div id="propCalculateBtnGroup" style="display:none; margin-top: 30px; text-align: left;">
+<button class="btn btn-primary btn-lg" onclick="calculateNewPropertyTax()" style="padding: 14px 30px; font-size: 1.1rem; border-radius: 12px; font-weight: 800; box-shadow: 0 4px 15px rgba(124,45,18,0.3);"><i class="fas fa-calculator" style="margin-left: 8px;"></i> احتساب ضريبة العقار</button>
+</div>
+<div id="propNewResultBox" class="result-box" style="display:none;margin-top:20px;">
+<div id="propExemptMessage" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:12px;padding:18px;color:#065f46;font-weight:700;text-align:right;margin-bottom:18px;"><i class="fas fa-check-circle"></i> <span id="propExemptText"></span></div>
+<div id="propNewResultDetails" style="display:none;">
+<div class="result-details" style="margin-top: 0;">
+<div class="result-row">
+<span>الإيراد السنوي للعقار:</span>
+<strong id="propResRent">0 د.ع</strong>
+</div>
+<small id="propResRentText" style="display:block;color:var(--text-muted);font-size:0.8rem;padding:0 18px 10px;"></small>
+<div class="result-row">
+<span>استقطاع الاندثار والصيانة (10%):</span>
+<strong id="propResMaint">0 د.ع</strong>
+</div>
+<small id="propResMaintText" style="display:block;color:var(--text-muted);font-size:0.8rem;padding:0 18px 10px;"></small>
+<div class="result-row">
+<span>الإيراد الخاضع للضريبة:</span>
+<strong id="propResTaxable">0 د.ع</strong>
+</div>
+<div class="result-row">
+<span>الضريبة الأساسية (10%):</span>
+<strong id="propResBaseTax">0 د.ع</strong>
+</div>
+<small id="propResBaseTaxText" style="display:block;color:var(--text-muted);font-size:0.8rem;padding:0 18px 10px;"></small>
+<div id="propRowEmptyWrap" style="display:none">
+<div class="result-row">
+<span>خصم مدة الخلو:</span>
+<strong id="propResEmpty" style="color: var(--success);">0 د.ع</strong>
+</div>
+<div id="propRowEmptyTextWrap" style="display:none"><small id="propResEmptyText" style="display:block;color:var(--text-muted);font-size:0.8rem;padding:0 18px 10px;"></small></div>
+</div>
+<div id="propPenaltiesSection" style="display:none; margin-top: 18px;">
+<div style="font-size: 0.95rem; font-weight: 800; color: var(--text-primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i> الغرامات الإضافية (اختياري)</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px 20px; padding: 0 18px;">
+<label class="checkbox-label"><input type="checkbox" id="propPenDelay"> غرامة تأخير</label>
+<label class="checkbox-label"><input type="checkbox" id="propPenFalseInfo"> إخفاء معلومات</label>
+<label class="checkbox-label"><input type="checkbox" id="propPenFakeEmpty"> خلو وهمي</label>
+<label class="checkbox-label"><input type="checkbox" id="propPenUseChange"> تغيير استعمال العقار بدون إخبار</label>
+</div>
+<div id="propPenRows" style="padding: 0 18px;"></div>
+</div>
+<div class="result-row total" style="display: flex; justify-content: space-between; align-items: center; padding: 18px; background: linear-gradient(135deg, #7c2d12, #ea580c); color: #fff; border-radius: 12px; margin-top: 16px; box-shadow: 0 4px 16px rgba(124,45,18,0.3);">
+<span style="color: #fff; font-weight: 700;">الضريبة السنوية المستحقة بعد الغرامات:</span>
+<strong id="propResFinalTax" style="color: #fff; font-size: 1.4rem; font-weight: 900;">0 د.ع</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+
+<section class="page-section" id="page-documents">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e3a8a;--hero-c2:#0f1b4d;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-folder-open"></i>
+</div>
+<div class="section-hero-text">
+<h2>المستندات والمرفقات</h2>
+<p>رفع وتنظيم المستندات الضريبية والتوقيع الإلكتروني</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-bottom: 24px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-upload" style="color: var(--accent);"></i> رفع الملفات</h3>
+</div>
+<div class="card-body">
+<div class="attachment-upload-zone" ondragover="this.classList.add('dragover');event.preventDefault()" ondragleave="this.classList.remove('dragover')" ondrop="event.preventDefault();handleFileDrop(event)">
+<i class="fas fa-cloud-upload-alt" style="font-size: 2.8rem; color: var(--accent); margin-bottom: 14px; display: block;"></i>
+<h3>اسحب الملفات هنا أو انقر للاختيار</h3>
+<input type="file" id="fileInput" multiple onchange="handleFileSelect(this.files)" style="display:none;">
+<button class="btn btn-primary" onclick="document.getElementById('fileInput').click()"><i class="fas fa-upload"></i> اختيار ملفات</button>
+</div>
+<div id="attachmentsList" style="margin-top: 20px;"></div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-signature" style="color: var(--accent);"></i> التوقيع الإلكتروني</h3>
+</div>
+<div class="card-body">
+<div id="esignDocs"></div>
+<div style="margin-top: 20px; text-align: center;">
+<canvas id="signaturePad" width="500" height="200" style="border:2px dashed var(--border);border-radius:12px;background:#fff;touch-action:none;cursor:crosshair;max-width:100%;"></canvas>
+<div style="margin-top: 14px; display: flex; gap: 10px; justify-content: center;">
+<button class="btn btn-sm" onclick="clearSignature()"><i class="fas fa-eraser"></i> مسح</button>
+<button class="btn btn-success btn-sm" onclick="saveSignature()"><i class="fas fa-check"></i> حفظ التوقيع</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-sales">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#059669;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-shopping-cart"></i>
+</div>
+<div class="section-hero-text">
+<h2>ضريبة المبيعات</h2>
+<p>احتساب ضريبة المبيعات والاستهلاك على السلع والخدمات</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--success), #059669); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-calculator" style="color: var(--accent);"></i> أداة احتساب ضريبة المبيعات</h3>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>نوع المبيعات</label>
+<select id="salesType">
+<option value="goods">سلع محلية</option>
+<option value="imported">سلع مستوردة</option>
+<option value="services">خدمات</option>
+<option value="telecom">اتصالات</option>
+<option value="tobacco">سكائر</option>
+</select>
+</div>
+<div class="form-group" style="margin-top: 16px;">
+<label>قيمة المبيعات</label>
+<input id="salesAmount" type="text" placeholder="قيمة المبيعات (د.ع)" onkeyup="formatRealTime(this)">
+</div>
+<div style="margin-top: 20px;">
+<button class="btn btn-primary btn-lg" onclick="calculateSalesTax()"><i class="fas fa-calculator"></i> احتساب الضريبة</button>
+</div>
+<div class="result-box" id="salesResultBox" style="display:none;margin-top:20px;">
+<div class="result-details" style="display:block;">
+<div class="result-row"><span>النسبة:</span><strong id="salesResRate">-</strong></div>
+<div class="result-row"><span>الضريبة:</span><strong id="salesResTax">-</strong></div>
+<div class="result-row total"><span>المبلغ الكلي مع الضريبة:</span><strong id="salesResTotal">-</strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-reports">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#4a044e;--hero-c2:#7e22ce;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-chart-bar"></i>
+</div>
+<div class="section-hero-text">
+<h2>التقارير والتحليلات</h2>
+<p>إنشاء التقارير الضريبية والتحليلات الإحصائية</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, #7e22ce, var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-chart-pie" style="color: var(--accent);"></i> منشئ التقارير</h3>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>نوع التقرير</label>
+<select id="rbType">
+<option value="overview">تقرير عام</option>
+<option value="comparison">مقارنة بين الفترات</option>
+<option value="detail">تفاصيل شهرية</option>
+</select>
+</div>
+<div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+<button class="btn btn-primary" onclick="generateCustomReport()"><i class="fas fa-file-invoice"></i> إنشاء التقرير</button>
+<button class="btn btn-success" onclick="exportCustomReport('pdf')"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+<button class="btn btn-success" onclick="exportCustomReport('excel')"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+</div>
+<div id="customReportOutput" style="display:none;margin-top:20px;"></div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-kpi">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0f1b4d;--hero-c2:#1a2980;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-chart-line"></i>
+</div>
+<div class="section-hero-text">
+<h2>مؤشرات الأداء</h2>
+<p>مؤشرات الأداء الرئيسية للنظام الضريبي</p>
+</div>
+</div>
+</div>
+<div class="kpi-row" id="kpiCardsRow"></div>
+<div class="grid-2" style="margin-top: 24px;">
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-bullseye"></i> الأهداف</h3></div>
+<div class="card-body"><div id="kpiGoals"></div></div>
+</div>
+<div class="card">
+<div class="card-header"><h3><i class="fas fa-trophy"></i> الإنجازات</h3></div>
+<div class="card-body"><div id="kpiAchievements"></div></div>
+</div>
+</div>
+<div class="card" style="margin-top:20px;">
+<div class="card-header"><h3><i class="fas fa-chart-line"></i> اتجاه التحصيل السنوي</h3></div>
+<div class="card-body"><div class="chart-container-card" style="height:300px;"><canvas id="kpiTrendChart"></canvas></div></div>
+</div>
+</section>
+<section class="page-section" id="page-heatmap">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#7c2d12;--hero-c2:#f97316;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-fire"></i>
+</div>
+<div class="section-hero-text">
+<h2>الخريطة الحرارية للمحافظات</h2>
+<p>توزيع النشاط الضريبي على محافظات العراق</p>
+</div>
+</div>
+</div>
+<div class="heatmap-grid" id="heatmapGrid"></div>
+</section>
+
+
+<section class="page-section" id="page-penalties">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#7f1d1d;--hero-c2:#dc2626;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-gavel"></i>
+</div>
+<div class="section-hero-text">
+<h2>حاسبة الغرامات والجزاءات</h2>
+<p>احتساب الغرامات الضريبية وفق أحكام القانون</p>
+</div>
+</div>
+</div>
+<div class="grid-2" style="margin-top: 25px; align-items: start;">
+<div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-exclamation-circle" style="color: var(--accent);"></i> نوع الغرامة</h3>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>اختر نوع الغرامة</label>
+<select id="penaltyType">
+<option value="late_payment">تأخر في الدفع</option>
+<option value="late_declaration">تأخر في تقديم الإقرار</option>
+<option value="tax_evasion">تهرب ضريبي</option>
+<option value="false_info">معلومات كاذبة</option>
+<option value="no_records">عدم مسك سجلات</option>
+</select>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 20px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-money-bill-wave" style="color: var(--accent);"></i> مبلغ الضريبة الأصلي</h3>
+</div>
+<div class="card-body">
+<div class="form-group">
+<label>أدخل مبلغ الضريبة (د.ع)</label>
+<input id="penaltyOriginalTax" type="text" placeholder="أدخل مبلغ الضريبة (د.ع)" onkeyup="formatRealTime(this)">
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-calendar-check" style="color: var(--accent);"></i> التواريخ</h3>
+</div>
+<div class="card-body">
+<div class="form-grid">
+<div class="form-group">
+<label>تاريخ الاستحقاق</label>
+<input id="penaltyDueDate" type="date">
+</div>
+<div class="form-group">
+<label>تاريخ الدفع الفعلي</label>
+<input id="penaltyPayDate" type="date">
+</div>
+</div>
+<button class="btn btn-primary btn-lg" style="width: 100%; margin-top: 20px;" onclick="calculatePenalty()"><i class="fas fa-calculator"></i> احتساب الغرامة</button>
+</div>
+</div>
+<div id="penaltyResult" class="result-box" style="display:none;margin-top:20px;">
+<div class="result-details" style="display:block;">
+<div class="result-row"><span>نوع الغرامة:</span><strong id="penaltyTypeResult">-</strong></div>
+<div class="result-row"><span>مدة التأخير:</span><strong id="penaltyDays">-</strong></div>
+<div class="result-row"><span>نسبة الغرامة:</span><strong id="penaltyRate">-</strong></div>
+<div class="result-row"><span>الضريبة الأصلية:</span><strong id="penaltyOriginal">-</strong></div>
+<div class="result-row total"><span>الغرامة النهائية:</span><strong id="penaltyAmount">-</strong></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-settings">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0f766e;--hero-c2:#14b8a6;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-cog"></i>
+</div>
+<div class="section-hero-text">
+<h2>الإعدادات</h2>
+<p>تخصيص النظام وتفضيلات العرض والبيانات</p>
+</div>
+</div>
+</div>
+<div class="grid-2" style="margin-top: 25px; align-items: start;">
+<div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-palette" style="color: var(--accent);"></i> المظهر والعرض</h3>
+</div>
+<div class="card-body">
+<div class="settings-section">
+<h4>حجم الخط</h4>
+<div class="form-group">
+<select id="settingFontSize" onchange="changeFontSize(this.value)">
+<option value="14">المقاس الافتراضي 14</option>
+<option value="16">متوسط 16</option>
+<option value="18">كبير 18</option>
+</select>
+</div>
+</div>
+<div class="settings-section" style="margin-bottom: 0;">
+<h4>الوضع الليلي</h4>
+<div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+<div>
+<strong>وضع ليلي</strong>
+<small style="display: block; color: var(--text-light); font-size: 0.8rem;">تفعيل المظهر الداكن للنظام</small>
+</div>
+<label class="switch">
+<input type="checkbox" id="settingDarkMode" onchange="toggleDarkMode()">
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-sliders-h" style="color: var(--accent);"></i> التفضيلات</h3>
+</div>
+<div class="card-body">
+<div class="settings-section">
+<div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+<div>
+<strong>الحفظ التلقائي للمسودات</strong>
+<small style="display: block; color: var(--text-light); font-size: 0.8rem;">حفظ المسودات تلقائياً أثناء العمل</small>
+</div>
+<label class="switch">
+<input type="checkbox" id="settingAutoSave" onclick="toggleAutoSave()">
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+<div class="settings-section">
+<div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+<div>
+<strong>إشعارات المتصفح</strong>
+<small style="display: block; color: var(--text-light); font-size: 0.8rem;">استقبال إشعارات حول المواعيد الضريبية</small>
+</div>
+<label class="switch">
+<input type="checkbox" id="settingNotifications" onclick="toggleBrowserNotifications()">
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+<div class="settings-section" style="margin-bottom: 0;">
+<div class="settings-item" style="display: flex; align-items: center; justify-content: space-between;">
+<div>
+<strong>المصادقة الثنائية</strong>
+<small style="display: block; color: var(--text-light); font-size: 0.8rem;">تفعيل طبقة حماية إضافية للحساب</small>
+</div>
+<label class="switch">
+<input type="checkbox" id="toggle2FA" onclick="toggle2FA(this.checked)">
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 20px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-database" style="color: var(--accent);"></i> البيانات</h3>
+</div>
+<div class="card-body">
+<div class="form-row">
+<button class="btn" onclick="exportAllData()"><i class="fas fa-download"></i> تصدير جميع البيانات</button>
+<button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> مسح جميع البيانات</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-audit">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e3a8a;--hero-c2:#2563eb;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-clipboard-list"></i>
+</div>
+<div class="section-hero-text">
+<h2>سجل العمليات</h2>
+<p>تتبع جميع العمليات والأحداث في النظام</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 25px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-history" style="color: var(--accent);"></i> سجل العمليات (آخر 50)</h3>
+<button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" onclick="clearAuditLog()"><i class="fas fa-trash"></i> مسح السجل</button>
+</div>
+<div class="card-body">
+<div class="table-container">
+<table>
+<thead>
+<tr><th>#</th><th>العملية</th><th>المستخدم</th><th>التفاصيل</th><th>الوقت</th></tr>
+</thead>
+<tbody id="auditLogBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-users">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#4a044e;--hero-c2:#a21caf;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-users-cog"></i>
+</div>
+<div class="section-hero-text">
+<h2>إدارة المستخدمين</h2>
+<p>إدارة حسابات المستخدمين والصلاحيات</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 25px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-users" style="color: var(--accent);"></i> المستخدمون</h3>
+<button class="btn btn-primary btn-sm" onclick="showAddUserForm()"><i class="fas fa-user-plus"></i> إضافة مستخدم</button>
+</div>
+<div class="card-body">
+<div id="addUserForm" class="emp-form-card" style="display:none;">
+<h3><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
+<div class="form-grid">
+<div class="form-group">
+<label>اسم المستخدم</label>
+<input id="newUsername" type="text" placeholder="أدخل اسم المستخدم">
+</div>
+<div class="form-group">
+<label>الاسم الكامل</label>
+<input id="newFullName" type="text" placeholder="أدخل الاسم الكامل">
+</div>
+</div>
+<div class="form-grid" style="margin-top: 16px;">
+<div class="form-group">
+<label>كلمة المرور</label>
+<input id="newPassword" type="password" placeholder="أدخل كلمة المرور">
+</div>
+<div class="form-group">
+<label>الدور</label>
+<select id="newRole">
+<option value="مدير النظام">مدير النظام</option>
+<option value="محاسب ضريبي">محاسب ضريبي</option>
+<option value="مدقق">مدقق</option>
+<option value="مشاهد">مشاهد</option>
+</select>
+</div>
+</div>
+<button class="btn btn-primary" style="margin-top: 20px;" onclick="addNewUser()"><i class="fas fa-check"></i> حفظ</button>
+</div>
+<div class="table-container">
+<table>
+<thead>
+<tr><th>اسم المستخدم</th><th>الاسم</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr>
+</thead>
+<tbody id="usersTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-calendar">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e40af;--hero-c2:#0f1b4d;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-calendar-alt"></i>
+</div>
+<div class="section-hero-text">
+<h2>التقويم الضريبي</h2>
+<p>المواعيد والمدد القانونية الضريبية السنوية</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 25px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; justify-content: center; gap: 20px; font-size: 1.25rem;">
+<button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" onclick="changeCalendarMonth(-1)"><i class="fas fa-chevron-right"></i></button>
+<span id="calendarMonthTitle" style="font-size:1.3rem;font-weight:800;"></span>
+<button class="btn btn-sm" style="background: rgba(255,255,255,0.15); color: #fff; border: none;" onclick="changeCalendarMonth(1)"><i class="fas fa-chevron-left"></i></button>
+</h3>
+</div>
+<div class="card-body">
+<div class="calendar-grid" id="calendarGrid"></div>
+</div>
+</div>
+<div class="card" style="margin-top:20px;">
+<div class="card-header">
+<h3><i class="fas fa-bell"></i> مواعيد هذا الشهر</h3>
+</div>
+<div class="card-body">
+<div id="calendarEvents"></div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-comparison">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#78350f;--hero-c2:#f59e0b;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-balance-scale"></i>
+</div>
+<div class="section-hero-text">
+<h2>مقارنة الضرائب بين السنوات</h2>
+<p>مقارنة إيرادات الضرائب عبر سنوات مالية مختلفة</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 25px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-chart-column" style="color: var(--accent);"></i> المقارنة</h3>
+</div>
+<div class="card-body">
+<div class="form-grid">
+<div class="form-group">
+<label>السنة الأولى</label>
+<select id="compYear1">
+<option value="2024">2024</option>
+<option value="2025">2025</option>
+<option value="2026" selected>2026</option>
+</select>
+</div>
+<div class="form-group">
+<label>السنة الثانية</label>
+<select id="compYear2">
+<option value="2024">2024</option>
+<option value="2025" selected>2025</option>
+<option value="2026">2026</option>
+</select>
+</div>
+</div>
+<button class="btn btn-primary btn-lg" style="width: 100%; margin-top: 20px;" onclick="generateComparison()"><i class="fas fa-balance-scale"></i> إنشاء المقارنة</button>
+</div>
+</div>
+<div id="comparisonResults" style="display:none;">
+<div class="table-container" style="margin-top: 20px;">
+<table>
+<thead>
+<tr><th>نوع الضريبة</th><th><span id="compHeader1"></span></th><th><span id="compHeader2"></span></th><th>التغير</th><th>النسبة</th></tr>
+</thead>
+<tbody id="comparisonBody"></tbody>
+</table>
+</div>
+<div class="chart-container-card" style="height:300px;margin-top:20px;">
+<canvas id="comparisonChart"></canvas>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-contact">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0f1b4d;--hero-c2:#1a2980;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-headset"></i>
+</div>
+<div class="section-hero-text">
+<h2>تواصل معنا</h2>
+<p>تقديم طلبات خدمات الضرائب والاستشارات</p>
+</div>
+</div>
+</div>
+<div class="card" style="border: none; box-shadow: 0 8px 25px rgba(15,27,77,0.08); border-radius: 16px; margin-top: 25px;">
+<div class="card-header" style="background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; border-radius: 16px 16px 0 0; padding: 20px 24px;">
+<h3 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.25rem;"><i class="fas fa-file-signature" style="color: var(--accent);"></i> تقديم طلب خدمة</h3>
+</div>
+<div class="card-body">
+<div class="form-grid">
+<div class="form-group">
+<label>اسم الشركة أو المكلف</label>
+<input id="contactName" type="text" placeholder="أدخل اسم الشركة أو المكلف">
+</div>
+<div class="form-group">
+<label>رقم الهاتف</label>
+<input id="contactPhone" type="tel" placeholder="أدخل رقم الهاتف">
+</div>
+</div>
+<div class="form-grid" style="margin-top: 16px;">
+<div class="form-group">
+<label>البريد الإلكتروني</label>
+<input id="contactEmail" type="email" placeholder="example@email.com">
+</div>
+<div class="form-group">
+<label>نوع الخدمة</label>
+<select id="contactService">
+<option value="">اختر نوع الخدمة</option>
+<option value="إعداد حسابات ختامية">إعداد حسابات ختامية</option>
+<option value="تقديم إقرار ضريبي">تقديم إقرار ضريبي</option>
+<option value="استشارة ضريبية">استشارة ضريبية</option>
+<option value="شهادة براءة ذمة">شهادة براءة ذمة</option>
+<option value="أخرى">أخرى</option>
+</select>
+</div>
+</div>
+<div class="form-group" style="margin-top: 16px;">
+<label>تفاصيل الطلب</label>
+<textarea id="contactDetails" rows="5" placeholder="اكتب تفاصيل الطلب هنا..."></textarea>
+</div>
+<button class="btn btn-primary btn-lg" style="width: 100%; margin-top: 20px;" onclick="submitContactForm()"><i class="fas fa-paper-plane"></i> إرسال الطلب</button>
+<div id="contactSuccessMsg" style="display:none;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:16px;border-radius:12px;margin-top:16px;font-weight:700;"><i class="fas fa-check-circle"></i> تم إرسال طلبك بنجاح! سنتواصل معك قريباً</div>
+</div>
+</div>
+</section>
+
+
+<section class="page-section" id="page-appointments">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e3a8a;--hero-c2:#0f1b4d;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-calendar-check"></i>
+</div>
+<div class="section-hero-text">
+<h2>المواعيد</h2>
+<p>تنظيم مواعيد العمل والمراجعات الضريبية</p>
+</div>
+</div>
+</div>
+<div class="stats-grid animate-in">
+<div class="stat-card">
+<div class="stat-icon" style="background:linear-gradient(135deg,rgba(37,99,235,0.12),rgba(37,99,235,0.05));color:var(--info);"><i class="fas fa-calendar-day"></i></div>
+<div class="stat-info"><h3 id="apptTotalCount">0</h3><p>إجمالي المواعيد</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background:linear-gradient(135deg,rgba(5,150,105,0.12),rgba(5,150,105,0.05));color:var(--success);"><i class="fas fa-sun"></i></div>
+<div class="stat-info"><h3 id="apptTodayCount">0</h3><p>مواعيد اليوم</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background:linear-gradient(135deg,rgba(124,58,237,0.12),rgba(124,58,237,0.05));color:#7c3aed;"><i class="fas fa-calendar-week"></i></div>
+<div class="stat-info"><h3 id="apptWeekCount">0</h3><p>مواعيد الأسبوع</p></div>
+</div>
+<div class="stat-card">
+<div class="stat-icon" style="background:linear-gradient(135deg,rgba(220,38,38,0.12),rgba(220,38,38,0.05));color:var(--danger);"><i class="fas fa-calendar-times"></i></div>
+<div class="stat-info"><h3 id="apptCancelledCount">0</h3><p>ملغاة</p></div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h3><i class="fas fa-calendar-alt"></i> المواعيد القادمة</h3>
+<button class="btn btn-primary btn-sm" onclick="createAppointment()"><i class="fas fa-plus"></i> إضافة موعد</button>
+</div>
+<div class="card-body">
+<div class="tasks-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+<button class="btn btn-sm active" onclick="filterAppointments('all',this)">الكل</button>
+<button class="btn btn-sm" onclick="filterAppointments('today',this)">اليوم</button>
+<button class="btn btn-sm" onclick="filterAppointments('week',this)">الأسبوع</button>
+<button class="btn btn-sm" onclick="filterAppointments('month',this)">الشهر</button>
+</div>
+<div id="appointmentsTimeline"></div>
+</div>
+</div>
+</section>
+<div class="emp-modal-overlay" id="appointmentModal" style="display:none;">
+<div class="emp-modal-wrapper" style="max-width:560px;height:auto;max-height:90vh;">
+<div class="emp-modal-header">
+<h2><i class="fas fa-calendar-plus"></i> إضافة موعد جديد</h2>
+<button class="emp-modal-close" onclick="closeAppointmentModal()"><i class="fas fa-times"></i></button>
+</div>
+<div class="emp-modal-body">
+<div class="emp-modal-content">
+<div class="emp-grid-2">
+<div class="emp-field" style="grid-column:1 / -1;"><label>عنوان الموعد</label><input id="apptTitle" type="text" required/></div>
+<div class="emp-field"><label>العميل / الطرف</label><input id="apptClient" type="text"/></div>
+<div class="emp-field"><label>التاريخ</label><input id="apptDate" type="date"/></div>
+<div class="emp-field"><label>الوقت</label><input id="apptTime" type="time"/></div>
+<div class="emp-field" style="grid-column:1 / -1;"><label>ملاحظات</label><textarea id="apptNotes" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;outline:none;color:var(--text-primary);min-height:80px;resize:vertical;"></textarea></div>
+</div>
+</div>
+</div>
+<div class="emp-modal-footer">
+<button class="btn btn-ghost" onclick="closeAppointmentModal()">إلغاء</button>
+<button class="btn btn-primary" onclick="saveAppointment()"><i class="fas fa-save"></i> حفظ</button>
+</div>
+</div>
 </div>
 
 
+<section class="page-section" id="page-invoices">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e3a8a;--hero-c2:#2563eb;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-file-invoice"></i>
+</div>
+<div class="section-hero-text">
+<h2>إدارة الفواتير</h2>
+<p>متابعة الفواتير الضريبية الصادرة والمدفوعة</p>
+</div>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon blue"><i class="fas fa-file-invoice"></i></div><div class="stat-info"><h3 id="invTotal">0</h3><p>إجمالي الفواتير</p></div></div>
+<div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="invPaid">0</h3><p>مدفوعة</p></div></div>
+<div class="stat-card"><div class="stat-icon orange"><i class="fas fa-clock"></i></div><div class="stat-info"><h3 id="invPending">0</h3><p>معلقة</p></div></div>
+<div class="stat-card"><div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div><div class="stat-info"><h3 id="invOverdue">0</h3><p>متأخرة</p></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px;background:var(--bg-card);padding:14px 18px;border-radius:14px;box-shadow:var(--shadow-card);border:1px solid var(--border-light);">
+<input type="text" placeholder="بحث بالاسم أو الرقم..." oninput="searchInvoices(this.value)" style="flex:1;min-width:200px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:var(--bg-secondary);outline:none;color:var(--text-primary);"/>
+<select onchange="filterInvoices(this.value)" style="padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.9rem;background:var(--bg-secondary);outline:none;color:var(--text-primary);">
+<option value="all">كل الحالات</option>
+<option value="paid">مدفوعة</option>
+<option value="pending">معلقة</option>
+<option value="overdue">متأخرة</option>
+</select>
+<button class="btn btn-primary" onclick="createNewInvoice()"><i class="fas fa-plus"></i> فاتورة جديدة</button>
+</div>
+<div class="table-container">
+<table>
+<thead><tr><th>الرقم</th><th>العميل</th><th>نوع الضريبة</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+<tbody id="invoicesTableBody"></tbody>
+</table>
+</div>
+</section>
+<section class="page-section" id="page-taxpayers">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#10b981;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-users"></i>
+</div>
+<div class="section-hero-text">
+<h2>سجل المكلفين</h2>
+<p>إدارة بيانات المكلفين الخاضعين للضريبة</p>
+</div>
+</div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px;background:var(--bg-card);padding:14px 18px;border-radius:14px;box-shadow:var(--shadow-card);border:1px solid var(--border-light);">
+<input type="text" placeholder="بحث بالاسم أو الرقم الضريبي..." oninput="searchTaxpayers(this.value)" style="flex:1;min-width:200px;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:var(--bg-secondary);outline:none;color:var(--text-primary);"/>
+<button class="btn btn-primary" onclick="addNewTaxpayer()"><i class="fas fa-plus"></i> إضافة مكلف</button>
+</div>
+<div class="table-container">
+<table>
+<thead><tr><th>الرقم الضريبي</th><th>الاسم</th><th>النوع</th><th>المحافظة</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+<tbody id="taxpayersTableBody"></tbody>
+</table>
+</div>
+</section>
+<section class="page-section" id="page-tasks">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#4a044e;--hero-c2:#9333ea;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-tasks"></i>
+</div>
+<div class="section-hero-text">
+<h2>إدارة المهام</h2>
+<p>متابعة المهام الضريبية اليومية</p>
+</div>
+</div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-body">
+<div class="tasks-progress-bar" style="display:flex;align-items:center;gap:14px;margin-bottom:18px;">
+<div class="progress-bar-bg" style="flex:1;"><div class="progress-bar-fill" id="tasksProgressFill" style="width:0%"></div></div>
+<span id="tasksProgressPercent" style="font-weight:700;font-size:0.9rem;min-width:45px;text-align:center;">0%</span>
+</div>
+<div class="tasks-filters" style="display:flex;gap:8px;flex-wrap:wrap;">
+<button class="btn btn-sm active" onclick="filterTasks('all', this)">الكل</button>
+<button class="btn btn-sm" onclick="filterTasks('pending', this)">معلقة</button>
+<button class="btn btn-sm" onclick="filterTasks('progress', this)">قيد العمل</button>
+<button class="btn btn-sm" onclick="filterTasks('done', this)">منجزة</button>
+</div>
+</div>
+</div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+<button class="btn btn-primary" onclick="addNewTask()"><i class="fas fa-plus"></i> إضافة مهمة</button>
+</div>
+<div id="tasksList"></div>
+</section>
+<section class="page-section" id="page-tickets">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#7f1d1d;--hero-c2:#dc2626;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-life-ring"></i>
+</div>
+<div class="section-hero-text">
+<h2>تذاكر الدعم</h2>
+<p>متابعة طلبات الدعم الفني</p>
+</div>
+</div>
+</div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-icon blue"><i class="fas fa-life-ring"></i></div><div class="stat-info"><h3 id="tktTotal">0</h3><p>إجمالي التذاكر</p></div></div>
+<div class="stat-card"><div class="stat-icon orange"><i class="fas fa-folder-open"></i></div><div class="stat-info"><h3 id="tktOpen">0</h3><p>مفتوحة</p></div></div>
+<div class="stat-card"><div class="stat-icon purple"><i class="fas fa-cogs"></i></div><div class="stat-info"><h3 id="tktProgress">0</h3><p>قيد المعالجة</p></div></div>
+<div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><h3 id="tktClosed">0</h3><p>مغلقة</p></div></div>
+</div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+<button class="btn btn-primary" onclick="createTicket()"><i class="fas fa-plus"></i> تذكرة جديدة</button>
+</div>
+<div class="table-container">
+<table>
+<thead><tr><th>الرقم</th><th>الموضوع</th><th>الأولوية</th><th>الحالة</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+<tbody id="ticketsTableBody"></tbody>
+</table>
+</div>
+</section>
+<section class="page-section" id="page-workflow">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0f1b4d;--hero-c2:#1a2980;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-project-diagram"></i>
+</div>
+<div class="section-hero-text">
+<h2>سير العمل</h2>
+<p>متابعة مسارات المعاملات الضريبية</p>
+</div>
+</div>
+</div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+<button class="btn btn-primary" onclick="createWorkflow()"><i class="fas fa-plus"></i> إنشاء مسار جديد</button>
+</div>
+<div class="workflow-board" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+<div class="wf-column">
+<div class="wf-column-header"><h4>جديدة</h4><span class="wf-count" id="wfNewCount">0</span></div>
+<div id="wfNew"></div>
+</div>
+<div class="wf-column">
+<div class="wf-column-header"><h4>قيد المراجعة</h4><span class="wf-count" id="wfReviewCount">0</span></div>
+<div id="wfReview"></div>
+</div>
+<div class="wf-column">
+<div class="wf-column-header"><h4>معتمدة</h4><span class="wf-count" id="wfApprovedCount">0</span></div>
+<div id="wfApproved"></div>
+</div>
+<div class="wf-column">
+<div class="wf-column-header"><h4>مكتملة</h4><span class="wf-count" id="wfCompletedCount">0</span></div>
+<div id="wfCompleted"></div>
+</div>
+</div>
+</section>
+<section class="page-section" id="page-loginhistory">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#1e3a8a;--hero-c2:#3b82f6;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-sign-in-alt"></i>
+</div>
+<div class="section-hero-text">
+<h2>سجل الدخول</h2>
+<p>محاولات تسجيل الدخول والأمان</p>
+</div>
+</div>
+</div>
+<div class="table-container">
+<table>
+<thead><tr><th>التاريخ</th><th>المستخدم</th><th>عنوان IP</th><th>المتصفح</th><th>الموقع</th><th>الحالة</th></tr></thead>
+<tbody id="loginHistoryBody"></tbody>
+</table>
+</div>
+</section>
+<section class="page-section" id="page-backup">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#065f46;--hero-c2:#059669;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-database"></i>
+</div>
+<div class="section-hero-text">
+<h2>النسخ الاحتياطي والاستعادة</h2>
+<p>إدارة النسخ الاحتياطية لبيانات النظام</p>
+</div>
+</div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-header"><h3><i class="fas fa-history"></i> آخر نسخة احتياطية</h3></div>
+<div class="card-body"><span id="lastBackupDate" style="font-weight:700;">لم يتم النسخ بعد</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+<button class="btn btn-primary" onclick="createBackup()"><i class="fas fa-save"></i> إنشاء نسخة احتياطية الآن</button>
+<button class="btn btn-warning" onclick="restoreBackup()"><i class="fas fa-undo"></i> استعادة من ملف</button>
+<label style="display:flex;align-items:center;gap:8px;font-size:0.9rem;font-weight:600;color:var(--text-secondary);cursor:pointer;"><input type="checkbox" onchange="toggleAutoBackup(this.checked)" style="accent-color:var(--primary);width:17px;height:17px;"/> النسخ التلقائي</label>
+</div>
+<div id="backupsList"></div>
+</section>
+<section class="page-section" id="page-api">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#111827;--hero-c2:#374151;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-code"></i>
+</div>
+<div class="section-hero-text">
+<h2>لوحة واجهة API</h2>
+<p>مفاتيح الوصول ونقاط النهاية للتكامل</p>
+</div>
+</div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-header"><h3><i class="fas fa-key"></i> مفتاح API</h3></div>
+<div class="card-body">
+<code id="apiKeyDisplay" style="direction:ltr;display:inline-block;background:#0f172a;color:#4ade80;padding:10px 14px;border-radius:8px;font-size:0.9rem;"></code>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;">
+<button class="btn btn-sm" onclick="toggleApiKey()"><i class="fas fa-eye"></i> إظهار/إخفاء</button>
+<button class="btn btn-sm" onclick="copyApiKey()"><i class="fas fa-copy"></i> نسخ</button>
+<button class="btn btn-sm btn-danger" onclick="regenerateApiKey()"><i class="fas fa-sync-alt"></i> إعادة توليد</button>
+</div>
+</div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-header"><h3><i class="fas fa-network-wired"></i> نقاط النهاية</h3></div>
+<div class="card-body"><div id="apiEndpoints"></div></div>
+</div>
+<div class="card" style="margin-bottom:20px;">
+<div class="card-header"><h3><i class="fas fa-chart-pie"></i> الإحصائيات</h3></div>
+<div class="card-body"><div id="apiUsageStats"></div></div>
+</div>
+<div class="card" style="margin-top:20px;">
+<div class="card-header"><h3><i class="fas fa-chart-bar"></i> استخدام API</h3></div>
+<div class="card-body"><div class="chart-container-card" style="height:280px;"><canvas id="apiUsageChart"></canvas></div></div>
+</div>
+</section>
+<div class="emp-modal-overlay" id="invoiceModal" style="display:none;">
+<div class="emp-modal-wrapper" style="max-width:640px;height:auto;max-height:90vh;">
+<div class="emp-modal-header"><h2><i class="fas fa-file-invoice"></i> فاتورة جديدة</h2><button class="emp-modal-close" onclick="closeInvoiceModal()"><i class="fas fa-times"></i></button></div>
+<div class="emp-modal-content">
+<div class="emp-grid-2">
+<div class="emp-field" style="grid-column:1/-1;"><label>اسم العميل</label><input id="invClientName" type="text" placeholder="اسم العميل"/></div>
+<div class="emp-field"><label>نوع الضريبة</label><select id="invTaxType"><option value="ضريبة دخل الشركات">ضريبة دخل الشركات</option><option value="ضريبة العقار">ضريبة العقار</option><option value="ضريبة المبيعات">ضريبة المبيعات</option><option value="ضريبة المهنة">ضريبة المهنة</option><option value="ضريبة العرصات">ضريبة العرصات</option></select></div>
+<div class="emp-field"><label>المبلغ (د.ع)</label><input id="invAmount" type="text" placeholder="المبلغ"/></div>
+<div class="emp-field"><label>تاريخ الاستحقاق</label><input id="invDueDate" type="date"/></div>
+<div class="emp-field" style="grid-column:1/-1;"><label>ملاحظات</label><textarea id="invNotes" rows="3" placeholder="ملاحظات إضافية" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;outline:none;resize:vertical;color:var(--text-primary);"></textarea></div>
+</div>
+</div>
+<div class="emp-modal-footer"><button class="btn btn-ghost" onclick="closeInvoiceModal()">إلغاء</button><button class="btn btn-primary" onclick="saveInvoice()"><i class="fas fa-save"></i> حفظ</button></div>
+</div>
+</div>
+<div class="emp-modal-overlay" id="taxpayerModal" style="display:none;">
+<div class="emp-modal-wrapper" style="max-width:640px;height:auto;max-height:90vh;">
+<div class="emp-modal-header"><h2><i class="fas fa-user-plus"></i> <span id="taxpayerModalTitle">إضافة مكلف جديد</span></h2><button class="emp-modal-close" onclick="closeTaxpayerModal()"><i class="fas fa-times"></i></button></div>
+<div class="emp-modal-content">
+<div class="emp-grid-2">
+<div class="emp-field" style="grid-column:1/-1;"><label>الاسم</label><input id="tpName" type="text" placeholder="الاسم الكامل"/></div>
+<div class="emp-field"><label>النوع</label><select id="tpType"><option value="individual">فرد</option><option value="company">شركة</option><option value="government">حكومي</option></select></div>
+<div class="emp-field"><label>المحافظة</label><select id="tpProvince"><option value="بغداد">بغداد</option><option value="البصرة">البصرة</option><option value="نينوى">نينوى</option><option value="أربيل">أربيل</option><option value="النجف">النجف</option><option value="كربلاء">كربلاء</option><option value="كركوك">كركوك</option><option value="السليمانية">السليمانية</option><option value="ذي قار">ذي قار</option><option value="بابل">بابل</option><option value="ديالى">ديالى</option><option value="الأنبار">الأنبار</option><option value="واسط">واسط</option><option value="ميسان">ميسان</option><option value="المثنى">المثنى</option><option value="القادسية">القادسية</option><option value="صلاح الدين">صلاح الدين</option><option value="دهوك">دهوك</option></select></div>
+<div class="emp-field"><label>الهاتف</label><input id="tpPhone" type="text" placeholder="07XXXXXXXXX"/></div>
+<div class="emp-field"><label>البريد الإلكتروني</label><input id="tpEmail" type="email" placeholder="example@mail.com"/></div>
+<div class="emp-field" style="grid-column:1/-1;"><label>العنوان</label><textarea id="tpAddress" rows="3" placeholder="العنوان الكامل" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;outline:none;resize:vertical;color:var(--text-primary);"></textarea></div>
+</div>
+</div>
+<div class="emp-modal-footer"><button class="btn btn-ghost" onclick="closeTaxpayerModal()">إلغاء</button><button class="btn btn-primary" onclick="saveTaxpayer()"><i class="fas fa-save"></i> حفظ</button></div>
+</div>
+</div>
+<div class="emp-modal-overlay" id="ticketModal" style="display:none;">
+<div class="emp-modal-wrapper" style="max-width:640px;height:auto;max-height:90vh;">
+<div class="emp-modal-header"><h2><i class="fas fa-ticket-alt"></i> تذكرة جديدة</h2><button class="emp-modal-close" onclick="closeTicketModal()"><i class="fas fa-times"></i></button></div>
+<div class="emp-modal-content">
+<div class="emp-grid-2">
+<div class="emp-field" style="grid-column:1/-1;"><label>الموضوع</label><input id="tktSubject" type="text" placeholder="موضوع التذكرة"/></div>
+<div class="emp-field"><label>القسم</label><select id="tktDept"><option value="الدعم الفني">الدعم الفني</option><option value="الاشتراكات">الاشتراكات</option><option value="المحاسبة">المحاسبة</option><option value="شؤون المكلفين">شؤون المكلفين</option></select></div>
+<div class="emp-field"><label>الأولوية</label><select id="tktPriority"><option value="low">منخفضة</option><option value="medium">متوسطة</option><option value="high">عالية</option><option value="urgent">عاجلة</option></select></div>
+<div class="emp-field" style="grid-column:1/-1;"><label>الوصف</label><textarea id="tktDesc" rows="4" placeholder="تفاصيل المشكلة أو الطلب" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:0.95rem;background:#fff;outline:none;resize:vertical;color:var(--text-primary);"></textarea></div>
+</div>
+</div>
+<div class="emp-modal-footer"><button class="btn btn-ghost" onclick="closeTicketModal()">إلغاء</button><button class="btn btn-primary" onclick="saveTicket()"><i class="fas fa-save"></i> حفظ</button></div>
+</div>
+</div>
+
+<section class="page-section" id="page-packages">
+<div class="section-hero" data-aos="fade-down" style="--hero-c1:#0f1b4d;--hero-c2:#1a2980;">
+<div class="section-hero-bg">
+<div class="hero-particle hp-1"></div>
+<div class="hero-particle hp-2"></div>
+<div class="hero-particle hp-3"></div>
+<div class="hero-wave"></div>
+</div>
+<div class="section-hero-content">
+<div class="section-hero-icon-3d">
+<div class="hero-icon-ring"></div>
+<i class="fas fa-gem"></i>
+</div>
+<div class="section-hero-text">
+<h2>الباقات والاشتراكات</h2>
+<p>إدارة باقتك الحالية ومقارنة الباقات والترقية</p>
+</div>
+</div>
+</div>
+<div id="currentPackageInfo" style="background:linear-gradient(135deg,#1a2980,#26d0ce); color:#fff; border-radius:16px; padding:20px 24px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 8px 25px rgba(26,41,128,0.2);"></div>
+<div class="card" style="border:none; box-shadow:0 8px 25px rgba(26,41,128,0.08); border-radius:16px;">
+<div class="card-header" style="background: linear-gradient(135deg, #1a2980, #26d0ce); color:#fff; border-radius:16px 16px 0 0; padding:20px 24px;">
+<h3 style="margin:0; display:flex; align-items:center; gap:10px; font-size:1.25rem;"><i class="fas fa-box-open" style="color:#a5f3fc;"></i> الباقات المتاحة</h3>
+</div>
+<div class="card-body" style="padding:30px;">
+<div class="packages-grid packages-grid-3" id="packagesGridInline"></div>
+</div>
+</div>
+</section>
+
+
+<!-- ==================== PENALTIES CALCULATOR ==================== -->
+</div>
+</main>
+</div><!-- end app-container -->
+<!-- ====== SEARCH MODAL ====== -->
+<div class="search-modal" id="searchModal">
+<div class="search-modal-backdrop" onclick="closeSearchModal()"></div>
+<div class="search-modal-content">
+<div class="search-modal-header">
+<i class="fas fa-search"></i>
+<input autocomplete="off" id="searchInput" oninput="performSearch(this.value)" placeholder="ابحث في النظام... (ضريبة، شركة، إعدادات...)" type="text"/>
+<kbd>ESC</kbd>
+</div>
+<div class="search-results" id="searchResults">
+<div class="search-empty"><i class="fas fa-search"></i><p>اكتب للبحث في الصفحات والوظائف</p></div>
+</div>
+</div>
+</div>
+<!-- ====== CHATBOT ====== -->
+<button class="chatbot-toggle" id="chatbotToggle" onclick="toggleChatbot()">
+<i class="fas fa-robot"></i>
+</button>
+<div class="chatbot-panel" id="chatbotPanel">
+<div class="chatbot-header">
+<div style="display:flex;align-items:center;gap:10px;">
+<div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+<div><h4>مساعد الضرائب</h4><span style="font-size:0.75rem;opacity:0.7;">متصل</span></div>
+</div>
+<button onclick="toggleChatbot()" style="background:none;border:none;color:#fff;font-size:1.2rem;cursor:pointer;"><i class="fas fa-times"></i></button>
+</div>
+<div class="chatbot-messages" id="chatbotMessages">
+<div class="chat-message bot">
+<div class="chat-bubble">مرحباً! أنا مساعد الضرائب العراقي 🏛️ يمكنني الإجابة على أسئلتك حول القوانين الضريبية. اكتب سؤالك أو اختر من الأسئلة الشائعة:</div>
+</div>
+<div class="chat-suggestions">
+<button onclick="askChatbot('ما هي نسبة ضريبة الشركات؟')">نسبة ضريبة الشركات</button>
+<button onclick="askChatbot('كيف تحسب ضريبة الدخل؟')">حساب ضريبة الدخل</button>
+<button onclick="askChatbot('ما هي غرامة التأخير؟')">غرامة التأخير</button>
+<button onclick="askChatbot('ما هو مبلغ الإعفاء الضريبي؟')">الإعفاء الضريبي</button>
+</div>
+</div>
+<div class="chatbot-input">
+<input id="chatInput" onkeypress="if(event.key==='Enter')sendChatMessage()" placeholder="اكتب سؤالك هنا..." type="text"/>
+<button onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+</div>
+</div>
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg">تمت العملية بنجاح</span></div>
+<script src="js/app.js?v=1785840765"></script>
+
+<script>
+// Format currency wrapper
+function formatRealTime(el) {
+    if(el.type !== 'text') el.type = 'text';
+    var raw = el.value.replace(/,/g, '').replace(/[^0-9\.]/g, '');
+    if(raw) {
+        el.value = Number(raw).toLocaleString('en-US');
+    }
+}
+
+// Init fiscal year context + year lock status after renderV2UI
+document.addEventListener('DOMContentLoaded', function() {
+  var sel = document.getElementById('fiscalYearSelect');
+  if (sel) {
+    if (!sel.options.length && typeof getFullFiscalYearRange === 'function') {
+      getFullFiscalYearRange().forEach(function(y) { sel.add(new Option(y, y)); });
+      sel.value = String(new Date().getFullYear());
+    }
+    if (typeof onFiscalYearChange === 'function' && sel.options.length) onFiscalYearChange();
+  }
+});
+
+// فلترة السجل الشهري حسب الشهر والبحث في أسماء الموظفين (تأثير عرضي فقط)
+window.filterMonthlyRegister = function() {
+  var container = document.getElementById('monthlyRegisterContainer');
+  if (!container) return;
+  var q = (document.getElementById('empSearchInput') || {}).value || '';
+  var mSel = document.getElementById('filterMonth');
+  var m = mSel ? mSel.value : '0';
+  var blocks = container.querySelectorAll('div[data-month]');
+  var shown = 0;
+  blocks.forEach(function(block) {
+    var show = (m === '0' || block.getAttribute('data-month') === m);
+    var rows = block.querySelectorAll('tbody tr');
+    rows.forEach(function(r) { r.style.display = ''; });
+    if (show && q) {
+      var any = false;
+      rows.forEach(function(r) {
+        if (r.textContent.toLowerCase().indexOf(q.toLowerCase()) === -1) r.style.display = 'none';
+        else any = true;
+      });
+      if (!any) show = false;
+    }
+    block.style.display = show ? '' : 'none';
+    if (show) shown++;
+  });
+  var title = container.querySelector('.monthly-filter-summary');
+  if (title) title.textContent = shown > 0 ? ('عرض ' + shown + ' شهر') : 'لا توجد نتائج مطابقة';
+};
+</script>
+
+</body>
+</html>

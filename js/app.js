@@ -1798,7 +1798,7 @@ window.renderMonthlyRegister = function() {
     grandCount += count;
     grandTaxable += tTaxable;
     grandTax += tTax;
-    html += '<div style="margin-bottom:22px;">' +
+    html += '<div style="margin-bottom:22px;" data-month="' + m + '">' +
       '<div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; padding:8px 12px; background:linear-gradient(135deg,#fff7ed,#ffedd5); border:1px solid #fed7aa; border-radius:12px 12px 0 0;">' +
       '<strong style="color:#9a3412; font-size:.9rem;">' + m + ' — ' + monthNames[m - 1] + '</strong>' +
       '<span style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">' +
