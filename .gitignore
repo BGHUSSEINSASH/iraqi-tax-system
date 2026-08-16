@@ -1,0 +1,13 @@
+node_modules/
+*.py
+*.xlsx
+.vscode/
+.venv/
+_docx_extract/
+_v4_extract/
+backups/
+rollback_safety_*/
+
+dist/
+frontend/dist/
+
