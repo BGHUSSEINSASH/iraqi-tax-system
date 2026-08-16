@@ -53,6 +53,11 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
+  { to: '/dashboard', label: 'لوحة التحكم', icon: <LayoutDashboard size={18} />, group: 'الرئيسية والإدارة' },
+  { to: '/companies', label: 'إدارة الشركات', icon: <Building2 size={18} />, group: 'الرئيسية والإدارة' },
+  { to: '/employees', label: 'إدارة الموظفين', icon: <Users size={18} />, group: 'الرئيسية والإدارة' },
+  { to: '/users', label: 'إدارة المستخدمين', icon: <Users size={18} />, group: 'الرئيسية والإدارة' },
+
   { to: '/tax/monthly', label: 'ضريبة الاستقطاع المباشر', icon: <CalendarClock size={18} />, group: 'إدارة الضرائب' },
   { to: '/tax/annual', label: 'الضريبة السنوية', icon: <FileSpreadsheet size={18} />, group: 'إدارة الضرائب' },
   { to: '/tax/corporate', label: 'ضريبة أرباح الشركات', icon: <Landmark size={18} />, group: 'إدارة الضرائب' },
@@ -149,7 +154,7 @@ export default function AppLayout() {
         </div>
       </div>
       <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4">
-        {['إدارة الضرائب', 'الأقسام الثانوية'].map((grp) => {
+        {['الرئيسية والإدارة', 'إدارة الضرائب', 'الأقسام الثانوية'].map((grp) => {
           const items = NAV.filter((x) => x.group === grp)
           return (
             <div key={grp} className="space-y-1">
