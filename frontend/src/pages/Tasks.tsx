@@ -1,0 +1,257 @@
+import { useMemo, useState } from 'react'
+import { useApp } from '../store/AppContext'
+import type { TaskItem } from '../lib/types'
+import {
+  PageHead,
+  Card,
+  CardBody,
+  Button,
+  Field,
+  Input,
+  Select,
+  Modal,
+  Badge,
+  useToast,
+} from '../components/ui'
+import { Plus, ListTodo, CheckCircle2, Circle, PlayCircle, Trash2, ShieldAlert } from 'lucide-react'
+import { useI18n } from '../i18n'
+
+export default function Tasks() {
+  const { data, add, update, remove } = useApp()
+  const { push } = useToast()
+  const { t } = useI18n()
+
+  const [openAdd, setOpenAdd] = useState(false)
+  const [filter, setFilter] = useState<'all' | 'pending' | 'progress' | 'done'>('all')
+
+  const [form, setForm] = useState<Partial<TaskItem>>({
+    title: '',
+    status: 'pending',
+    priority: 'medium',
+    date: new Date().toISOString().slice(0, 10),
+  })
+
+  const resetForm = () => {
+    setForm({
+      title: '',
+      status: 'pending',
+      priority: 'medium',
+      date: new Date().toISOString().slice(0, 10),
+    })
+  }
+
+  const list = useMemo(() => {
+    const arr = [...(data.tasks || [])]
+    return arr.filter((x) => filter === 'all' || x.status === filter)
+  }, [data.tasks, filter])
+
+  const progress = useMemo(() => {
+    const arr = data.tasks || []
+    if (arr.length === 0) return 0
+    const completed = arr.filter((x) => x.status === 'done').length
+    return Math.round((completed / arr.length) * 100)
+  }, [data.tasks])
+
+  const handleAdd = () => {
+    if (!form.title) {
+      push('error', t('pgSecondary.tasks.toast.titleRequired'))
+      return
+    }
+    const newId = 'TSK-' + Date.now()
+    const item: TaskItem = {
+      id: newId,
+      title: form.title || '',
+      status: form.status || 'pending',
+      priority: form.priority || 'medium',
+      date: form.date || new Date().toISOString().slice(0, 10),
+    }
+    add('tasks', item)
+    push('success', t('pgSecondary.tasks.toast.added'))
+    setOpenAdd(false)
+    resetForm()
+  }
+
+  const handleCycleStatus = (task: TaskItem) => {
+    const order: TaskItem['status'][] = ['pending', 'progress', 'done']
+    const idx = order.indexOf(task.status)
+    const nextStatus = order[(idx + 1) % order.length]
+    update('tasks', task.id, { status: nextStatus })
+    push(
+      'success',
+      t('pgSecondary.tasks.toast.statusUpdated', {
+        status: t(nextStatus === 'done' ? 'pgSecondary.tasks.status.done' : nextStatus === 'progress' ? 'pgSecondary.tasks.status.progress' : 'pgSecondary.tasks.status.pending'),
+      }),
+    )
+  }
+
+  const handleDelete = (id: string) => {
+    remove('tasks', id)
+    push('success', t('pgSecondary.tasks.toast.deleted'))
+  }
+
+  const priorityBadge = (prio: TaskItem['priority']) => {
+    if (prio === 'high') return <Badge tone="red">{t('pgSecondary.tasks.priority.high')}</Badge>
+    if (prio === 'medium') return <Badge tone="amber">{t('pgSecondary.tasks.priority.medium')}</Badge>
+    return <Badge tone="slate">{t('pgSecondary.tasks.priority.low')}</Badge>
+  }
+
+  const getStatusIcon = (status: TaskItem['status']) => {
+    if (status === 'done') return <CheckCircle2 className="text-emerald-500 hover:scale-110 transition" size={21} />
+    if (status === 'progress') return <PlayCircle className="text-sky-500 hover:scale-110 transition" size={21} />
+    return <Circle className="text-ink-400 hover:text-brand-600 hover:scale-110 transition" size={21} />
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHead
+        title={t('pgSecondary.tasks.page.title')}
+        desc={t('pgSecondary.tasks.page.desc')}
+        actions={
+          <Button onClick={() => setOpenAdd(true)}>
+            <Plus size={16} className="ml-1.5" />
+            {t('pgSecondary.tasks.page.add')}
+          </Button>
+        }
+      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        {/* Progress & Sidebar Filters */}
+        <div className="lg:col-span-4 space-y-4">
+          <Card>
+            <CardBody className="space-y-4">
+              <h3 className="text-sm font-bold text-ink-800">{t('pgSecondary.tasks.progress.title')}</h3>
+              
+              <div className="flex items-baseline justify-between">
+                <span className="text-3xl font-black text-brand-800 font-mono">{progress}%</span>
+                <span className="text-xs font-semibold text-ink-500">
+                  {t('pgSecondary.tasks.progress.doneCount', { done: data.tasks?.filter((x) => x.status === 'done').length || 0, total: data.tasks?.length || 0 })}
+                </span>
+              </div>
+
+              <div className="h-2.5 w-full rounded-full bg-ink-100 overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+
+              <p className="text-xs text-ink-500 leading-relaxed">
+                {t('pgSecondary.tasks.progress.hint')}
+              </p>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardBody className="p-2 space-y-1">
+              <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-ink-400">{t('pgSecondary.tasks.filter.title')}</div>
+              {[
+                { id: 'all', label: t('pgSecondary.tasks.filter.all'), count: data.tasks?.length || 0 },
+                { id: 'pending', label: t('pgSecondary.tasks.filter.pending'), count: data.tasks?.filter((x) => x.status === 'pending').length || 0 },
+                { id: 'progress', label: t('pgSecondary.tasks.filter.progress'), count: data.tasks?.filter((x) => x.status === 'progress').length || 0 },
+                { id: 'done', label: t('pgSecondary.tasks.filter.done'), count: data.tasks?.filter((x) => x.status === 'done').length || 0 },
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  onClick={() => setFilter(pill.id as any)}
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-bold transition ${filter === pill.id ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-100'}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <ListTodo size={14} className={filter === pill.id ? 'text-brand-600' : 'text-ink-400'} />
+                    {pill.label}
+                  </span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full ${filter === pill.id ? 'bg-brand-200/50 text-brand-800' : 'bg-ink-100 text-ink-600'}`}>
+                    {pill.count}
+                  </span>
+                </button>
+              ))}
+            </CardBody>
+          </Card>
+        </div>
+
+        {/* Tasks List */}
+        <div className="lg:col-span-8 space-y-3">
+          {list.length === 0 ? (
+            <Card className="border-dashed border-ink-300">
+              <CardBody className="flex flex-col items-center justify-center py-20 text-center text-ink-400">
+                <ShieldAlert size={36} className="text-ink-300 mb-2" />
+                <h4 className="font-bold text-ink-600 text-sm">{t('pgSecondary.tasks.empty.title')}</h4>
+                <p className="text-xs text-ink-400 mt-1">{t('pgSecondary.tasks.empty.desc')}</p>
+              </CardBody>
+            </Card>
+          ) : (
+            list.map((task) => {
+              const isDone = task.status === 'done'
+              return (
+                <div
+                  key={task.id}
+                  className={`flex items-center gap-4 p-4 rounded-xl border bg-white shadow-sm hover:shadow-md transition duration-200 ${isDone ? 'border-emerald-100 bg-emerald-50/5 opacity-80' : 'border-ink-200'}`}
+                >
+                  {/* Status cycle checkbox */}
+                  <button
+                    onClick={() => handleCycleStatus(task)}
+                    className="flex shrink-0 items-center justify-center cursor-pointer"
+                    title={t('pgSecondary.tasks.action.cycle')}
+                  >
+                    {getStatusIcon(task.status)}
+                  </button>
+
+                  <div className="flex-1 min-w-0">
+                    <h4 className={`text-sm font-bold truncate leading-snug ${isDone ? 'line-through text-ink-400' : 'text-ink-800'}`}>
+                      {task.title}
+                    </h4>
+                    <p className="text-[11px] text-ink-400 font-mono mt-0.5">{t('pgSecondary.tasks.dateLabel', { date: task.date })}</p>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    {priorityBadge(task.priority)}
+
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-ink-400 hover:bg-red-50 hover:text-red-600 transition"
+                      title={t('pgSecondary.tasks.action.delete')}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              )
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Add Modal */}
+      <Modal open={openAdd} onClose={() => setOpenAdd(false)} title={t('pgSecondary.tasks.modal.title')}>
+        <div className="grid grid-cols-1 gap-4">
+          <Field label={t('pgSecondary.tasks.modal.titleLabel')} required>
+            <Input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              placeholder={t('pgSecondary.tasks.modal.titlePlaceholder')}
+            />
+          </Field>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Field label={t('pgSecondary.tasks.modal.priority')}>
+              <Select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value as any })}>
+                <option value="low">{t('pgSecondary.tasks.modal.priorityLow')}</option>
+                <option value="medium">{t('pgSecondary.tasks.modal.priorityMedium')}</option>
+                <option value="high">{t('pgSecondary.tasks.modal.priorityHigh')}</option>
+              </Select>
+            </Field>
+            <Field label={t('pgSecondary.tasks.modal.date')}>
+              <Input
+                type="date"
+                value={form.date}
+                onChange={(e) => setForm({ ...form, date: e.target.value })}
+              />
+            </Field>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="secondary" onClick={() => setOpenAdd(false)}>{t('pgSecondary.common.cancel')}</Button>
+          <Button onClick={handleAdd}>{t('pgSecondary.tasks.modal.submit')}</Button>
+        </div>
+      </Modal>
+    </div>
+  )
+}

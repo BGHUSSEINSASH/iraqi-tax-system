@@ -1,0 +1,291 @@
+import { useMemo, useState } from 'react'
+import { useApp } from '../store/AppContext'
+import type { Appointment } from '../lib/types'
+import {
+  PageHead,
+  Card,
+  CardBody,
+  Button,
+  Field,
+  Input,
+  Select,
+  Modal,
+  ConfirmDialog,
+  StatCard,
+  useToast,
+  Badge,
+} from '../components/ui'
+import { Plus, Calendar, Clock, User, FileText, CheckCircle, Trash2, CalendarCheck, HelpCircle } from 'lucide-react'
+import { useI18n } from '../i18n'
+
+export default function Appointments() {
+  const { data, add, update, remove } = useApp()
+  const { push } = useToast()
+  const { t, months } = useI18n()
+
+  const [openAdd, setOpenAdd] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'all' | 'upcoming' | 'completed'>('all')
+
+  const [form, setForm] = useState<Partial<Appointment>>({
+    title: '',
+    date: new Date().toISOString().slice(0, 10),
+    time: '10:00',
+    client: '',
+    notes: '',
+    status: 'upcoming',
+  })
+
+  const resetForm = () => {
+    setForm({
+      title: '',
+      date: new Date().toISOString().slice(0, 10),
+      time: '10:00',
+      client: '',
+      notes: '',
+      status: 'upcoming',
+    })
+  }
+
+  const list = useMemo(() => {
+    const arr = [...(data.appointments || [])]
+    // sort by date ascending
+    arr.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    return arr.filter((x) => filter === 'all' || x.status === filter)
+  }, [data.appointments, filter])
+
+  const stats = useMemo(() => {
+    const arr = data.appointments || []
+    return {
+      total: arr.length,
+      upcoming: arr.filter((x) => x.status === 'upcoming').length,
+      completed: arr.filter((x) => x.status === 'completed').length,
+    }
+  }, [data.appointments])
+
+  const handleAdd = () => {
+    if (!form.title || !form.date) {
+      push('error', t('pgSecondary.appointments.toast.required'))
+      return
+    }
+    const newId = 'APT-' + Date.now()
+    const item: Appointment = {
+      id: newId,
+      title: form.title || '',
+      date: form.date || '',
+      time: form.time || '10:00',
+      client: form.client || '',
+      notes: form.notes || '',
+      status: form.status || 'upcoming',
+    }
+    add('appointments', item)
+    push('success', t('pgSecondary.appointments.toast.added'))
+    setOpenAdd(false)
+    resetForm()
+  }
+
+  const handleComplete = (id: string) => {
+    update('appointments', id, { status: 'completed' })
+    push('success', t('pgSecondary.appointments.toast.completed'))
+  }
+
+  const handleDelete = () => {
+    if (!deleteId) return
+    remove('appointments', deleteId)
+    push('success', t('pgSecondary.appointments.toast.deleted'))
+    setDeleteId(null)
+  }
+
+  const formatIQDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr)
+      const day = d.getDate()
+      const month = months[d.getMonth()]
+      return { day, month }
+    } catch {
+      return { day: '?', month: '?' }
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHead
+        title={t('pgSecondary.appointments.page.title')}
+        desc={t('pgSecondary.appointments.page.desc')}
+        actions={
+          <Button onClick={() => setOpenAdd(true)}>
+            <Plus size={16} className="ml-1.5" />
+            {t('pgSecondary.appointments.page.add')}
+          </Button>
+        }
+      />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <StatCard icon={<Calendar size={22} />} label={t('pgSecondary.appointments.stat.total')} value={stats.total} tone="brand" />
+        <StatCard icon={<Clock size={22} />} label={t('pgSecondary.appointments.stat.upcoming')} value={stats.upcoming} tone="amber" />
+        <StatCard icon={<CalendarCheck size={22} />} label={t('pgSecondary.appointments.stat.completed')} value={stats.completed} tone="green" />
+      </div>
+
+      <div className="flex justify-start gap-1 rounded-xl bg-ink-100 p-1 max-w-sm">
+        <button
+          onClick={() => setFilter('all')}
+          className={`flex-1 rounded-lg px-4 py-1.5 text-xs font-semibold transition ${filter === 'all' ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500 hover:text-ink-800'}`}
+        >
+          {t('pgSecondary.appointments.filter.all')}
+        </button>
+        <button
+          onClick={() => setFilter('upcoming')}
+          className={`flex-1 rounded-lg px-4 py-1.5 text-xs font-semibold transition ${filter === 'upcoming' ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500 hover:text-ink-800'}`}
+        >
+          {t('pgSecondary.appointments.filter.upcoming')}
+        </button>
+        <button
+          onClick={() => setFilter('completed')}
+          className={`flex-1 rounded-lg px-4 py-1.5 text-xs font-semibold transition ${filter === 'completed' ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500 hover:text-ink-800'}`}
+        >
+          {t('pgSecondary.appointments.filter.completed')}
+        </button>
+      </div>
+
+      <div className="space-y-4 max-w-3xl">
+        {list.length === 0 ? (
+          <Card className="border-dashed border-ink-300">
+            <CardBody className="flex flex-col items-center justify-center py-16 text-center text-ink-400">
+              <HelpCircle size={36} className="text-ink-300 mb-2" />
+              <h4 className="font-bold text-ink-600 text-sm">{t('pgSecondary.appointments.empty.title')}</h4>
+              <p className="text-xs text-ink-400 mt-1">{t('pgSecondary.appointments.empty.desc')}</p>
+            </CardBody>
+          </Card>
+        ) : (
+          list.map((item) => {
+            const { day, month } = formatIQDate(item.date)
+            const isCompleted = item.status === 'completed'
+            return (
+              <div
+                key={item.id}
+                className={`flex gap-4 p-5 rounded-2xl border bg-white shadow-sm hover:shadow transition duration-200 ${isCompleted ? 'border-emerald-100' : 'border-ink-200'}`}
+              >
+                {/* Date Badge */}
+                <div className={`flex flex-col items-center justify-center min-w-[70px] h-[70px] rounded-xl font-bold ${isCompleted ? 'bg-emerald-50 text-emerald-700' : 'bg-brand-50 text-brand-700'}`}>
+                  <span className="text-2xl leading-none font-black font-mono">{day}</span>
+                  <span className="text-[11px] mt-1">{month}</span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <h4 className={`text-base font-bold truncate ${isCompleted ? 'line-through text-ink-400' : 'text-ink-800'}`}>
+                    {item.title}
+                  </h4>
+                  
+                  <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-2 text-xs text-ink-500 font-medium">
+                    <span className="flex items-center gap-1 font-mono">
+                      <Clock size={13} className="text-brand-500" />
+                      {item.time}
+                    </span>
+                    {item.client && (
+                      <span className="flex items-center gap-1">
+                        <User size={13} className="text-brand-500" />
+                        {t('pgSecondary.appointments.clientLabel', { client: item.client })}
+                      </span>
+                    )}
+                  </div>
+
+                  {item.notes && (
+                    <p className="text-xs text-ink-400 mt-2 bg-ink-50 border border-ink-100 rounded-lg p-2.5 max-w-xl">
+                      {item.notes}
+                    </p>
+                  )}
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col justify-between items-end shrink-0 gap-2">
+                  <Badge tone={isCompleted ? 'green' : 'amber'}>
+                    {isCompleted ? t('pgSecondary.appointments.badge.completed') : t('pgSecondary.appointments.badge.upcoming')}
+                  </Badge>
+                  
+                  <div className="flex items-center gap-1">
+                    {!isCompleted && (
+                      <button
+                        onClick={() => handleComplete(item.id)}
+                        className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-emerald-100 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition"
+                        title={t('pgSecondary.appointments.action.complete')}
+                      >
+                        <CheckCircle size={14} />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setDeleteId(item.id)}
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-100 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition"
+                      title={t('pgSecondary.appointments.action.delete')}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })
+        )}
+      </div>
+
+      {/* Add Modal */}
+      <Modal open={openAdd} onClose={() => setOpenAdd(false)} title={t('pgSecondary.appointments.modal.title')}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Field label={t('pgSecondary.appointments.modal.titleLabel')} required>
+              <Input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                placeholder={t('pgSecondary.appointments.modal.titlePlaceholder')}
+              />
+            </Field>
+          </div>
+          <Field label={t('pgSecondary.appointments.modal.client')}>
+            <Input
+              value={form.client}
+              onChange={(e) => setForm({ ...form, client: e.target.value })}
+              placeholder={t('pgSecondary.appointments.modal.clientPlaceholder')}
+            />
+          </Field>
+          <Field label={t('pgSecondary.appointments.modal.date')} required>
+            <Input
+              type="date"
+              value={form.date}
+              onChange={(e) => setForm({ ...form, date: e.target.value })}
+            />
+          </Field>
+          <Field label={t('pgSecondary.appointments.modal.time')} required>
+            <Input
+              type="time"
+              value={form.time}
+              onChange={(e) => setForm({ ...form, time: e.target.value })}
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <Field label={t('pgSecondary.appointments.modal.notes')}>
+              <Input
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder={t('pgSecondary.appointments.modal.notesPlaceholder')}
+              />
+            </Field>
+          </div>
+        </div>
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="secondary" onClick={() => setOpenAdd(false)}>{t('pgSecondary.common.cancel')}</Button>
+          <Button onClick={handleAdd}>{t('pgSecondary.appointments.modal.submit')}</Button>
+        </div>
+      </Modal>
+
+      {/* Cancel Confirm */}
+      <ConfirmDialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title={t('pgSecondary.appointments.confirm.title')}
+        message={t('pgSecondary.appointments.confirm.message')}
+        confirmText={t('pgSecondary.appointments.confirm.confirmText')}
+      />
+    </div>
+  )
+}
