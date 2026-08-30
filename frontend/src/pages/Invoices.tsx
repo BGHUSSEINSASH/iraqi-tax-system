@@ -38,9 +38,13 @@ export default function Invoices() {
   const [form, setForm] = useState<Partial<Invoice>>({
     client: '',
     taxType: 'ضريبة دخل الشركات',
+    taxRate: 0.15,
     amount: 0,
+    taxAmount: 0,
     date: new Date().toISOString().slice(0, 10),
     due: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
+    period: new Date().toISOString().slice(0, 7),
+    relatedEntityId: '',
     status: 'pending',
     notes: '',
   })
@@ -49,9 +53,13 @@ export default function Invoices() {
     setForm({
       client: '',
       taxType: 'ضريبة دخل الشركات',
+      taxRate: 0.15,
       amount: 0,
+      taxAmount: 0,
       date: new Date().toISOString().slice(0, 10),
       due: new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().slice(0, 10),
+      period: new Date().toISOString().slice(0, 7),
+      relatedEntityId: '',
       status: 'pending',
       notes: '',
     })
@@ -89,9 +97,13 @@ export default function Invoices() {
       id: newId,
       client: form.client || '',
       taxType: form.taxType || 'ضريبة دخل الشركات',
+      taxRate: form.taxRate || 0.15,
       amount: form.amount || 0,
+      taxAmount: form.taxAmount || form.amount * (form.taxRate || 0.15),
       date: form.date || new Date().toISOString().slice(0, 10),
       due: form.due || '',
+      period: form.period || new Date().toISOString().slice(0, 7),
+      relatedEntityId: form.relatedEntityId || '',
       status: form.status || 'pending',
       notes: form.notes || '',
     }

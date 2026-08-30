@@ -9,9 +9,16 @@ import {
 import { uid } from '../lib/format'
 import type { User } from '../lib/types'
 
-const ROLE_TONE: Record<User['role'], 'brand' | 'amber'> = {
+const ROLE_TONE: Record<User['role'], 'brand' | 'amber' | 'purple'> = {
+  founder: 'purple',
   admin: 'brand',
   accountant: 'amber',
+}
+
+const roleLabel = (role: User['role']) => {
+  if (role === 'founder') return 'مؤسس النظام'
+  if (role === 'admin') return 'مدير النظام'
+  return 'محاسب ضريبي'
 }
 
 export default function Users() {
@@ -42,6 +49,7 @@ export default function Users() {
       name: fullName.trim(),
       password: password.trim(),
       role,
+      status: 'active',
     })
     setUsername('')
     setFullName('')
@@ -52,7 +60,7 @@ export default function Users() {
   }
 
   const del = (u: User) => {
-    if (u.username === 'admin') {
+    if (u.username === 'admin' || u.role === 'founder') {
       push('error', t('pgRegistry.users.toast.cannotDeleteAdmin'))
       return
     }
@@ -80,13 +88,15 @@ export default function Users() {
     {
       key: 'role',
       title: t('pgRegistry.users.col.role'),
-      render: (u) => <Badge tone={ROLE_TONE[u.role]}>{t(`pgRegistry.users.role.${u.role}`)}</Badge>,
+      render: (u) => <Badge tone={ROLE_TONE[u.role]}>{roleLabel(u.role)}</Badge>,
     },
     {
       key: 'status',
       title: t('pgRegistry.users.col.status'),
       render: (u) =>
-        u.username === 'admin' ? (
+        u.status === 'suspended' ? (
+          <Badge tone="red">معلّق</Badge>
+        ) : u.username === 'admin' || u.role === 'founder' ? (
           <Badge tone="green"><Check size={12} /> {t('pgRegistry.users.status.active')}</Badge>
         ) : (
           <Badge tone="slate">{t('pgRegistry.users.status.registered')}</Badge>
@@ -103,7 +113,7 @@ export default function Users() {
           onClick={() => del(u)}
           title={t('pgRegistry.users.action.delete')}
         >
-          {u.username === 'admin' ? <X size={14} /> : <Trash2 size={14} />}
+          {u.username === 'admin' || u.role === 'founder' ? <X size={14} /> : <Trash2 size={14} />}
         </Button>
       ),
     },
@@ -128,7 +138,7 @@ export default function Users() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 text-xs text-ink-500"><Shield size={15} className="text-brand-600" /> {t('pgRegistry.users.stat.admins')}</div>
-          <div className="mt-1 text-xl font-bold text-ink-800">{users.filter((u) => u.role === 'admin').length}</div>
+          <div className="mt-1 text-xl font-bold text-ink-800">{users.filter((u) => u.role === 'admin' || u.role === 'founder').length}</div>
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-2 text-xs text-ink-500"><Check size={15} className="text-emerald-600" /> {t('pgRegistry.users.stat.accountants')}</div>

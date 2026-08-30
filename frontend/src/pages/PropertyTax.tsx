@@ -1,45 +1,32 @@
 import { useMemo, useState } from 'react'
 import { Home, Plus, Pencil, Trash2, FileSpreadsheet, FileText, Calculator, CheckCircle2 } from 'lucide-react'
 import { useApp } from '../store/AppContext'
-import { PageHead, Card, CardHeader, CardBody, Button, Badge, IconBtn, Modal, Field, Input, Select, MoneyInput, Textarea, Toggle, DataTable, useToast, ConfirmDialog, type Column } from '../components/ui'
+import { PageHead, Card, CardHeader, CardBody, Button, Badge, IconBtn, Modal, Field, Input, Select, MoneyInput, Textarea, Toggle, DataTable, useToast, ConfirmDialog, Tabs, type Column } from '../components/ui'
 import { useI18n } from '../i18n'
 import type { PropertyRecord } from '../lib/types'
 import { fmt, money, nowYear, uid } from '../lib/format'
-import { calcPropertyForm } from '../lib/tax'
 import { exportExcel, exportPdf } from '../lib/export'
-import PropertyWizard from '../components/PropertyWizard'
 
-interface FormState {
-  year: number
+interface SaleForm {
   name: string
-  location: string
-  nature: string
-  familyHome: boolean
-  isNew: boolean
-  buildDate: string
-  isEmpty: boolean
-  emptyMonths: number
-  annualRent: number
-  paid: number
-  penaltyMonths: number
-  penaltyDelay: boolean
-  penaltyFalseInfo: boolean
-  penaltyFakeEmpty: boolean
-  penaltyUseChange: boolean
+  area: number
+  pricePerMeter: number
   notes: string
 }
 
-function ResultRow({ label, value, note }: { label: string; value: string; note?: string }) {
-  return (
-    <div>
-      <div className="flex items-center justify-between">
-        <span className="text-sm text-ink-600">{label}</span>
-        <strong className="text-sm font-bold text-ink-800">{value}</strong>
-      </div>
-      {note && <p className="mt-0.5 pr-4 text-[11px] leading-snug text-ink-400">{note}</p>}
-    </div>
-  )
+interface IncomeForm {
+  name: string
+  location: string
+  annualRent: number
+  exemptState: boolean
+  exemptReligious: boolean
+  exemptFamily: boolean
+  paid: number
+  notes: string
 }
+
+const emptySale: SaleForm = { name: '', area: 0, pricePerMeter: 0, notes: '' }
+const emptyIncome: IncomeForm = { name: '', location: '', annualRent: 0, exemptState: false, exemptReligious: false, exemptFamily: false, paid: 0, notes: '' }
 
 export default function PropertyTax() {
   const { data, currentCompany, add, update, remove } = useApp()
@@ -49,189 +36,129 @@ export default function PropertyTax() {
   const cid = data.activeCompanyId
   const cfg = data.config
 
-  const [selYear, setSelYear] = useState(year)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [tab, setTab] = useState<'sale' | 'income'>('sale')
+  const [saleForm, setSaleForm] = useState<SaleForm>(emptySale)
+  const [incomeForm, setIncomeForm] = useState<IncomeForm>(emptyIncome)
+  const [incomeResultOpen, setIncomeResultOpen] = useState(false)
   const [editing, setEditing] = useState<PropertyRecord | null>(null)
-  const [form, setForm] = useState<FormState>({ year, name: '', location: '', nature: 'none', familyHome: false, isNew: false, buildDate: '', isEmpty: false, emptyMonths: 0, annualRent: 0, paid: 0, penaltyMonths: 0, penaltyDelay: false, penaltyFalseInfo: false, penaltyFakeEmpty: false, penaltyUseChange: false, notes: '' })
+  const [modalOpen, setModalOpen] = useState(false)
   const [confirmId, setConfirmId] = useState<string | null>(null)
+  const [editingTab, setEditingTab] = useState<'sale' | 'income'>('sale')
 
-  const list = useMemo(
-    () => data.properties.filter((r) => r.companyId === cid && r.year === selYear).sort((a, b) => a.name.localeCompare(b.name)),
-    [data.properties, cid, selYear],
+  const saleList = useMemo(
+    () => data.properties.filter((r) => r.companyId === cid && r.year === year && r.nature === 'sale'),
+    [data.properties, cid, year],
   )
 
-  const totalTax = list.reduce((s, r) => s + r.tax, 0)
-  const totalPenalty = list.reduce((s, r) => s + r.penalty, 0)
-  const totalDue = list.reduce((s, r) => s + r.totalDue, 0)
-  const totalPaid = list.reduce((s, r) => s + r.paid, 0)
-
-  const hdr = [
-    t('pgTax.property.colProperty'),
-    t('pgTax.common.location'),
-    t('pgTax.property.colAnnualRent'),
-    t('pgTax.property.colTaxable'),
-    t('pgTax.property.colTax'),
-    t('pgTax.property.colPenalty'),
-    t('pgTax.property.colTotalDue'),
-    t('pgTax.property.colPaid'),
-  ]
-
-  const penLabels: Record<string, string> = {
-    'غرامة تأخير': t('pgTax.property.penDelayLabel'),
-    'إخفاء معلومات': t('pgTax.property.penFalseInfoLabel'),
-    'خلو وهمي': t('pgTax.property.penFakeEmptyLabel'),
-    'تغيير استعمال العقار بدون إخبار': t('pgTax.property.penUseChangeLabel'),
-    'غرامة تأخير شهرية': t('pgTax.property.penMonthlyLabel'),
-  }
-
-  const penLaws: Record<string, string> = {
-    'غرامة تأخير': t('pgTax.property.penDelayLaw'),
-    'إخفاء معلومات': t('pgTax.property.penFalseInfoLaw'),
-    'خلو وهمي': t('pgTax.property.penFakeEmptyLaw'),
-    'تغيير استعمال العقار بدون إخبار': t('pgTax.property.penUseChangeLaw'),
-    'غرامة تأخير شهرية': t('pgTax.property.penMonthlyLaw', { months: form.penaltyMonths }),
-  }
-
-  const result = useMemo(
-    () =>
-      calcPropertyForm({
-        annualRent: form.annualRent,
-        nature: form.nature,
-        familyHome: form.familyHome,
-        isNew: form.isNew,
-        buildDate: form.buildDate,
-        isEmpty: form.isEmpty,
-        emptyMonths: form.emptyMonths,
-        rate: cfg.propertyRate,
-        penaltyDelay: form.penaltyDelay,
-        penaltyFalseInfo: form.penaltyFalseInfo,
-        penaltyFakeEmpty: form.penaltyFakeEmpty,
-        penaltyUseChange: form.penaltyUseChange,
-        penaltyMonths: form.penaltyMonths,
-        monthlyPenaltyRate: cfg.propertyPenaltyRate,
-      }),
-    [form, cfg.propertyRate, cfg.propertyPenaltyRate],
+  const incomeList = useMemo(
+    () => data.properties.filter((r) => r.companyId === cid && r.year === year && r.nature !== 'sale'),
+    [data.properties, cid, year],
   )
 
-  const needsRent = form.nature === 'none' && !form.familyHome
-  const balance = result.finalTax - form.paid
+  const saleResult = useMemo(() => {
+    const value = saleForm.area * saleForm.pricePerMeter
+    const tax = value * cfg.propertyRate
+    return { value, tax }
+  }, [saleForm.area, saleForm.pricePerMeter, cfg.propertyRate])
 
-  const openNew = () => {
+  const incomeExempt = incomeForm.exemptState || incomeForm.exemptReligious || incomeForm.exemptFamily
+  const incomeTax = incomeExempt ? 0 : incomeForm.annualRent * cfg.propertyRate
+  const incomeBalance = incomeTax - incomeForm.paid
+
+  const saveSale = () => {
+    if (!saleForm.name.trim()) { push('error', 'يرجى إدخال اسم العقار'); return }
+    if (saleForm.area <= 0 || saleForm.pricePerMeter <= 0) { push('error', 'يرجى إدخال المساحة والسعر'); return }
+    const payload = {
+      year, name: saleForm.name, location: '', nature: 'sale' as const,
+      annualRent: 0, exemptAmount: 0, rate: cfg.propertyRate,
+      taxable: saleResult.value, tax: saleResult.tax, paid: 0,
+      penaltyMonths: 0, penalty: 0, totalDue: saleResult.tax,
+      notes: saleForm.notes, familyHome: false, isNew: false, buildDate: '',
+      isEmpty: false, emptyMonths: 0, maintenance: 0, exempt: false,
+      exemptReason: '', penaltyDelay: false, penaltyFalseInfo: false,
+      penaltyFakeEmpty: false, penaltyUseChange: false,
+    }
+    if (editing && editingTab === 'sale') {
+      update('properties', editing.id, payload)
+      push('success', 'تم تعديل العقار بنجاح')
+    } else {
+      add('properties', { id: uid(), companyId: cid, ...payload })
+      push('success', 'تم إضافة العقار بنجاح')
+    }
+    setSaleForm(emptySale)
     setEditing(null)
-    setForm({ year: selYear, name: '', location: '', nature: 'none', familyHome: false, isNew: false, buildDate: '', isEmpty: false, emptyMonths: 0, annualRent: 0, paid: 0, penaltyMonths: 0, penaltyDelay: false, penaltyFalseInfo: false, penaltyFakeEmpty: false, penaltyUseChange: false, notes: '' })
+  }
+
+  const saveIncome = () => {
+    if (!incomeForm.name.trim()) { push('error', 'يرجى إدخال اسم العقار'); return }
+    if (incomeForm.annualRent <= 0 && !incomeExempt) { push('error', 'يرجى إدخال مبلغ الإيجار'); return }
+    const exemptReason = incomeForm.exemptState ? 'state' : incomeForm.exemptReligious ? 'religious' : incomeForm.exemptFamily ? 'family' : ''
+    const payload = {
+      year, name: incomeForm.name, location: incomeForm.location,
+      nature: incomeForm.exemptState ? 'state' : incomeForm.exemptReligious ? 'religious' : 'none',
+      annualRent: incomeForm.annualRent, exemptAmount: 0, rate: cfg.propertyRate,
+      taxable: incomeExempt ? 0 : incomeForm.annualRent, tax: incomeTax,
+      paid: incomeForm.paid, penaltyMonths: 0, penalty: 0, totalDue: incomeTax,
+      notes: incomeForm.notes, familyHome: incomeForm.exemptFamily, isNew: false,
+      buildDate: '', isEmpty: false, emptyMonths: 0, maintenance: 0,
+      exempt: incomeExempt, exemptReason, penaltyDelay: false, penaltyFalseInfo: false,
+      penaltyFakeEmpty: false, penaltyUseChange: false,
+    }
+    if (editing && editingTab === 'income') {
+      update('properties', editing.id, payload)
+      push('success', 'تم تعديل العقار بنجاح')
+    } else {
+      add('properties', { id: uid(), companyId: cid, ...payload })
+      push('success', 'تم إضافة العقار بنجاح')
+    }
+    setIncomeForm(emptyIncome)
+    setEditing(null)
+  }
+
+  const openEditSale = (r: PropertyRecord) => {
+    setEditing(r)
+    setEditingTab('sale')
+    setSaleForm({ name: r.name, area: 0, pricePerMeter: r.taxable > 0 && r.tax > 0 ? r.tax / r.taxable * 100 / cfg.propertyRate : 0, notes: r.notes })
     setModalOpen(true)
   }
 
-  const openEdit = (r: PropertyRecord) => {
+  const openEditIncome = (r: PropertyRecord) => {
     setEditing(r)
-    setForm({
-      year: r.year,
-      name: r.name,
-      location: r.location,
-      nature: r.nature ?? 'none',
-      familyHome: r.familyHome ?? false,
-      isNew: r.isNew ?? false,
-      buildDate: r.buildDate ?? '',
-      isEmpty: r.isEmpty ?? false,
-      emptyMonths: r.emptyMonths ?? 0,
-      annualRent: r.annualRent,
-      paid: r.paid,
-      penaltyMonths: r.penaltyMonths ?? 0,
-      penaltyDelay: r.penaltyDelay ?? false,
-      penaltyFalseInfo: r.penaltyFalseInfo ?? false,
-      penaltyFakeEmpty: r.penaltyFakeEmpty ?? false,
-      penaltyUseChange: r.penaltyUseChange ?? false,
-      notes: r.notes,
+    setEditingTab('income')
+    setIncomeForm({
+      name: r.name, location: r.location, annualRent: r.annualRent,
+      exemptState: r.nature === 'state', exemptReligious: r.nature === 'religious',
+      exemptFamily: r.familyHome ?? false, paid: r.paid, notes: r.notes,
     })
     setModalOpen(true)
   }
 
-  const save = () => {
-    if (!form.name.trim()) {
-      push('error', t('pgTax.property.nameRequired'))
-      return
-    }
-    if (!result.exempt && result.rent <= 0) {
-      push('error', t('pgTax.property.rentRequired'))
-      return
-    }
-    const payload = {
-      year: form.year,
-      name: form.name,
-      location: form.location,
-      annualRent: form.annualRent,
-      exemptAmount: 0,
-      rate: cfg.propertyRate,
-      taxable: result.taxable,
-      tax: result.baseTax,
-      paid: form.paid,
-      penaltyMonths: form.penaltyMonths,
-      penalty: result.penalty,
-      totalDue: result.finalTax,
-      notes: form.notes,
-      nature: form.nature,
-      familyHome: form.familyHome,
-      isNew: form.isNew,
-      buildDate: form.buildDate,
-      isEmpty: form.isEmpty,
-      emptyMonths: form.emptyMonths,
-      maintenance: result.maintenance,
-      exempt: result.exempt,
-      exemptReason: result.exemptReason,
-      penaltyDelay: form.penaltyDelay,
-      penaltyFalseInfo: form.penaltyFalseInfo,
-      penaltyFakeEmpty: form.penaltyFakeEmpty,
-      penaltyUseChange: form.penaltyUseChange,
-    }
-    if (editing) {
-      update('properties', editing.id, payload)
-      push('success', t('pgTax.property.updated'))
-    } else {
-      add('properties', { id: uid(), companyId: cid, ...payload })
-      push('success', t('pgTax.property.added'))
-    }
-    setModalOpen(false)
-  }
+  const saleColumns: Column<PropertyRecord>[] = [
+    { key: 'name', title: 'العقار', render: (r) => <div><div className="font-semibold text-ink-800">{r.name}</div><div className="text-xs text-ink-400">{r.location}</div></div> },
+    { key: 'taxable', title: 'قيمة العقار', total: (rs) => rs.reduce((s, r) => s + r.taxable, 0), render: (r) => <span className="text-xs">{money(r.taxable)}</span> },
+    { key: 'tax', title: 'الضريبة', total: (rs) => rs.reduce((s, r) => s + r.tax, 0), render: (r) => <span className="text-xs font-bold text-brand-700">{money(r.tax)}</span> },
+    { key: 'paid', title: 'المسدد', total: (rs) => rs.reduce((s, r) => s + r.paid, 0), render: (r) => <span className="text-xs">{money(r.paid)}</span> },
+    { key: 'balance', title: 'الرصيد', render: (r) => { const b = r.totalDue - r.paid; return b <= 0 ? <Badge tone="green">مسدد</Badge> : <Badge tone="red">{money(b)}</Badge> } },
+    { key: 'actions', title: '', render: (r) => (
+      <div className="flex items-center justify-end gap-1">
+        <IconBtn title="تعديل" onClick={() => openEditSale(r)}><Pencil size={16} /></IconBtn>
+        <IconBtn title="حذف" tone="danger" onClick={() => setConfirmId(r.id)}><Trash2 size={16} /></IconBtn>
+      </div>
+    )},
+  ]
 
-  const columns: Column<PropertyRecord>[] = [
-    {
-      key: 'name',
-      title: t('pgTax.property.colProperty'),
-      render: (r) => (
-        <div>
-          <div className="font-semibold text-ink-800">{r.name}</div>
-          <div className="text-xs text-ink-400">{r.location}</div>
-        </div>
-      ),
-    },
-    { key: 'annualRent', title: t('pgTax.property.colAnnualRent'), total: (rs) => rs.reduce((s, r) => s + r.annualRent, 0), render: (r) => (r.exempt ? <Badge tone="green">{t('pgTax.property.exempt')}</Badge> : <span className="text-xs">{money(r.annualRent)}</span>) },
-    { key: 'taxable', title: t('pgTax.property.colTaxable'), total: (rs) => rs.reduce((s, r) => s + r.taxable, 0), render: (r) => <span className="text-xs">{money(r.taxable)}</span> },
-    { key: 'tax', title: t('pgTax.property.colTax'), total: (rs) => rs.reduce((s, r) => s + r.tax, 0), render: (r) => <span className="text-xs font-bold text-brand-700">{money(r.tax)}</span> },
-    { key: 'penalty', title: t('pgTax.property.colPenalty'), total: (rs) => rs.reduce((s, r) => s + r.penalty, 0), render: (r) => (r.penalty > 0 ? <Badge tone="amber">{money(r.penalty)}</Badge> : <span className="text-xs text-ink-400">—</span>) },
-    { key: 'totalDue', title: t('pgTax.property.colTotalDue'), total: (rs) => rs.reduce((s, r) => s + r.totalDue, 0), render: (r) => <span className="text-xs font-semibold">{money(r.totalDue)}</span> },
-    { key: 'paid', title: t('pgTax.property.colPaid'), total: (rs) => rs.reduce((s, r) => s + r.paid, 0), render: (r) => <span className="text-xs">{money(r.paid)}</span> },
-    {
-      key: 'balance',
-      title: t('pgTax.property.colBalance'),
-      render: (r) => {
-        const b = r.totalDue - r.paid
-        return b <= 0 ? <Badge tone="green">{t('pgTax.property.settled')}</Badge> : <Badge tone="red">{money(b)}</Badge>
-      },
-    },
-    {
-      key: 'actions',
-      title: '',
-      render: (r) => (
-        <div className="flex items-center justify-end gap-1">
-          <IconBtn title={t('pgTax.property.edit')} onClick={() => openEdit(r)}>
-            <Pencil size={16} />
-          </IconBtn>
-          <IconBtn title={t('pgTax.property.delete')} tone="danger" onClick={() => setConfirmId(r.id)}>
-            <Trash2 size={16} />
-          </IconBtn>
-        </div>
-      ),
-    },
+  const incomeColumns: Column<PropertyRecord>[] = [
+    { key: 'name', title: 'العقار', render: (r) => <div><div className="font-semibold text-ink-800">{r.name}</div><div className="text-xs text-ink-400">{r.location}</div></div> },
+    { key: 'annualRent', title: 'الإيجار السنوي', total: (rs) => rs.reduce((s, r) => s + r.annualRent, 0), render: (r) => r.exempt ? <Badge tone="green">معفي</Badge> : <span className="text-xs">{money(r.annualRent)}</span> },
+    { key: 'tax', title: 'الضريبة', total: (rs) => rs.reduce((s, r) => s + r.tax, 0), render: (r) => <span className="text-xs font-bold text-brand-700">{money(r.tax)}</span> },
+    { key: 'paid', title: 'المسدد', total: (rs) => rs.reduce((s, r) => s + r.paid, 0), render: (r) => <span className="text-xs">{money(r.paid)}</span> },
+    { key: 'balance', title: 'الرصيد', render: (r) => { const b = r.totalDue - r.paid; return b <= 0 ? <Badge tone="green">مسدد</Badge> : <Badge tone="red">{money(b)}</Badge> } },
+    { key: 'actions', title: '', render: (r) => (
+      <div className="flex items-center justify-end gap-1">
+        <IconBtn title="تعديل" onClick={() => openEditIncome(r)}><Pencil size={16} /></IconBtn>
+        <IconBtn title="حذف" tone="danger" onClick={() => setConfirmId(r.id)}><Trash2 size={16} /></IconBtn>
+      </div>
+    )},
   ]
 
   return (
@@ -239,54 +166,144 @@ export default function PropertyTax() {
       <PageHead
         title={t('pgTax.property.title')}
         desc={t('pgTax.property.desc', { law: t('pgTax.property.law') })}
-        actions={
-          <>
-            <Select className="max-w-[140px]" value={selYear} onChange={(e) => setSelYear(Number(e.target.value))}>
-              {[year - 1, year, year + 1].map((y) => (
-                <option key={y} value={y}>
-                  {y}
-                </option>
-              ))}
-            </Select>
-            <Button onClick={openNew}>
-              <Plus size={16} /> {t('pgTax.property.addProperty')}
-            </Button>
-          </>
-        }
       />
 
-      <PropertyWizard
-        defaultYear={selYear}
-        onSave={(payload) => {
-          add('properties', { id: uid(), companyId: cid, ...payload })
-        }}
-      />
-      <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <Card className="p-4"><div className="text-xs text-ink-500">{t('pgTax.property.statProperties')}</div><div className="mt-1 text-xl font-bold text-ink-800">{fmt(list.length)}</div></Card>
-        <Card className="p-4"><div className="text-xs text-ink-500">{t('pgTax.property.statRevenue')}</div><div className="mt-1 text-xl font-bold text-ink-800">{money(list.reduce((s, r) => s + r.annualRent, 0))}</div></Card>
-        <Card className="p-4"><div className="text-xs text-ink-500">{t('pgTax.property.statTax')}</div><div className="mt-1 text-xl font-bold text-brand-700">{money(totalTax)}</div></Card>
-        <Card className="p-4"><div className="text-xs text-ink-500">{t('pgTax.property.statPenalties')}</div><div className="mt-1 text-xl font-bold text-amber-600">{money(totalPenalty)}</div></Card>
-        <Card className="p-4"><div className="text-xs text-ink-500">{t('pgTax.property.statBalance')}</div><div className="mt-1 text-xl font-bold text-red-600">{money(totalDue - totalPaid)}</div></Card>
+      <div className="mb-5">
+        <Tabs
+          items={[
+            { id: 'sale', label: 'بيع العقار' },
+            { id: 'income', label: 'إيراد العقار (إيجار)' },
+          ]}
+          value={tab}
+          onChange={setTab}
+        />
+      </div>
+
+      {tab === 'sale' && (
+        <Card className="mb-4">
+          <CardHeader title="حاسبة ضريبة بيع العقار" subtitle="أدخل مساحة العقار وسعر المتر لحساب الضريبة" />
+          <CardBody>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <Field label="اسم العقار" required>
+                  <Input value={saleForm.name} onChange={(e) => setSaleForm({ ...saleForm, name: e.target.value })} placeholder="اسم العقار" />
+                </Field>
+                <Field label="مساحة العقار (م²)">
+                  <Input type="number" dir="ltr" min={0} value={saleForm.area || ''} onChange={(e) => setSaleForm({ ...saleForm, area: Math.max(0, Number(e.target.value)) })} />
+                </Field>
+                <Field label="سعر المتر (دينار)">
+                  <MoneyInput value={saleForm.pricePerMeter} onChange={(v) => setSaleForm({ ...saleForm, pricePerMeter: v })} />
+                </Field>
+              </div>
+              {saleForm.area > 0 && saleForm.pricePerMeter > 0 && (
+                <div className="rounded-xl border border-brand-200 bg-gradient-to-b from-brand-50 to-white p-5">
+                  <div className="mb-3 text-sm font-bold text-brand-700">نتيجة الحساب</div>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="rounded-lg border border-ink-200 bg-white p-3">
+                      <div className="text-xs text-ink-500">قيمة العقار</div>
+                      <div className="mt-1 text-lg font-bold">{money(saleResult.value)}</div>
+                    </div>
+                    <div className="rounded-lg border border-ink-200 bg-white p-3">
+                      <div className="text-xs text-ink-500">نسبة الضريبة</div>
+                      <div className="mt-1 text-lg font-bold">{fmt(cfg.propertyRate * 100)}%</div>
+                    </div>
+                    <div className="rounded-lg border border-brand-600 bg-brand-600 p-3 text-white">
+                      <div className="text-xs text-emerald-100">الضريبة المستحقة</div>
+                      <div className="mt-1 text-xl font-black">{money(saleResult.tax)}</div>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Field label="ملاحظات">
+                      <Textarea value={saleForm.notes} onChange={(e) => setSaleForm({ ...saleForm, notes: e.target.value })} />
+                    </Field>
+                  </div>
+                  <div className="mt-3 flex justify-end">
+                    <Button onClick={saveSale}><Plus size={16} /> حفظ السجل</Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {tab === 'income' && (
+        <Card className="mb-4">
+          <CardHeader title="حاسبة ضريبة إيراد العقار" subtitle="أدخل مبلغ الإيجار السنوي لحساب الضريبة" />
+          <CardBody>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <Field label="اسم العقار" required>
+                  <Input value={incomeForm.name} onChange={(e) => setIncomeForm({ ...incomeForm, name: e.target.value })} placeholder="اسم العقار" />
+                </Field>
+                <Field label="الموقع">
+                  <Input value={incomeForm.location} onChange={(e) => setIncomeForm({ ...incomeForm, location: e.target.value })} />
+                </Field>
+                <Field label="الإيجار السنوي (دينار)">
+                  <MoneyInput value={incomeForm.annualRent} onChange={(v) => setIncomeForm({ ...incomeForm, annualRent: v })} />
+                </Field>
+              </div>
+              <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
+                <div className="mb-2 text-sm font-bold text-ink-800">الإعفاءات</div>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={incomeForm.exemptState} onChange={(e) => setIncomeForm({ ...incomeForm, exemptState: e.target.checked, exemptReligious: false, exemptFamily: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                    معفي — ملكية حكومية
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={incomeForm.exemptReligious} onChange={(e) => setIncomeForm({ ...incomeForm, exemptReligious: e.target.checked, exemptState: false, exemptFamily: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                    معفي — أماكن دينية
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" checked={incomeForm.exemptFamily} onChange={(e) => setIncomeForm({ ...incomeForm, exemptFamily: e.target.checked, exemptState: false, exemptReligious: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                    معفي — سكن عائلي
+                  </label>
+                </div>
+              </div>
+              {incomeForm.annualRent > 0 && (
+                <div className="flex justify-center">
+                  <Button onClick={() => setIncomeResultOpen(true)}>
+                    <Calculator size={16} /> احتساب الضريبة
+                  </Button>
+                </div>
+              )}
+              {incomeExempt && (
+                <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-600" />
+                  <p className="text-sm font-bold text-emerald-800">العقار معفي من الضريبة وفقاً للقانون</p>
+                </div>
+              )}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      <div className="mb-4 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Card className="p-4"><div className="text-xs text-ink-500">{tab === 'sale' ? 'عقارات البيع' : 'عقارات الإيجار'}</div><div className="mt-1 text-xl font-bold text-ink-800">{fmt(tab === 'sale' ? saleList.length : incomeList.length)}</div></Card>
+        <Card className="p-4"><div className="text-xs text-ink-500">إجمالي القيمة</div><div className="mt-1 text-xl font-bold text-ink-800">{money((tab === 'sale' ? saleList : incomeList).reduce((s, r) => s + (tab === 'sale' ? r.taxable : r.annualRent), 0))}</div></Card>
+        <Card className="p-4 bg-brand-600 text-white"><div className="text-xs text-emerald-100">الضريبة</div><div className="mt-1 text-xl font-bold">{money((tab === 'sale' ? saleList : incomeList).reduce((s, r) => s + r.tax, 0))}</div></Card>
+        <Card className="p-4"><div className="text-xs text-ink-500">الرصيد</div><div className="mt-1 text-xl font-bold text-red-600">{money((tab === 'sale' ? saleList : incomeList).reduce((s, r) => s + Math.max(0, r.totalDue - r.paid), 0))}</div></Card>
       </div>
 
       <Card>
         <CardHeader
-          title={t('pgTax.property.tableTitle', { year: selYear })}
-          subtitle={t('pgTax.property.tableSubtitle')}
+          title={tab === 'sale' ? 'سجل عقارات البيع' : 'سجل عقارات الإيجار'}
           action={
             <>
               <Button variant="secondary" size="sm" onClick={() => {
-                const body = list.map((r) => [r.name, r.location, r.annualRent, r.taxable, r.tax, r.penalty, r.totalDue, r.paid])
-                body.push([t('pgTax.common.total'), '', list.reduce((s, r) => s + r.annualRent, 0), list.reduce((s, r) => s + r.taxable, 0), totalTax, totalPenalty, totalDue, totalPaid])
-                exportExcel(`${t('pgTax.property.title').replace(/ /g, '-')}-${selYear}.xlsx`, t('pgTax.property.excelSheet'), hdr, body)
-                push('success', t('pgTax.property.exportExcelMsg'))
+                const list = tab === 'sale' ? saleList : incomeList
+                const hdrs = tab === 'sale' ? ['العقار', 'القيمة', 'الضريبة', 'المسدد'] : ['العقار', 'الإيجار', 'الضريبة', 'المسدد']
+                const body = list.map((r) => tab === 'sale' ? [r.name, r.taxable, r.tax, r.paid] : [r.name, r.annualRent, r.tax, r.paid])
+                exportExcel(`${t('pgTax.property.title').replace(/ /g, '-')}-${year}.xlsx`, tab === 'sale' ? 'عقارات البيع' : 'عقارات الإيجار', hdrs, body)
+                push('success', 'تم التصدير بنجاح')
               }}>
                 <FileSpreadsheet size={15} /> {t('pgTax.common.excel')}
               </Button>
               <Button variant="secondary" size="sm" onClick={() => {
-                const body = list.map((r) => [r.name, r.location, fmt(r.annualRent), fmt(r.taxable), fmt(r.tax), fmt(r.penalty), fmt(r.totalDue), fmt(r.paid)])
-                body.push([t('pgTax.common.total'), '', fmt(list.reduce((s, r) => s + r.annualRent, 0)), fmt(list.reduce((s, r) => s + r.taxable, 0)), fmt(totalTax), fmt(totalPenalty), fmt(totalDue), fmt(totalPaid)])
-                exportPdf({ title: t('pgTax.property.pdfTitle'), subtitle: t('pgTax.property.pdfSubtitle', { year: selYear }), company: currentCompany, headers: hdr, rows: body })
+                const list = tab === 'sale' ? saleList : incomeList
+                const hdrs = tab === 'sale' ? ['العقار', 'القيمة', 'الضريبة', 'المسدد'] : ['العقار', 'الإيجار', 'الضريبة', 'المسدد']
+                const body = list.map((r) => tab === 'sale' ? [r.name, fmt(r.taxable), fmt(r.tax), fmt(r.paid)] : [r.name, fmt(r.annualRent), fmt(r.tax), fmt(r.paid)])
+                exportPdf({ title: tab === 'sale' ? 'عقارات البيع' : 'عقارات الإيجار', subtitle: `السنة ${year}`, company: currentCompany, headers: hdrs, rows: body })
               }}>
                 <FileText size={15} /> {t('pgTax.common.pdf')}
               </Button>
@@ -294,159 +311,119 @@ export default function PropertyTax() {
           }
         />
         <CardBody className="p-0">
-          <DataTable columns={columns} rows={list} dense empty={t('pgTax.property.tableEmpty')} />
+          <DataTable columns={tab === 'sale' ? saleColumns : incomeColumns} rows={tab === 'sale' ? saleList : incomeList} dense empty="لا توجد سجلات" />
         </CardBody>
       </Card>
 
-      <Modal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        title={editing ? t('pgTax.property.editTitle') : t('pgTax.property.addTitle')}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setModalOpen(false)}>{t('pgTax.common.cancel')}</Button>
-            <Button onClick={save}>{editing ? t('pgTax.common.saveChanges') : t('pgTax.common.add')}</Button>
-          </>
-        }
-      >
+      {/* Income calculation result modal */}
+      <Modal open={incomeResultOpen} onClose={() => setIncomeResultOpen(false)} title="نتيجة احتساب ضريبة إيراد العقار">
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label={t('pgTax.property.fieldName')} required>
-              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t('pgTax.property.namePlaceholder')} />
-            </Field>
-            <Field label={t('pgTax.property.fieldLocation')}>
-              <Input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
-            </Field>
-          </div>
-
-          <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
-            <div className="mb-2 flex items-center gap-2 text-sm font-bold text-ink-800">
-              <Home size={15} className="text-brand-600" /> {t('pgTax.property.sectionTitle')}
+          <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-ink-600">مبلغ الإيجار السنوي</span>
+              <strong className="text-sm font-bold text-ink-800">{money(incomeForm.annualRent)}</strong>
             </div>
-            <Field label={t('pgTax.property.fieldNature')}>
-              <Select value={form.nature} onChange={(e) => setForm({ ...form, nature: e.target.value })}>
-                <option value="none">{t('pgTax.property.natureTaxable')}</option>
-                <option value="state">{t('pgTax.property.natureState')}</option>
-                <option value="religious">{t('pgTax.property.natureReligious')}</option>
-                <option value="diplomatic">{t('pgTax.property.natureDiplomatic')}</option>
-              </Select>
-            </Field>
-            {form.nature === 'none' && (
-              <div className="mt-3">
-                <Field label={t('pgTax.property.familyHomeField')}>
-                  <Select value={form.familyHome ? 'family' : 'no'} onChange={(e) => setForm({ ...form, familyHome: e.target.value === 'family' })}>
-                    <option value="no">{t('pgTax.property.familyNo')}</option>
-                    <option value="family">{t('pgTax.property.familyYes')}</option>
-                  </Select>
-                </Field>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-ink-600">نسبة الضريبة</span>
+              <strong className="text-sm font-bold text-ink-800">{fmt(cfg.propertyRate * 100)}%</strong>
+            </div>
+            {incomeExempt && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-emerald-600 font-bold">العقار معفي</span>
+                <Badge tone="green">معفي</Badge>
               </div>
             )}
-            {needsRent && (
-              <div className="mt-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field label={t('pgTax.property.isNewField')}>
-                    <Select value={form.isNew ? 'yes' : 'no'} onChange={(e) => setForm({ ...form, isNew: e.target.value === 'yes' })}>
-                      <option value="no">{t('pgTax.property.no')}</option>
-                      <option value="yes">{t('pgTax.property.yes')}</option>
-                    </Select>
-                  </Field>
-                  <Field label={t('pgTax.property.isEmptyField')}>
-                    <Select value={form.isEmpty ? 'yes' : 'no'} onChange={(e) => setForm({ ...form, isEmpty: e.target.value === 'yes' })}>
-                      <option value="no">{t('pgTax.property.no')}</option>
-                      <option value="yes">{t('pgTax.property.yes')}</option>
-                    </Select>
-                  </Field>
-                </div>
-                {form.isNew && (
-                  <div className="mt-3">
-                    <Field label={t('pgTax.property.buildDateField')}>
-                      <Input type="date" dir="ltr" value={form.buildDate} onChange={(e) => setForm({ ...form, buildDate: e.target.value })} />
-                    </Field>
-                  </div>
-                )}
-                {form.isEmpty && (
-                  <div className="mt-3">
-                    <Field label={t('pgTax.property.emptyMonthsField')}>
-                      <Input type="number" min={0} value={form.emptyMonths || ''} onChange={(e) => setForm({ ...form, emptyMonths: Math.max(0, Number(e.target.value)) })} />
-                    </Field>
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="border-t border-ink-200 pt-3 flex items-center justify-between">
+              <span className="text-sm font-bold text-ink-800">الضريبة المستحقة</span>
+              <strong className="text-xl font-black text-brand-700">{money(incomeTax)}</strong>
+            </div>
           </div>
-
-          {needsRent && (
-            <Field label={t('pgTax.property.annualRentField')}>
-              <MoneyInput value={form.annualRent} onChange={(v) => setForm({ ...form, annualRent: v })} />
-            </Field>
-          )}
-
-          {needsRent && result.rent > 0 && (
-            <div className="rounded-xl border border-ink-200 bg-ink-50/50 p-4">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-brand-800">
-                <Calculator size={15} /> {t('pgTax.property.calcDetails')}
-              </div>
-              <div className="space-y-2">
-                <ResultRow label={t('pgTax.property.rowRent')} value={money(result.rent)} note={t('pgTax.property.rowRentNote')} />
-                <ResultRow label={t('pgTax.property.rowMaintenance')} value={money(result.maintenance)} note={t('pgTax.property.rowMaintenanceNote')} />
-                {result.emptyDeduction > 0 && (
-                  <ResultRow label={t('pgTax.property.rowEmptyDeduction', { months: form.emptyMonths })} value={money(result.emptyDeduction)} note={t('pgTax.property.rowEmptyDeductionNote')} />
-                )}
-                <ResultRow label={t('pgTax.property.rowTaxable')} value={money(result.taxable)} />
-                <ResultRow label={t('pgTax.property.rowBaseTax')} value={money(result.baseTax)} note={t('pgTax.property.rowBaseTaxNote')} />
-                {result.penalties.map((p) => (
-                  <ResultRow key={p.label} label={penLabels[p.label] ?? p.label} value={money(p.amount)} note={penLaws[p.label] ?? p.law} />
-                ))}
-              </div>
-              <div className="mt-3 flex items-center justify-between rounded-xl bg-gradient-to-l from-brand-700 to-brand-500 px-4 py-3 text-white">
-                <span className="text-sm font-bold">{t('pgTax.property.finalTaxLabel')}</span>
-                <span className="text-xl font-black">{money(result.finalTax)}</span>
-              </div>
-              <div className="mt-2 flex items-center justify-between text-xs">
-                <span className="text-ink-500">{t('pgTax.property.paidNow')}</span>
-                <span className={balance > 0 ? 'font-bold text-red-600' : 'font-bold text-emerald-600'}>
-                  {balance > 0 ? t('pgTax.property.remaining', { amount: money(balance) }) : t('pgTax.property.fullyPaid')}
-                </span>
-              </div>
+          <Field label="المسدد حالياً">
+            <MoneyInput value={incomeForm.paid} onChange={(v) => setIncomeForm({ ...incomeForm, paid: v })} />
+          </Field>
+          {incomeTax > 0 && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-ink-500">الرصيد المتبقي</span>
+              <span className={incomeBalance > 0 ? 'font-bold text-red-600' : 'font-bold text-emerald-600'}>
+                {incomeBalance > 0 ? `المتبقي: ${money(incomeBalance)}` : 'مسدد بالكامل'}
+              </span>
             </div>
           )}
-
-          {result.exempt && (
-            <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
-              <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-emerald-600" />
-              <p className="text-sm font-bold leading-relaxed text-emerald-800">{t('pgTax.property.reason_' + result.exemptKey, { law: t('pgTax.property.law') })}</p>
-            </div>
-          )}
-
-          {needsRent && result.rent > 0 && !result.exempt && (
-            <div className="rounded-xl border border-ink-200 p-4">
-              <div className="mb-3 text-sm font-bold text-ink-800">{t('pgTax.property.penaltyTitle')}</div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <Toggle checked={form.penaltyDelay} onChange={(v) => setForm({ ...form, penaltyDelay: v })} label={t('pgTax.property.penaltyDelay')} />
-                <Toggle checked={form.penaltyFalseInfo} onChange={(v) => setForm({ ...form, penaltyFalseInfo: v })} label={t('pgTax.property.penaltyFalseInfo')} />
-                <Toggle checked={form.penaltyFakeEmpty} onChange={(v) => setForm({ ...form, penaltyFakeEmpty: v })} label={t('pgTax.property.penaltyFakeEmpty')} />
-                <Toggle checked={form.penaltyUseChange} onChange={(v) => setForm({ ...form, penaltyUseChange: v })} label={t('pgTax.property.penaltyUseChange')} />
-              </div>
-              <div className="mt-3">
-                <Field label={t('pgTax.property.penaltyMonthly')}>
-                  <Input type="number" min={0} value={form.penaltyMonths || ''} onChange={(e) => setForm({ ...form, penaltyMonths: Math.max(0, Number(e.target.value)) })} />
-                </Field>
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <Field label={t('pgTax.property.fieldPaid')}>
-              <MoneyInput value={form.paid} onChange={(v) => setForm({ ...form, paid: v })} />
-            </Field>
-            <Field label={t('pgTax.property.fieldNotes')}>
-              <Textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
-            </Field>
+          <Field label="ملاحظات">
+            <Textarea value={incomeForm.notes} onChange={(e) => setIncomeForm({ ...incomeForm, notes: e.target.value })} />
+          </Field>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => setIncomeResultOpen(false)}>إغلاق</Button>
+            <Button onClick={() => { saveIncome(); setIncomeResultOpen(false) }}><Plus size={16} /> حفظ السجل</Button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmDialog open={confirmId !== null} onClose={() => setConfirmId(null)} onConfirm={() => { if (confirmId) { remove('properties', confirmId); setConfirmId(null); push('success', t('pgTax.property.deleted')) } }} title={t('pgTax.property.deleteTitle')} message={t('pgTax.property.deleteMessage')} />
+      {/* Edit modal */}
+      <Modal
+        open={modalOpen}
+        onClose={() => { setModalOpen(false); setEditing(null) }}
+        title="تعديل بيانات العقار"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => { setModalOpen(false); setEditing(null) }}>إلغاء</Button>
+            <Button onClick={editingTab === 'sale' ? saveSale : saveIncome}>حفظ التعديلات</Button>
+          </>
+        }
+      >
+        {editingTab === 'sale' ? (
+          <div className="space-y-4">
+            <Field label="اسم العقار" required>
+              <Input value={saleForm.name} onChange={(e) => setSaleForm({ ...saleForm, name: e.target.value })} />
+            </Field>
+            <Field label="ملاحظات">
+              <Textarea value={saleForm.notes} onChange={(e) => setSaleForm({ ...saleForm, notes: e.target.value })} />
+            </Field>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <Field label="اسم العقار" required>
+              <Input value={incomeForm.name} onChange={(e) => setIncomeForm({ ...incomeForm, name: e.target.value })} />
+            </Field>
+            <Field label="الموقع">
+              <Input value={incomeForm.location} onChange={(e) => setIncomeForm({ ...incomeForm, location: e.target.value })} />
+            </Field>
+            <Field label="الإيجار السنوي">
+              <MoneyInput value={incomeForm.annualRent} onChange={(v) => setIncomeForm({ ...incomeForm, annualRent: v })} />
+            </Field>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={incomeForm.exemptState} onChange={(e) => setIncomeForm({ ...incomeForm, exemptState: e.target.checked, exemptReligious: false, exemptFamily: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                معفي — ملكية حكومية
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={incomeForm.exemptReligious} onChange={(e) => setIncomeForm({ ...incomeForm, exemptReligious: e.target.checked, exemptState: false, exemptFamily: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                معفي — أماكن دينية
+              </label>
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" checked={incomeForm.exemptFamily} onChange={(e) => setIncomeForm({ ...incomeForm, exemptFamily: e.target.checked, exemptState: false, exemptReligious: false })} className="h-4 w-4 rounded border-ink-300 text-brand-600" />
+                معفي — سكن عائلي
+              </label>
+            </div>
+            <Field label="المسدد">
+              <MoneyInput value={incomeForm.paid} onChange={(v) => setIncomeForm({ ...incomeForm, paid: v })} />
+            </Field>
+            <Field label="ملاحظات">
+              <Textarea value={incomeForm.notes} onChange={(e) => setIncomeForm({ ...incomeForm, notes: e.target.value })} />
+            </Field>
+          </div>
+        )}
+      </Modal>
+
+      <ConfirmDialog
+        open={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={() => {
+          if (confirmId) { remove('properties', confirmId); setConfirmId(null); push('success', 'تم الحذف بنجاح') }
+        }}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء."
+      />
     </div>
   )
 }

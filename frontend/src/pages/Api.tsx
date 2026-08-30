@@ -74,7 +74,8 @@ export default function Api() {
     }
     update('apiKeys', found.id, { lastUsed: new Date().toISOString() })
     const summary = {
-      taxpayer_count: data.taxpayers.length,
+      company_count: data.companies.length,
+      employee_count: data.employees.length,
       invoice_count: data.invoices.length,
       declared_rows: data.monthlyRows.filter((r) => r.declared).length,
       collection_total: data.invoices.filter((i) => i.status === 'paid').reduce((s, i) => s + (i.amount || 0), 0),
@@ -198,7 +199,7 @@ Authorization: Bearer {YOUR_KEY}
 {
   "success": true,
   "data": [
-    { "id": 1, "name": "${data.taxpayers[0]?.name ?? '...'}" }
+    { "id": 1, "name": "${data.companies[0]?.name ?? '...'}" }
   ]
 }`}
               </pre>

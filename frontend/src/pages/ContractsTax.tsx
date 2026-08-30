@@ -183,6 +183,9 @@ export default function ContractsTax() {
   const [recordSubject, setRecordSubject] = useState('')
   const [recordPaid, setRecordPaid] = useState(0)
   const [recordNotes, setRecordNotes] = useState('')
+  const [recordStartDate, setRecordStartDate] = useState('')
+  const [recordEndDate, setRecordEndDate] = useState('')
+  const [recordContractorType, setRecordContractorType] = useState<'primary' | 'secondary'>('primary')
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [withKey, setWithKey] = useState<WithholdingKey>('construction')
   const [withAmount, setWithAmount] = useState(0)
@@ -269,6 +272,9 @@ export default function ContractsTax() {
       tax: result.tax,
       paid: 0,
       notes: result.formula,
+      startDate: '',
+      endDate: '',
+      contractorType: 'primary',
     })
     push('success', t('pgTax.contracts.contractSaved'))
     setParty('')
@@ -307,6 +313,9 @@ export default function ContractsTax() {
     setRecordSubject('')
     setRecordPaid(0)
     setRecordNotes('')
+    setRecordStartDate('')
+    setRecordEndDate('')
+    setRecordContractorType('primary')
     setModalOpen(true)
   }
 
@@ -321,6 +330,9 @@ export default function ContractsTax() {
     setRecordSubject(r.subject)
     setRecordPaid(r.paid)
     setRecordNotes(r.notes)
+    setRecordStartDate(r.startDate ?? '')
+    setRecordEndDate(r.endDate ?? '')
+    setRecordContractorType(r.contractorType ?? 'primary')
     setModalOpen(true)
   }
 
@@ -340,6 +352,9 @@ export default function ContractsTax() {
       tax: res.tax,
       paid: recordPaid,
       notes: res.formula || recordNotes,
+      startDate: recordStartDate,
+      endDate: recordEndDate,
+      contractorType: recordContractorType,
     }
     if (editing) {
       update('contracts', editing.id, payload)
@@ -372,6 +387,13 @@ export default function ContractsTax() {
           {contractRuleById(r.typeId)?.num ? <span className="mr-1 text-[10px] text-ink-400">#{contractRuleById(r.typeId)?.num}</span> : null}
         </div>
       ),
+    },
+    { key: 'startDate', title: 'بداية العقد', render: (r) => <span className="text-xs">{r.startDate ? fmtDate(r.startDate) : '—'}</span> },
+    { key: 'endDate', title: 'نهاية العقد', render: (r) => <span className="text-xs">{r.endDate ? fmtDate(r.endDate) : '—'}</span> },
+    {
+      key: 'contractorType',
+      title: 'النوع',
+      render: (r) => r.contractorType === 'secondary' ? <Badge tone="amber">ثانوي</Badge> : <Badge tone="green">رئيسي</Badge>,
     },
     { key: 'amount', title: t('pgTax.contracts.colAmount'), total: (rs) => rs.reduce((s, r) => s + r.amount, 0), render: (r) => <span className="text-xs">{money(r.amount)}</span> },
     {
@@ -668,6 +690,14 @@ export default function ContractsTax() {
               </Select>
             </Field>
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="تاريخ بدء العقد">
+              <Input type="date" value={recordStartDate} onChange={(e) => setRecordStartDate(e.target.value)} />
+            </Field>
+            <Field label="تاريخ انتهاء العقد">
+              <Input type="date" value={recordEndDate} onChange={(e) => setRecordEndDate(e.target.value)} />
+            </Field>
+          </div>
           <Field label={t('pgTax.contracts.fieldActivity')} required>
             <Select value={recordTypeId} onChange={(e) => setRecordTypeId(e.target.value)}>
               {rulesForCategory(recordCat).map((x) => (
@@ -687,6 +717,12 @@ export default function ContractsTax() {
               <Input value={recordSubject} onChange={(e) => setRecordSubject(e.target.value)} placeholder={t('pgTax.contracts.subjectPlaceholder')} />
             </Field>
           </div>
+          <Field label="نوع المقاول">
+            <Select value={recordContractorType} onChange={(e) => setRecordContractorType(e.target.value as 'primary' | 'secondary')}>
+              <option value="primary">مقاول رئيسي</option>
+              <option value="secondary">مقاول ثانوي</option>
+            </Select>
+          </Field>
           <div className="grid grid-cols-2 gap-4">
             <Field label={t('pgTax.contracts.fieldPaid')}>
               <MoneyInput value={recordPaid} onChange={(v) => setRecordPaid(v)} />
@@ -701,6 +737,15 @@ export default function ContractsTax() {
             </span>
             <span className="text-2xl font-black text-brand-700">{money(calcContract2026(recordRule, recordInputs).tax)}</span>
           </div>
+          {recordContractorType === 'secondary' && recordEndDate && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+              <div className="font-bold text-amber-800">ملاحظة: مقاول ثانوي</div>
+              <div className="mt-1 text-amber-700">
+                يجب جلب كتاب صرف استحقاق من المقاول الرئيسي قبل تاريخ انتهاء العقد ({recordEndDate}).
+                في حال عدم الجلب، تعتبر الضريبة كأمانة ضريبية يجب تحويلها إلى الهيئة العامة للضرائب.
+              </div>
+            </div>
+          )}
         </div>
       </Modal>
 

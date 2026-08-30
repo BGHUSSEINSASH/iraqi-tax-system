@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="المكلف — نظام إدارة ضريبية عراقي متكامل. حساب الضرائب، تقديم الإقرارات، ومتابعة الالتزامات الضريبية للشركات والمحاسبين في منصة واحدة." />
+  <meta name="theme-color" content="#2D3580" />
+  <title>المكلف | TAX IQ — حلول ضريبية ذكية للعراق</title>
+
+  <!-- Favicon: dual-triangle mark on indigo -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D3580'/%3E%3Cpolygon points='10,54 28,12 38,54' fill='white'/%3E%3Cpolygon points='36,54 48,22 56,54' fill='%239BA3C7' opacity='0.85'/%3E%3C/svg%3E" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     01 — NAVBAR
+══════════════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="navbar-inner">
+      <!-- Brand -->
+      <a href="#" class="navbar-brand">
+        <div class="navbar-mark">
+          <svg width="26" height="26" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+            <polygon points="8,46 26,8 35,46" fill="white"/>
+            <polygon points="33,46 45,16 52,46" fill="#9BA3C7" opacity="0.85"/>
+          </svg>
+        </div>
+        <div>
+          <div class="navbar-name">المكلف</div>
+          <div class="navbar-tag">حلول ضريبية ذكية</div>
+        </div>
+      </a>
+
+      <!-- Links -->
+      <ul class="navbar-links">
+        <li><a href="#about">ما هو النظام؟</a></li>
+        <li><a href="#modules">الوحدات الضريبية</a></li>
+        <li><a href="#features">الميزات</a></li>
+        <li><a href="#pricing">الأسعار</a></li>
+        <li><a href="#faq">الأسئلة الشائعة</a></li>
+      </ul>
+
+      <!-- CTA -->
+      <div class="navbar-cta">
+        <a href="#cta" class="btn btn-outline btn-sm">طلب عرض توضيحي</a>
+        <a href="#cta" class="btn btn-primary btn-sm">ابدأ الآن</a>
+      </div>
+
+      <!-- Mobile toggle -->
+      <button class="navbar-toggle" id="menuToggle" aria-label="القائمة">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#about"   onclick="closeMobileMenu()">ما هو النظام؟</a>
+    <a href="#modules" onclick="closeMobileMenu()">الوحدات الضريبية</a>
+    <a href="#features" onclick="closeMobileMenu()">الميزات</a>
+    <a href="#pricing" onclick="closeMobileMenu()">الأسعار</a>
+    <a href="#faq"     onclick="closeMobileMenu()">الأسئلة الشائعة</a>
+    <a href="#cta" class="btn btn-primary" style="margin-top:8px;justify-content:center;" onclick="closeMobileMenu()">ابدأ الآن</a>
+  </div>
+</nav>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     02 — HERO
+══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content reveal">
+        <div class="hero-badge">
+          <span class="dot"></span>
+          النظام الضريبي الأول من نوعه في العراق
+        </div>
+        <h1 class="hero-title">
+          إدارة الضرائب في العراق،<br/>
+          <em>بدقة ووضوح</em>
+        </h1>
+        <p class="hero-desc">
+          منصة متكاملة لحساب الضرائب، تقديم الإقرارات، ومتابعة الالتزامات الضريبية للشركات والمحاسبين والمكلفين — في منصة واحدة، بعربية كاملة.
+        </p>
+        <div class="hero-btns">
+          <a href="#cta" class="btn btn-white btn-lg">ابدأ مجاناً</a>
+          <a href="#modules" class="btn btn-white-outline btn-lg">استعرض الوحدات</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">7</div>
+            <div class="hero-stat-label">أنواع ضرائب</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">+500</div>
+            <div class="hero-stat-label">شركة تثق بنا</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">100%</div>
+            <div class="hero-stat-label">امتثال ضريبي</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">80%</div>
+            <div class="hero-stat-label">توفير في الوقت</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard mockup (desktop only) -->
+      <div class="hero-visual reveal">
+        <div class="dashboard-mockup">
+          <div class="mockup-header">
+            <div class="mockup-header-brand">
+              <svg width="20" height="20" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+                <polygon points="8,46 26,8 35,46" fill="white"/>
+                <polygon points="33,46 45,16 52,46" fill="#9BA3C7" opacity="0.85"/>
+              </svg>
+              <span class="mockup-header-name">المكلف</span>
+            </div>
+            <span class="mockup-year">السنة المالية 2026</span>
+          </div>
+          <div class="mockup-cards">
+            <div class="mockup-card">
+              <div class="mockup-card-label">ضرائب مستحقة</div>
+              <div class="mockup-card-val big">12,480,000</div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-card-label">إقرارات مقدمة</div>
+              <div class="mockup-card-val">27</div>
+            </div>
+            <div class="mockup-card">
+              <div class="mockup-card-label">قيد المراجعة</div>
+              <div class="mockup-card-val">4</div>
+            </div>
+          </div>
+          <table class="mockup-table">
+            <thead>
+              <tr>
+                <th>المكلف</th>
+                <th>النوع</th>
+                <th>المبلغ</th>
+                <th>الحالة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>شركة الرافدين للتجارة</td>
+                <td>ضريبة دخل</td>
+                <td>3,120,000</td>
+                <td><span class="mockup-status green">مقدّم</span></td>
+              </tr>
+              <tr>
+                <td>مؤسسة بابل الهندسية</td>
+                <td>ضريبة عقار</td>
+                <td>870,000</td>
+                <td><span class="mockup-status amber">مراجعة</span></td>
+              </tr>
+              <tr>
+                <td>مكتب دجلة للمحاسبة</td>
+                <td>ضريبة دخل</td>
+                <td>1,455,000</td>
+                <td><span class="mockup-status green">مقدّم</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     03 — STATS BAR
+══════════════════════════════════════════════════════════════ -->
+<div class="stats-bar">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="reveal">
+        <div class="stat-num" data-target="7">0</div>
+        <div class="stat-label">وحدات ضريبية متكاملة</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num" data-target="500">0</div>
+        <div class="stat-label">شركة وجهة ضريبية</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">امتثال للتشريعات العراقية</div>
+      </div>
+      <div class="reveal">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">توفر مستمر بدون انقطاع</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     04 — ABOUT / ما هو المكلف؟
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="reveal">
+        <span class="section-label">ما هو المكلف؟</span>
+        <h2 class="section-title">نظام ضريبي عراقي متكامل — مبني للواقع</h2>
+        <p class="section-desc">
+          المكلف هو منصة SaaS عراقية متخصصة في إدارة الالتزامات الضريبية وفق قانون ضريبة الدخل العراقي رقم 113 لسنة 1982 وتعديلاته. يغطي النظام كل أنواع الضرائب التي تواجهها الشركات والمحاسبون يومياً.
+        </p>
+        <ul class="about-list">
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            حساب تلقائي دقيق وفق الشرائح الضريبية العراقية المعتمدة
+          </li>
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            توليد النماذج الرسمية (ض.د/14 وغيرها) جاهزة للتقديم
+          </li>
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            متابعة المواعيد الضريبية والتنبيه قبل الاستحقاق
+          </li>
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            نظام صلاحيات متعدد الأدوار: مؤسس، مدير، محاسب
+          </li>
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            تصدير البيانات بصيغ Excel وPDF لكل التقارير
+          </li>
+          <li>
+            <div class="icon-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            نسخ احتياطي وسجل عمليات تدقيق كامل لكل حركة
+          </li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="about-visual">
+          <div class="about-visual-title">لماذا المكلف؟</div>
+          <div class="about-visual-sub">المشاكل التي نحلها كل يوم</div>
+          <div class="about-visual-items">
+            <div class="about-visual-item">
+              <div class="avi-num">01</div>
+              <div class="avi-text">إنهاء الحسابات اليدوية الخاطئة وأخطاء الشرائح الضريبية</div>
+            </div>
+            <div class="about-visual-item">
+              <div class="avi-num">02</div>
+              <div class="avi-text">لا فوضى في المواعيد — كل الاستحقاقات في مكان واحد</div>
+            </div>
+            <div class="about-visual-item">
+              <div class="avi-num">03</div>
+              <div class="avi-text">توليد النماذج الرسمية في ثوانٍ بدل ساعات</div>
+            </div>
+            <div class="about-visual-item">
+              <div class="avi-num">04</div>
+              <div class="avi-text">متابعة كل الغرامات المحتملة قبل وقوعها</div>
+            </div>
+            <div class="about-visual-item">
+              <div class="avi-num">05</div>
+              <div class="avi-text">سجل تدقيق كامل لكل عملية لحماية الشركة والمحاسب</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     05 — TAX MODULES / الوحدات الضريبية
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="modules" style="background: var(--ink-50);">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">الوحدات الضريبية</span>
+      <h2 class="section-title">7 أنواع ضرائب — كل شيء في مكان واحد</h2>
+      <p class="section-desc">كل وحدة ضريبية مصممة خصيصاً لمتطلبات القانون العراقي مع حسابات تلقائية دقيقة</p>
+    </div>
+    <div class="modules-grid">
+
+      <!-- 1. Monthly -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="module-title">الاستقطاع المباشر — الشهري</div>
+        <div class="module-desc">حساب الضريبة الشهرية لكل موظف بشكل تلقائي وفق الشرائح المعتمدة مع كل الإعفاءات القانونية.</div>
+        <ul class="module-features">
+          <li>حساب الشرائح الضريبية التصاعدية (3%، 5%، 10%، 15%)</li>
+          <li>الإعفاء القانوني للزوجة والأبناء تلقائياً</li>
+          <li>خصم التأمين الاجتماعي وضمان الحياة</li>
+          <li>تصفية الموظفين حسب الشهر والسنة</li>
+          <li>تصدير نموذج ض.د/14 الرسمي</li>
+        </ul>
+        <span class="module-badge">ضريبة الرواتب</span>
+      </div>
+
+      <!-- 2. Annual -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div class="module-title">الاستقطاع المباشر — السنوي</div>
+        <div class="module-desc">التسوية السنوية الكاملة لمقارنة الضريبة المدفوعة شهرياً مع الضريبة المستحقة السنوية لكل موظف.</div>
+        <ul class="module-features">
+          <li>حساب الفرق بين المدفوع والمستحق</li>
+          <li>دعم سنوات العمل الجزئية (حساب الأشهر الفعلية)</li>
+          <li>معالجة موظفي الإجازة وتاريخ الانتهاء</li>
+          <li>عرض شرائح الضريبة السنوية مفصّلة</li>
+          <li>توليد التقرير السنوي الرسمي</li>
+        </ul>
+        <span class="module-badge">التسوية السنوية</span>
+      </div>
+
+      <!-- 3. Corporate -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="module-title">ضريبة أرباح الشركات</div>
+        <div class="module-desc">احتساب ضريبة الأرباح للقطاعين العام والنفطي مع معالجة الإعفاءات والتنزيلات المعتمدة قانونياً.</div>
+        <ul class="module-features">
+          <li>القطاع العام: نسبة 15% من الوعاء الضريبي</li>
+          <li>القطاع النفطي: نسبة 35% من الأرباح</li>
+          <li>خصم المصاريف المعتمدة والتنزيلات القانونية</li>
+          <li>كشف الأرباح الرسمي مفصّل البنود</li>
+          <li>مقارنة الأرباح عبر السنوات</li>
+        </ul>
+        <span class="module-badge">ضريبة الشركات</span>
+      </div>
+
+      <!-- 4. Contracts -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M9 15l2 2 4-4"/><polyline points="14 2 14 8 20 8"/>
+          </svg>
+        </div>
+        <div class="module-title">ضريبة العقود الرسمية</div>
+        <div class="module-desc">ضريبة الاستقطاع على العقود الحكومية والخاصة مع تمييز المقاول الأول والثانوي وأنواع العقود المختلفة.</div>
+        <ul class="module-features">
+          <li>توريد السلع: 3.3% | الخدمات: 7% | الاستشارات: 10%</li>
+          <li>تمييز المقاول الأول والثانوي تلقائياً</li>
+          <li>تتبع تواريخ البداية والانتهاء</li>
+          <li>سجل المدفوعات والمتبقي لكل عقد</li>
+          <li>تصدير قائمة العقود كاملة</li>
+        </ul>
+        <span class="module-badge">ضريبة العقود</span>
+      </div>
+
+      <!-- 5. Property -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="module-title">ضريبة العقار</div>
+        <div class="module-desc">احتساب ضريبة الإيجار والدخل العقاري مع معالجة الإعفاءات والغرامات وأشهر الشغور وفق القانون.</div>
+        <ul class="module-features">
+          <li>نسبة 10% من الدخل الإيجاري السنوي</li>
+          <li>إعفاء البيت العائلي الواحد تلقائياً</li>
+          <li>حساب غرامة التأخير (2% شهرياً)</li>
+          <li>معالجة أشهر الشغور وخصم الصيانة</li>
+          <li>تتبع حالة العقار (مشغول/شاغر/جديد)</li>
+        </ul>
+        <span class="module-badge">ضريبة العقار</span>
+      </div>
+
+      <!-- 6. Land -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+          </svg>
+        </div>
+        <div class="module-title">ضريبة العرصات</div>
+        <div class="module-desc">حساب ضريبة الأراضي غير المبنية (العرصات) على أساس المساحة والقيمة مع تطبيق الإعفاء القانوني.</div>
+        <ul class="module-features">
+          <li>نسبة 2% من القيمة السوقية للأرض</li>
+          <li>إعفاء أول 800 متر مربع قانونياً</li>
+          <li>حساب تلقائي للمساحة الخاضعة للضريبة</li>
+          <li>تسجيل الموقع والمحافظة</li>
+          <li>تتبع حالة الدفع سنة بسنة</li>
+        </ul>
+        <span class="module-badge">ضريبة الأراضي</span>
+      </div>
+
+      <!-- 7. Profession -->
+      <div class="module-card reveal">
+        <div class="module-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </div>
+        <div class="module-title">ضريبة المهن الحرة</div>
+        <div class="module-desc">احتساب ضريبة الدخل المهني للمحامين والأطباء والمهندسين والمستشارين والمهن الحرة الأخرى.</div>
+        <ul class="module-features">
+          <li>إعفاء 250,000 دينار شهرياً مقطوع</li>
+          <li>تطبيق الشرائح الضريبية على الدخل المتبقي</li>
+          <li>تسجيل اسم المهنة ونوع النشاط</li>
+          <li>تتبع المبالغ المدفوعة والمتبقية</li>
+          <li>سجل سنوي بكل مدفوعات المهن</li>
+        </ul>
+        <span class="module-badge">المهن الحرة</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     06 — DASHBOARD SECTION
+══════════════════════════════════════════════════════════════ -->
+<section class="section dashboard-section" id="dashboard">
+  <div class="container">
+    <div class="dashboard-grid">
+      <div class="reveal">
+        <span class="section-label">لوحة التحكم</span>
+        <h2 class="section-title">كل شيء في لوحة واحدة واضحة</h2>
+        <p class="section-desc">لوحة تحكم احترافية تعرض ملخصاً فورياً لكل الالتزامات الضريبية والمواعيد والحالات</p>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            </div>
+            <div>
+              <div class="feature-title">إحصائيات فورية ومرئية</div>
+              <div class="feature-desc">أرقام وبطاقات ملخصة لإجمالي الضرائب المستحقة، المقدمة، وقيد المراجعة في الوقت الفعلي</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+            </div>
+            <div>
+              <div class="feature-title">رسوم بيانية تحليلية</div>
+              <div class="feature-desc">مقارنة الضرائب شهراً بشهر وسنة بسنة لاتخاذ قرارات مالية أفضل</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <div class="feature-title">تنبيهات الاستحقاق التلقائية</div>
+              <div class="feature-desc">تنبيهات مسبقة لكل المواعيد الضريبية قبل أسبوع وقبل يوم من الاستحقاق</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Big mockup -->
+      <div class="reveal">
+        <div class="db-mockup-big">
+          <div class="db-mockup-top">
+            <div class="db-mockup-top-title">لوحة التحكم الرئيسية</div>
+            <div class="db-mockup-top-year">السنة المالية 2026</div>
+          </div>
+          <div class="db-mockup-body">
+            <div class="db-kpis">
+              <div class="db-kpi">
+                <div class="db-kpi-label">إجمالي الضرائب المستحقة</div>
+                <div class="db-kpi-val sm">12,480,000</div>
+              </div>
+              <div class="db-kpi">
+                <div class="db-kpi-label">إقرارات مقدمة</div>
+                <div class="db-kpi-val">27</div>
+              </div>
+              <div class="db-kpi">
+                <div class="db-kpi-label">قيد المراجعة</div>
+                <div class="db-kpi-val">4</div>
+              </div>
+            </div>
+            <div class="db-rows">
+              <div class="db-row">
+                <span class="db-row-name">شركة الرافدين للتجارة</span>
+                <span class="db-row-type">ضريبة دخل</span>
+                <span class="db-row-amount">3,120,000</span>
+                <span class="db-row-status s-done">مقدّم</span>
+              </div>
+              <div class="db-row">
+                <span class="db-row-name">مؤسسة بابل الهندسية</span>
+                <span class="db-row-type">ضريبة عقار</span>
+                <span class="db-row-amount">870,000</span>
+                <span class="db-row-status s-rev">مراجعة</span>
+              </div>
+              <div class="db-row">
+                <span class="db-row-name">مكتب دجلة للمحاسبة</span>
+                <span class="db-row-type">ضريبة دخل</span>
+                <span class="db-row-amount">1,455,000</span>
+                <span class="db-row-status s-done">مقدّم</span>
+              </div>
+              <div class="db-row">
+                <span class="db-row-name">شركة الفرات للنفط</span>
+                <span class="db-row-type">ضريبة نفطية</span>
+                <span class="db-row-amount">6,250,000</span>
+                <span class="db-row-status s-pend">معلّق</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     07 — EXTRA FEATURES / الميزات الإضافية
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="features">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">الميزات الإضافية</span>
+      <h2 class="section-title">أكثر من مجرد حساب ضريبي</h2>
+      <p class="section-desc">منظومة متكاملة من الأدوات لإدارة كل جوانب العمل الضريبي</p>
+    </div>
+    <div class="extras-grid">
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="extra-title">المواعيد الضريبية</div>
+        <div class="extra-desc">تقويم ذكي لكل المواعيد الضريبية مع تنبيهات تلقائية. يولّد المواعيد من سجلات الضرائب الموجودة.</div>
+      </div>
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="extra-title">المهام والتنبيهات</div>
+        <div class="extra-desc">نظام مهام متكامل لتوزيع وتتبع المهام بين أفراد الفريق مع تصنيف حسب نوع الضريبة والأولوية.</div>
+      </div>
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div class="extra-title">احتساب الغرامات</div>
+        <div class="extra-desc">حساب تلقائي للغرامات والمدد القانونية لكل نوع ضريبة مع تقدير الغرامة اليومية والشهرية.</div>
+      </div>
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div class="extra-title">مسارات سير العمل</div>
+        <div class="extra-desc">لوحة Kanban لمتابعة حالة كل ملف ضريبي من البداية حتى التقديم: جديد → مراجعة → موافقة → مقدّم.</div>
+      </div>
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <div class="extra-title">الفواتير الضريبية</div>
+        <div class="extra-desc">توليد فواتير ضريبية رسمية مرتبطة بكل نوع ضريبة مع تتبع حالة الدفع (مدفوع/معلق/متأخر).</div>
+      </div>
+      <div class="extra-card reveal">
+        <div class="extra-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        </div>
+        <div class="extra-title">واجهة API التكاملية</div>
+        <div class="extra-desc">API مفتوحة لربط النظام بأنظمة المحاسبة الخارجية مع مفاتيح API آمنة وسجل استخدام.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     08 — HOW IT WORKS / كيف يعمل النظام؟
+══════════════════════════════════════════════════════════════ -->
+<section class="section how-section" id="how">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">كيف يعمل؟</span>
+      <h2 class="section-title">أربع خطوات فقط</h2>
+      <p class="section-desc">من التسجيل إلى الإقرار الضريبي الكامل في دقائق</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card reveal">
+        <div class="step-num">١</div>
+        <div class="step-title">سجّل شركتك</div>
+        <div class="step-desc">أدخل بيانات الشركة والمعلومات الأساسية مرة واحدة. يُحفظ كل شيء تلقائياً.</div>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">٢</div>
+        <div class="step-title">أضف الموظفين والبيانات</div>
+        <div class="step-desc">أدخل بيانات الموظفين والرواتب والعقود والعقارات وغيرها لكل نوع ضريبة.</div>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">٣</div>
+        <div class="step-title">اترك الحساب للنظام</div>
+        <div class="step-desc">يحسب النظام الضريبة تلقائياً وفق القانون العراقي مع كل الإعفاءات والتنزيلات.</div>
+      </div>
+      <div class="step-card reveal">
+        <div class="step-num">٤</div>
+        <div class="step-title">صدّر وقدّم الإقرار</div>
+        <div class="step-desc">اطبع النماذج الرسمية أو صدّر ملفات Excel/PDF جاهزة للتقديم للسلطة الضريبية.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     09 — WHO IS IT FOR / لمن هو المكلف؟
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="audience">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">لمن هو المكلف؟</span>
+      <h2 class="section-title">مصمم لثلاث شرائح رئيسية</h2>
+      <p class="section-desc">سواء كنت شركة أو محاسباً أو مؤسسة، المكلف مصمم لاحتياجاتك تحديداً</p>
+    </div>
+    <div class="audience-grid">
+      <div class="audience-card reveal">
+        <div class="audience-card-head">
+          <div class="audience-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="audience-title">الشركات والمؤسسات</div>
+        </div>
+        <div class="audience-body">
+          <ul class="audience-list">
+            <li>إدارة ضرائب الرواتب لعشرات الموظفين</li>
+            <li>حساب ضريبة أرباح الشركة السنوية</li>
+            <li>متابعة عقود التوريد والخدمات</li>
+            <li>إدارة الأصول العقارية والأراضي</li>
+            <li>تقارير ضريبية للإدارة العليا</li>
+            <li>أرشيف رقمي كامل لكل الملفات</li>
+          </ul>
+        </div>
+      </div>
+      <div class="audience-card reveal">
+        <div class="audience-card-head">
+          <div class="audience-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="audience-title">المحاسبون والمكتبون</div>
+        </div>
+        <div class="audience-body">
+          <ul class="audience-list">
+            <li>إدارة محافظ عملاء متعددة من منصة واحدة</li>
+            <li>حسابات دقيقة توفر وقت التدقيق</li>
+            <li>نماذج رسمية جاهزة للطباعة الفورية</li>
+            <li>سجل عمليات لإثبات المسؤولية</li>
+            <li>تنبيهات تلقائية لمواعيد التقديم</li>
+            <li>تصدير البيانات للعميل بأي صيغة</li>
+          </ul>
+        </div>
+      </div>
+      <div class="audience-card reveal">
+        <div class="audience-card-head">
+          <div class="audience-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div class="audience-title">المهنيون الحرون</div>
+        </div>
+        <div class="audience-body">
+          <ul class="audience-list">
+            <li>أطباء ومحامون ومهندسون ومستشارون</li>
+            <li>حساب ضريبة المهن تلقائياً</li>
+            <li>الإعفاء القانوني المقطوع تلقائياً</li>
+            <li>تسجيل الدخل السنوي وتتبعه</li>
+            <li>تقرير سنوي كامل للتقديم</li>
+            <li>بدون تعقيدات — واجهة بسيطة جداً</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     10 — SECURITY / الأمان والموثوقية
+══════════════════════════════════════════════════════════════ -->
+<section class="section security-section" id="security">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">الأمان والموثوقية</span>
+      <h2 class="section-title">بياناتك محمية ومؤمّنة</h2>
+      <p class="section-desc">نبني الثقة من خلال الشفافية والأمان التقني والحوكمة الكاملة</p>
+    </div>
+    <div class="security-grid">
+      <div class="security-card reveal">
+        <div class="security-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div class="security-title">نظام صلاحيات متكامل</div>
+        <div class="security-desc">ثلاثة مستويات: مؤسس — مدير — محاسب. كل دور بصلاحيات محددة ومضبوطة.</div>
+      </div>
+      <div class="security-card reveal">
+        <div class="security-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        </div>
+        <div class="security-title">سجل عمليات تدقيق كامل</div>
+        <div class="security-desc">كل عملية تُسجَّل مع الوقت واسم المستخدم — لا يمكن تعديل السجل أو حذفه.</div>
+      </div>
+      <div class="security-card reveal">
+        <div class="security-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <div class="security-title">نسخ احتياطي دوري</div>
+        <div class="security-desc">تصدير واستعادة كاملة لكل البيانات بصيغة JSON مع توثيق تاريخ كل نسخة.</div>
+      </div>
+      <div class="security-card reveal">
+        <div class="security-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2D3580" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="security-title">سجل الدخول الأمني</div>
+        <div class="security-desc">تتبع كل عمليات الدخول مع IP والمتصفح والوقت — كشف فوري لأي دخول غير مصرح.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     11 — PRICING / الأسعار
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">باقات الاشتراك</span>
+      <h2 class="section-title">اختر الباقة المناسبة لنشاطك</h2>
+      <p class="section-desc">أسعار واضحة بلا رسوم خفية — يمكن الترقية أو التخفيض في أي وقت</p>
+    </div>
+    <div class="pricing-grid">
+
+      <!-- Basic -->
+      <div class="pricing-card reveal">
+        <div class="pricing-name">الأساسية</div>
+        <div class="pricing-desc">للشركات الصغيرة والمحاسبين المستقلين الذين يديرون عدداً محدوداً من الملفات</div>
+        <div class="pricing-amount">150,000</div>
+        <div class="pricing-period">دينار عراقي / شهرياً</div>
+        <hr class="pricing-divider"/>
+        <ul class="pricing-features">
+          <li><span class="pf-icon">✓</span> الاستقطاع الشهري والسنوي</li>
+          <li><span class="pf-icon">✓</span> ضريبة أرباح الشركات</li>
+          <li><span class="pf-icon">✓</span> حتى 25 موظف</li>
+          <li><span class="pf-icon">✓</span> تصدير PDF و Excel</li>
+          <li><span class="pf-icon">✓</span> دعم فني بالبريد الإلكتروني</li>
+          <li><span class="pf-icon no">✗</span> <span style="color:var(--ink-300)">ضرائب العقود والعقار</span></li>
+          <li><span class="pf-icon no">✗</span> <span style="color:var(--ink-300)">API والتكاملات</span></li>
+        </ul>
+        <div class="pricing-cta">
+          <a href="#cta" class="btn btn-outline">ابدأ بالأساسية</a>
+        </div>
+      </div>
+
+      <!-- Professional (featured) -->
+      <div class="pricing-card featured reveal">
+        <div class="pricing-badge">الأكثر طلباً</div>
+        <div class="pricing-name">الاحترافية</div>
+        <div class="pricing-desc">للشركات المتوسطة ومكاتب المحاسبة التي تحتاج تغطية ضريبية شاملة</div>
+        <div class="pricing-amount">350,000</div>
+        <div class="pricing-period">دينار عراقي / شهرياً</div>
+        <hr class="pricing-divider"/>
+        <ul class="pricing-features">
+          <li><span class="pf-icon">✓</span> جميع الوحدات الضريبية السبع</li>
+          <li><span class="pf-icon">✓</span> موظفون غير محدودين</li>
+          <li><span class="pf-icon">✓</span> المواعيد والمهام التلقائية</li>
+          <li><span class="pf-icon">✓</span> مسارات سير العمل Kanban</li>
+          <li><span class="pf-icon">✓</span> سجل عمليات التدقيق</li>
+          <li><span class="pf-icon">✓</span> نسخ احتياطي وإعادة استعادة</li>
+          <li><span class="pf-icon">✓</span> دعم فني ذو أولوية</li>
+        </ul>
+        <div class="pricing-cta">
+          <a href="#cta" class="btn btn-primary">ابدأ بالاحترافية</a>
+        </div>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="pricing-card reveal">
+        <div class="pricing-name">المؤسسية</div>
+        <div class="pricing-desc">للمؤسسات الكبرى والشركات المتعددة الفروع التي تحتاج تحكماً كاملاً وAPI</div>
+        <div class="pricing-amount">750,000</div>
+        <div class="pricing-period">دينار عراقي / شهرياً</div>
+        <hr class="pricing-divider"/>
+        <ul class="pricing-features">
+          <li><span class="pf-icon">✓</span> كل ما في الاحترافية</li>
+          <li><span class="pf-icon">✓</span> لوحة مؤسس مع تحكم كامل</li>
+          <li><span class="pf-icon">✓</span> إدارة الباقات والتعويضات</li>
+          <li><span class="pf-icon">✓</span> API تكاملية مع مفاتيح مخصصة</li>
+          <li><span class="pf-icon">✓</span> صلاحيات مخصصة للأدوار</li>
+          <li><span class="pf-icon">✓</span> مدير حساب مخصص</li>
+          <li><span class="pf-icon">✓</span> تدريب الفريق مجاناً</li>
+        </ul>
+        <div class="pricing-cta">
+          <a href="#cta" class="btn btn-outline">تواصل معنا</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     12 — TESTIMONIALS / شهادات العملاء
+══════════════════════════════════════════════════════════════ -->
+<section class="section" id="testimonials" style="background: var(--ink-50);">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">شهادات العملاء</span>
+      <h2 class="section-title">ماذا يقول من جرّبوا المكلف؟</h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"قبل المكلف كنا نصرف أسبوعاً كاملاً لحساب رواتب 80 موظف. الآن ينتهي كل شيء في ساعتين بدقة 100%. أفضل استثمار قمت به لمكتبي."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">أ</div>
+          <div>
+            <div class="testimonial-name">أحمد الجواد</div>
+            <div class="testimonial-role">مدير مكتب محاسبة — بغداد</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"النظام حل مشكلة تتبع العقود والضرائب عليها التي كانت تسبب لنا خسائر سنوياً من الغرامات. الآن نتابع كل عقد ونعرف الضريبة المستحقة بلحظة."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">ز</div>
+          <div>
+            <div class="testimonial-name">زينب الموسوي</div>
+            <div class="testimonial-role">مديرة مالية — شركة الرافدين للمقاولات</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card reveal">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"بصفتي محامياً، حساب ضريبة المهن كان كابوساً. المكلف يحسبها بثوانٍ ويعطيني التقرير جاهزاً. وفّر عليّ الكثير من الوقت والقلق."</div>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">م</div>
+          <div>
+            <div class="testimonial-name">محمد الجبوري</div>
+            <div class="testimonial-role">محامٍ ومستشار قانوني — النجف</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     13 — FAQ / الأسئلة الشائعة
+══════════════════════════════════════════════════════════════ -->
+<section class="section faq-section" id="faq">
+  <div class="container">
+    <div class="text-center reveal">
+      <span class="section-label">الأسئلة الشائعة</span>
+      <h2 class="section-title">إجابات على أكثر الأسئلة تكراراً</h2>
+    </div>
+    <div class="faq-list">
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل المكلف متوافق مع قانون ضريبة الدخل العراقي الحالي؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم. النظام مبني على قانون ضريبة الدخل العراقي رقم 113 لسنة 1982 وكل تعديلاته اللاحقة. يتم تحديث المعاملات والشرائح والنسب تلقائياً مع كل تشريع جديد.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل يمكن تصدير النماذج الرسمية جاهزة للتقديم؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم. يولّد المكلف نموذج ض.د/14 الرسمي وغيره من النماذج جاهزة للطباعة بصيغة PDF. كما يمكن تصدير كل البيانات بصيغة Excel للمراجعة أو الأرشفة.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل يدعم النظام شركات متعددة في حساب واحد؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم في باقة المؤسسية. يدعم إدارة شركات متعددة مع إمكانية التبديل بينها بسهولة. كل شركة لها بياناتها المستقلة ومستخدموها وسجلاتها.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          ماذا يحدث إذا أخطأت في إدخال البيانات؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">يمكنك تعديل أي سجل في أي وقت. النظام يُسجّل كل تعديل في سجل التدقيق مع اسم من عدّل والوقت، لذا يمكن تتبع كل التغييرات بسهولة.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل بياناتي آمنة وسرية؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم. النظام يوفر نظام صلاحيات متعدد الأدوار، وسجل دخول أمني، وسجل عمليات تدقيق. كما يمكنك تصدير نسخة احتياطية كاملة من بياناتك في أي وقت.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل هناك فترة تجريبية مجانية؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم. نوفر فترة تجريبية مجانية 30 يوماً بكامل مزايا الباقة الاحترافية دون الحاجة لبطاقة ائتمان. تواصل معنا لتفعيل حسابك التجريبي.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          هل النظام يعمل على الجوال؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">نعم. واجهة المكلف مصممة بالكامل لتعمل على الحاسوب والجوال والتابلت. يمكنك الوصول لكل الوظائف من أي جهاز وأي متصفح حديث.</div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question" onclick="toggleFaq(this)">
+          كيف يتم تحديث النظام؟
+          <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <div class="faq-answer">التحديثات تلقائية وبدون انقطاع للخدمة. عند صدور أي تشريع ضريبي جديد، يتم تحديث النظام وإشعارك فوراً لمراجعة أي تغييرات تؤثر على حساباتك.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     14 — CTA / ابدأ الآن
+══════════════════════════════════════════════════════════════ -->
+<section class="cta-section" id="cta">
+  <div class="container" style="position:relative;z-index:1;">
+    <div class="cta-mark">
+      <svg width="44" height="44" viewBox="0 0 56 56" fill="none" aria-hidden="true">
+        <polygon points="8,46 26,8 35,46" fill="white"/>
+        <polygon points="33,46 45,16 52,46" fill="#9BA3C7" opacity="0.85"/>
+      </svg>
+    </div>
+    <h2 class="cta-title">ابدأ إدارة ضرائبك بذكاء اليوم</h2>
+    <p class="cta-desc">انضم لأكثر من 500 شركة ومحاسب يستخدمون المكلف لإدارة التزاماتهم الضريبية بثقة ودقة</p>
+    <div class="cta-btns">
+      <a href="#" class="btn btn-white btn-lg" id="ctaStartBtn">ابدأ التجربة المجانية</a>
+      <a href="#" class="btn btn-white-outline btn-lg" id="ctaDemoBtn">طلب عرض توضيحي</a>
+    </div>
+
+    <!-- Credentials terminal -->
+    <div class="cta-terminal">
+      <div class="cta-terminal-bar">
+        <span style="background:#ff5f57;"></span>
+        <span style="background:#ffbd2e;"></span>
+        <span style="background:#28c840;"></span>
+        <span style="margin-right:auto;font-size:11px;color:rgba(255,255,255,.3);font-family:monospace;">terminal — almukallaf.iq</span>
+      </div>
+      <div class="cta-terminal-body">
+        <div class="cmt">// بيانات الدخول التجريبية</div>
+        <div>
+          <span class="lbl">المستخدم: </span>
+          <span class="val" id="demoUser">admin</span>
+          <button class="cta-copy" onclick="copyText('admin', this)" title="نسخ">نسخ</button>
+        </div>
+        <div>
+          <span class="lbl">كلمة المرور: </span>
+          <span class="val" id="demoPwd">admin123</span>
+          <button class="cta-copy" onclick="copyText('admin123', this)" title="نسخ">نسخ</button>
+        </div>
+        <div class="cmd" id="ctaLaunchLine" style="margin-top:8px;cursor:pointer;" onclick="openApp()">$ تسجيل الدخول للنظام →</div>
+      </div>
+    </div>
+
+    <!-- Interest form -->
+    <div style="margin-top:40px;max-width:480px;margin-left:auto;margin-right:auto;">
+      <form id="interestForm" onsubmit="submitInterest(event)" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+        <input type="text" id="interestName" placeholder="اسمك أو اسم الشركة" required
+          style="flex:1;min-width:200px;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-family:Tajawal,sans-serif;font-size:14px;outline:none;">
+        <input type="tel" id="interestPhone" placeholder="رقم الهاتف" required
+          style="flex:1;min-width:160px;padding:12px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:white;font-family:Tajawal,sans-serif;font-size:14px;outline:none;">
+        <button type="submit" class="btn btn-white" style="flex-shrink:0;">أرسل طلبك</button>
+      </form>
+      <div id="formSuccess" style="display:none;margin-top:16px;padding:12px 20px;background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);border-radius:10px;color:#4ade80;font-size:14px;text-align:center;">
+        تم استلام طلبك! سنتواصل معك خلال 24 ساعة.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;background:#2D3580;border-radius:9px;display:flex;align-items:center;justify-content:center;">
+            <svg width="22" height="22" viewBox="0 0 56 56" fill="none">
+              <polygon points="8,46 26,8 35,46" fill="white"/>
+              <polygon points="33,46 45,16 52,46" fill="#9BA3C7" opacity="0.85"/>
+            </svg>
+          </div>
+          <div class="footer-brand-name">المكلف</div>
+        </div>
+        <div class="footer-brand-tag">حلول ضريبية ذكية | TAX IQ</div>
+        <div class="footer-brand-desc">نظام إدارة ضريبية عراقي متكامل مبني خصيصاً للشركات والمحاسبين والمكلفين في العراق. دقيق، سريع، موثوق.</div>
+      </div>
+      <div>
+        <div class="footer-col-title">الوحدات</div>
+        <ul class="footer-links">
+          <li><a href="#modules">الاستقطاع الشهري</a></li>
+          <li><a href="#modules">الاستقطاع السنوي</a></li>
+          <li><a href="#modules">ضريبة الشركات</a></li>
+          <li><a href="#modules">ضريبة العقود</a></li>
+          <li><a href="#modules">ضريبة العقار</a></li>
+          <li><a href="#modules">ضريبة المهن</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">الميزات</div>
+        <ul class="footer-links">
+          <li><a href="#features">المواعيد والمهام</a></li>
+          <li><a href="#features">احتساب الغرامات</a></li>
+          <li><a href="#features">مسارات العمل</a></li>
+          <li><a href="#features">الفواتير</a></li>
+          <li><a href="#features">API التكاملية</a></li>
+          <li><a href="#security">سجل التدقيق</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">الشركة</div>
+        <ul class="footer-links">
+          <li><a href="#about">من نحن</a></li>
+          <li><a href="#pricing">الأسعار</a></li>
+          <li><a href="#faq">الأسئلة الشائعة</a></li>
+          <li><a href="#cta">تواصل معنا</a></li>
+          <li><a href="#cta">طلب عرض</a></li>
+          <li><a href="#cta">ابدأ مجاناً</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 المكلف — TAX IQ. جميع الحقوق محفوظة.</div>
+      <div class="footer-legal">
+        <a href="#">سياسة الخصوصية</a>
+        <a href="#">شروط الاستخدام</a>
+        <a href="#">الدعم الفني</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="script.js"></script>
+</body>
+</html>

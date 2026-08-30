@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none">
+  <!-- Large white triangle (left) -->
+  <polygon points="10,46 28,10 36,46" fill="white"/>
+  <!-- Small silver triangle (right, offset) -->
+  <polygon points="32,46 44,18 50,46" fill="#9BA3C7" opacity="0.85"/>
+</svg>

@@ -8,8 +8,14 @@ export default defineConfig({
     port: 5173,
     open: false,
   },
+  esbuild: {
+    drop: ['console', 'debugger'],
+    legalComments: 'none',
+  },
   build: {
+    sourcemap: false,
     chunkSizeWarningLimit: 1500,
+    minify: 'esbuild',
     rollupOptions: {
       output: {
         manualChunks: {

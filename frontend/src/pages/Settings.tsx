@@ -3,7 +3,7 @@ import { Save, Building2, SlidersHorizontal, Database, Plus, Trash2, Download, P
 import { useApp } from '../store/AppContext'
 import { useI18n } from '../i18n'
 import { PageHead, Card, CardHeader, CardBody, Button, Field, Input, Select, Textarea, Modal, Badge, useToast, Tabs, ConfirmDialog, type Column, DataTable } from '../components/ui'
-import type { ContractType, SalesType, User } from '../lib/types'
+import type { ContractType, User } from '../lib/types'
 import { uid } from '../lib/format'
 
 function NumInput({ value, onChange, step = 1000, suffix }: { value: number; onChange: (v: number) => void; step?: number; suffix?: string }) {
@@ -33,7 +33,6 @@ export default function Settings() {
 
   const [co, setCo] = useState({ name: '', taxId: '', activity: '', sector: currentCompany?.sector ?? 'private', address: '', phone: '', email: '', notes: '' })
   const [types, setTypes] = useState<ContractType[]>([])
-  const [salesTypes, setSalesTypes] = useState<SalesType[]>([])
   const [userModal, setUserModal] = useState(false)
   const [editUser, setEditUser] = useState<User | null>(null)
   const [userForm, setUserForm] = useState({ username: '', name: '', password: '', role: 'accountant' as User['role'] })
@@ -59,8 +58,7 @@ export default function Settings() {
 
   useEffect(() => {
     setTypes(cfg.contractTypes)
-    setSalesTypes(cfg.salesTypes)
-  }, [cfg.contractTypes, cfg.salesTypes])
+  }, [cfg.contractTypes])
 
   const saveCompany = () => {
     if (!currentCompany) return
@@ -74,8 +72,7 @@ export default function Settings() {
 
   const saveTypes = () => {
     const clean = types.filter((t) => t.label.trim() && t.rate >= 0)
-    const cleanSales = salesTypes.filter((t) => t.label.trim() && t.rate >= 0)
-    setConfig({ contractTypes: clean, salesTypes: cleanSales })
+    setConfig({ contractTypes: clean })
     push('success', t('pgRegistry.settings.toast.typesSaved'))
   }
 
@@ -146,7 +143,10 @@ export default function Settings() {
     {
       key: 'role',
       title: t('pgRegistry.settings.col.role'),
-      render: (u) => (u.role === 'admin' ? <Badge tone="brand">{t('pgRegistry.settings.role.admin')}</Badge> : <Badge tone="slate">{t('pgRegistry.settings.role.accountant')}</Badge>),
+      render: (u) => {
+        if (u.role === 'founder') return <Badge tone="purple">مؤسس النظام</Badge>
+        return u.role === 'admin' ? <Badge tone="brand">{t('pgRegistry.settings.role.admin')}</Badge> : <Badge tone="slate">{t('pgRegistry.settings.role.accountant')}</Badge>
+      },
     },
     {
       key: 'actions',
@@ -282,29 +282,6 @@ export default function Settings() {
             </CardBody>
           </Card>
 
-          <Card>
-            <CardHeader title={t('pgRegistry.settings.tax.salesTitle')} subtitle={t('pgRegistry.settings.tax.salesSubtitle')} />
-            <CardBody className="space-y-3">
-              {salesTypes.map((st, i) => (
-                <div key={st.id} className="flex flex-wrap items-center gap-2 rounded-xl border border-ink-200 p-3">
-                  <Input className="flex-1 min-w-[180px]" value={st.label} onChange={(e) => setSalesTypes(salesTypes.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} />
-                  <div className="w-32">
-                    <div className="relative">
-                      <Input type="number" dir="ltr" step={0.1} value={Math.round(st.rate * 1000) / 10} onChange={(e) => setSalesTypes(salesTypes.map((x, j) => (j === i ? { ...x, rate: Math.max(0, Number(e.target.value)) / 100 } : x)))} className="pl-10 text-left" />
-                      <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-ink-400">%</span>
-                    </div>
-                  </div>
-                  <Button size="sm" variant="ghost" onClick={() => setSalesTypes(salesTypes.filter((_, j) => j !== i))}>
-                    <Trash2 size={15} />
-                  </Button>
-                </div>
-              ))}
-              <Button variant="secondary" size="sm" onClick={() => setSalesTypes([...salesTypes, { id: uid(), label: t('pgRegistry.settings.tax.newSalesCategory'), rate: 0.1 }])}>
-                <Plus size={15} /> {t('pgRegistry.settings.tax.addSalesCategory')}
-              </Button>
-            </CardBody>
-          </Card>
-
           <div className="flex justify-end">
             <Button onClick={saveTypes}>
               <Save size={16} /> {t('pgRegistry.settings.tax.save')}
@@ -425,4 +402,3 @@ export default function Settings() {
     </div>
   )
 }
-

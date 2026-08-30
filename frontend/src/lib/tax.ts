@@ -146,6 +146,19 @@ export interface AnnualTaxResult extends TaxResult {
 
 export function calcEmployeeAnnual(emp: Employee, cfg: TaxConfig, months: number, paidTax: number): AnnualTaxResult {
   const monthly = calcEmployeeMonthly(emp, cfg)
+  
+  // For partial years (< 12 months), use monthly tax calculation repeated for each month
+  // For full year (12 months), use annual brackets
+  if (months < 12) {
+    const gross = monthly.gross * months
+    const deductions = monthly.deductions * months
+    const taxable = Math.max(0, gross - deductions)
+    const annualTax = monthly.tax * months
+    
+    return { gross, deductions, taxable, tax: round(annualTax), months, paidTax, difference: round(annualTax - paidTax) }
+  }
+  
+  // Full year - use annual brackets
   const gross = monthly.gross * months
   const deductions = monthly.deductions * months
   const taxable = Math.max(0, gross - deductions)

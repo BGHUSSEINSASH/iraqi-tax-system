@@ -3,15 +3,130 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="المكلف — TAX IQ | نظام إدارة ضريبية عربي متكامل" />
+    <meta name="description" content="المكلف — TAX IQ | نظام إدارة ضريبية عراقي متكامل — حلول ضريبية ذكية للشركات والمحاسبين" />
+    <meta name="theme-color" content="#2D3580" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline'; connect-src 'self' http://localhost:4000 https://api.tax-office.example.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self';" />
     <title>المكلف — TAX IQ | نظام إدارة ضريبية</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23059669'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial'>ض</text></svg>" />
+
+    <!-- Favicon: dual-triangle mark on indigo -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D3580'/%3E%3Cpolygon points='10,54 28,12 38,54' fill='white'/%3E%3Cpolygon points='36,54 48,22 56,54' fill='%239BA3C7' opacity='0.85'/%3E%3C/svg%3E" />
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%232D3580'/%3E%3Cpolygon points='28,150 80,34 106,150' fill='white'/%3E%3Cpolygon points='100,150 136,60 158,150' fill='%239BA3C7' opacity='0.85'/%3E%3C/svg%3E" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ── Splash Screen ───────────────────────────────────────────────── */
+      #tax-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        background: #2D3580;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        font-family: 'Tajawal', Arial, sans-serif;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #tax-splash.fade-out {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+      #tax-splash svg.splash-mark {
+        width: 88px;
+        height: 88px;
+        margin-bottom: 24px;
+        animation: splashFloat 2s ease-in-out infinite;
+      }
+      @keyframes splashFloat {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(-6px); }
+      }
+      #tax-splash .splash-name {
+        font-size: 42px;
+        font-weight: 900;
+        color: #ffffff;
+        letter-spacing: -0.5px;
+        margin-bottom: 8px;
+        line-height: 1;
+      }
+      #tax-splash .splash-tag {
+        font-size: 15px;
+        font-weight: 400;
+        color: #9BA3C7;
+        letter-spacing: 0.5px;
+        margin-bottom: 48px;
+      }
+      #tax-splash .splash-bar-wrap {
+        width: 180px;
+        height: 3px;
+        background: rgba(255,255,255,0.12);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      #tax-splash .splash-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #9BA3C7, #ffffff);
+        border-radius: 99px;
+        animation: splashLoad 1.4s ease-out forwards;
+      }
+      @keyframes splashLoad {
+        0%   { width: 0%; }
+        60%  { width: 75%; }
+        100% { width: 100%; }
+      }
+    </style>
   </head>
   <body>
+    <!-- Splash Screen — shown before React mounts -->
+    <div id="tax-splash" role="status" aria-label="جارٍ تحميل المكلف">
+      <svg class="splash-mark" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="8,46 26,8 35,46" fill="white"/>
+        <polygon points="33,46 45,16 52,46" fill="#9BA3C7" opacity="0.85"/>
+      </svg>
+      <div class="splash-name">المكلف</div>
+      <div class="splash-tag">حلول ضريبية ذكية</div>
+      <div class="splash-bar-wrap">
+        <div class="splash-bar"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+      (() => {
+        // ── Dev-tools protection ──────────────────────────────────────────
+        const blockedKeys = new Set(['F12', 'F10', 'F9']);
+        const isModifierCombo = (event) => {
+          const key = event.key ? event.key.toLowerCase() : '';
+          const ctrl = event.ctrlKey || event.metaKey;
+          const shift = event.shiftKey;
+          return (
+            (ctrl && shift && ['i', 'c', 'j', 'k', 'u'].includes(key)) ||
+            (ctrl && ['s', 'p', 'u'].includes(key)) ||
+            (event.altKey && key === 'd') ||
+            blockedKeys.has(event.key)
+          );
+        };
+        document.addEventListener('contextmenu', (e) => e.preventDefault(), { passive: false });
+        document.addEventListener('keydown', (e) => {
+          if (isModifierCombo(e)) { e.preventDefault(); e.stopPropagation(); }
+        }, { passive: false });
+
+        let devtoolsTimer = setInterval(() => {
+          if (window.outerWidth - window.innerWidth > 160 || window.outerHeight - window.innerHeight > 160) {
+            document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Tajawal,Arial,sans-serif;color:#1f2937;background:#f3f4f6;text-align:center;padding:24px;font-size:18px;">تم حظر فتح أدوات المطورين في هذا التطبيق.</div>';
+            window.stop();
+          }
+        }, 400);
+        window.addEventListener('beforeunload', () => clearInterval(devtoolsTimer));
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Calculator, Save, FileText, FileSpreadsheet, CalendarClock, RotateCcw, Plus, Upload } from 'lucide-react'
+import { Calculator, Save, FileText, FileSpreadsheet, CalendarClock, RotateCcw, Plus, Upload, Pencil, Trash2 } from 'lucide-react'
 import { useApp } from '../store/AppContext'
-import { PageHead, Card, CardHeader, CardBody, Button, Badge, Modal, DataTable, useToast, Input, Select, Field, Toggle, MoneyInput, type Column } from '../components/ui'
+import { PageHead, Card, CardHeader, CardBody, Button, Badge, Modal, DataTable, useToast, Input, Select, Field, Toggle, MoneyInput, ConfirmDialog, type Column } from '../components/ui'
 import type { Employee, MonthlyRow, MaritalStatus } from '../lib/types'
 import { calcEmployeeMonthly } from '../lib/tax'
 import { fmt, money, nowYear, nowMonth, fmtDate, uid } from '../lib/format'
@@ -99,7 +99,7 @@ const emptyForm: FormState = {
 }
 
 export default function MonthlyTax() {
-  const { data, currentCompany, add, replace } = useApp()
+  const { data, currentCompany, add, update, remove, replace } = useApp()
   const { push } = useToast()
   const { t } = useI18n()
   const year = nowYear()
@@ -111,9 +111,58 @@ export default function MonthlyTax() {
   const [declModal, setDeclModal] = useState(false)
   const [empModalOpen, setEmpModalOpen] = useState(false)
   const [form, setForm] = useState<FormState>(emptyForm)
+  const [editingEmp, setEditingEmp] = useState<Employee | null>(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const openNewEmployee = () => {
     setForm({ ...emptyForm })
+    setEditingEmp(null)
+    setEmpModalOpen(true)
+  }
+
+  const openEditEmployee = (emp: Employee) => {
+    setEditingEmp(emp)
+    setForm({
+      ...emptyForm,
+      name: emp.name,
+      nationalId: emp.nationalId,
+      birthDate: emp.birthDate,
+      gender: emp.gender,
+      jobTitle: emp.jobTitle,
+      startDate: emp.startDate,
+      notes: emp.notes,
+      nat: emp.nat ?? 'iraqi',
+      res: emp.res ?? 'resident',
+      sec: emp.sec ?? 'private',
+      mainEmployer: emp.mainEmployer ?? 'yes',
+      employerName: emp.employerName ?? '',
+      employerId: emp.employerId ?? '',
+      marital: emp.marital ?? 'single',
+      over63: emp.over63 ?? 'no',
+      salary: emp.salary ?? emp.basicSalary ?? 0,
+      allow: emp.allow ?? emp.allowances ?? 0,
+      cashHous: emp.cashHous ?? emp.otherBenefits ?? 0,
+      inKind: emp.inKind ?? 'none',
+      actualRent: emp.actualRent ?? 0,
+      ins: emp.ins ?? emp.lifeInsurance ?? 0,
+      alimony: emp.alimony ?? 0,
+      child: emp.child ?? emp.childrenCount ?? 0,
+      childrenNames: emp.childrenNames ?? [],
+      socialSecurity: emp.socialSecurity,
+      isPrimaryEmployer: emp.isPrimaryEmployer,
+      spouseName: emp.spouseName ?? '',
+      spouseCivilId: emp.spouseCivilId ?? '',
+      marriageDate: emp.marriageDate ?? '',
+      divorceDate: emp.divorceDate ?? '',
+      spouseDisabled: emp.spouseDisabled ?? 'no',
+      spouseEmployed: emp.spouseEmployed ?? 'no',
+      incomeMerge: emp.incomeMerge ?? 'no',
+      spouseEmpId: emp.spouseEmpId ?? '',
+      leaveYear: emp.leaveYear ?? '',
+      leaveMonth: emp.leaveMonth ?? '',
+      leaveDay: emp.leaveDay ?? '',
+      continuity: emp.endDate ? 'left' : 'active',
+    })
     setEmpModalOpen(true)
   }
 
@@ -204,6 +253,18 @@ export default function MonthlyTax() {
       isLeft && form.leaveYear && form.leaveMonth && form.leaveDay
         ? `${form.leaveYear}-${String(form.leaveMonth).padStart(2, '0')}-${String(form.leaveDay).padStart(2, '0')}`
         : ''
+
+    if (editingEmp) {
+      update('employees', editingEmp.id, {
+        ...payload,
+        active: !isLeft,
+        endDate,
+      })
+      setEmpModalOpen(false)
+      setEditingEmp(null)
+      push('success', t('pgTax.employee.updated'))
+      return
+    }
 
     const emp: Employee = {
       id: uid(),
@@ -360,6 +421,24 @@ export default function MonthlyTax() {
           {r.declared ? <Badge tone="green">{t('pgTax.monthly.yes')}</Badge> : <Badge tone="slate">{t('pgTax.monthly.no')}</Badge>}
         </button>
       )
+    },
+    {
+      key: 'actions',
+      title: '',
+      render: (r) => {
+        const e = data.employees.find((x) => x.id === r.employeeId)
+        if (!e) return null
+        return (
+          <div className="flex items-center justify-end gap-1">
+            <button onClick={() => openEditEmployee(e)} className="rounded p-1 text-ink-400 hover:bg-ink-100 hover:text-brand-600" title="تعديل">
+              <Pencil size={15} />
+            </button>
+            <button onClick={() => setConfirmDeleteId(e.id)} className="rounded p-1 text-ink-400 hover:bg-red-50 hover:text-red-600" title="حذف">
+              <Trash2 size={15} />
+            </button>
+          </div>
+        )
+      }
     }
   ]
 
@@ -625,17 +704,31 @@ export default function MonthlyTax() {
         </div>
       </Modal>
 
+      <ConfirmDialog
+        open={confirmDeleteId !== null}
+        onClose={() => setConfirmDeleteId(null)}
+        onConfirm={() => {
+          if (confirmDeleteId) {
+            remove('employees', confirmDeleteId)
+            setConfirmDeleteId(null)
+            push('success', 'تم حذف الموظف بنجاح')
+          }
+        }}
+        title="تأكيد الحذف"
+        message="هل أنت متأكد من حذف هذا الموظف؟ لا يمكن التراجع عن هذا الإجراء."
+      />
+
       <Modal
         open={empModalOpen}
         onClose={() => setEmpModalOpen(false)}
-        title={t('pgTax.employee.titleMonthly')}
+        title={editingEmp ? 'تعديل بيانات الموظف' : t('pgTax.employee.titleMonthly')}
         size="xl"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setEmpModalOpen(false)}>
+            <Button variant="secondary" onClick={() => { setEmpModalOpen(false); setEditingEmp(null) }}>
               {t('pgTax.common.cancel')}
             </Button>
-            <Button onClick={saveNewEmployee}>{t('pgTax.common.addEmployee')}</Button>
+            <Button onClick={saveNewEmployee}>{editingEmp ? t('pgTax.common.saveChanges') : t('pgTax.common.addEmployee')}</Button>
           </>
         }
       >

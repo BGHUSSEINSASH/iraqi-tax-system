@@ -1,0 +1,10 @@
+© 2026 BGHUSSEINSASH. All rights reserved.
+
+This software and all associated code, documentation, design assets, logic, branding, and data are proprietary and confidential.
+
+Permission is granted only by explicit written authorization from BGHUSSEINSASH.
+
+Any unauthorized use, copying, modification, distribution, public disclosure, reverse engineering, extraction, or reuse is prohibited.
+
+Official repository:
+https://github.com/BGHUSSEINSASH/iraqi-tax-system.git

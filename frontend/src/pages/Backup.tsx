@@ -42,7 +42,6 @@ export default function Backup() {
     data.employees.length +
     data.monthlyRows.length +
     data.annualRows.length +
-    data.taxpayers.length +
     data.invoices.length +
     data.tasks.length +
     data.tickets.length +
@@ -71,7 +70,6 @@ export default function Backup() {
       const parsed = JSON.parse(raw)
       replace('companies', parsed.companies ?? [])
       replace('employees', parsed.employees ?? [])
-      replace('taxpayers', parsed.taxpayers ?? [])
       replace('invoices', parsed.invoices ?? [])
       resetData()
       push('success', t('pgSystem.backup.toast.restored', { date: fmtDate(entry.date) }))
@@ -103,7 +101,6 @@ export default function Backup() {
         replace('companies', parsed.companies)
         replace('employees', parsed.employees ?? [])
         replace('invoices', parsed.invoices ?? [])
-        replace('taxpayers', parsed.taxpayers ?? [])
         push('success', t('pgSystem.backup.toast.imported'))
       } catch {
         push('error', t('pgSystem.backup.toast.invalidFile'))

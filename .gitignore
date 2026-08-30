@@ -7,7 +7,18 @@ _docx_extract/
 _v4_extract/
 backups/
 rollback_safety_*/
-
-dist/
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+backend/data/
 frontend/dist/
+dist/
+*.tsbuildinfo
+qa-changes.mjs
+qa-debug-login.mjs
+qa-*.mjs
+src/app/
 

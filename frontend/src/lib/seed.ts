@@ -1,4 +1,4 @@
-import type { AppData, Company, Employee, TaxConfig } from './types'
+import type { AppData, Company, Employee, TaxConfig, SubscriptionTier, ModuleVisibility, RolePermission, SubscriptionGrant, UserRole } from './types'
 import { nowYear } from './format'
 import { calcEmployeeAnnual, calcEmployeeMonthly, calcCorporate, calcLand, calcProfession, calcPropertyForm, calcSales, calcContract, DEFAULT_EMPLOYEE_BRACKETS } from './tax'
 
@@ -24,14 +24,6 @@ export function defaultConfig(): TaxConfig {
       { id: 'service', label: 'خدمات ومقاولات', rate: 0.07 },
       { id: 'consult', label: 'استشارات وأعمال مهنية', rate: 0.1 },
     ],
-    salesTypes: [
-      { id: 'essential', label: 'سلع أساسية', rate: 0.05 },
-      { id: 'standard', label: 'سلع عامة', rate: 0.1 },
-      { id: 'services', label: 'خدمات', rate: 0.15 },
-      { id: 'tobacco', label: 'تبغ ومشروبات', rate: 0.2 },
-      { id: 'luxury', label: 'سلع كمالية', rate: 0.3 },
-    ],
-    salesDefaultId: 'standard',
   }
 }
 
@@ -89,6 +81,78 @@ function seedEmployees(): Employee[] {
   ]
 }
 
+// All nav paths that can be shown/hidden by the founder
+const ALL_MODULE_PATHS = [
+  '/dashboard',
+  '/employees',
+  '/users',
+  '/tax/monthly',
+  '/tax/annual',
+  '/tax/corporate',
+  '/tax/contracts',
+  '/tax/property',
+  '/tax/land',
+  '/tax/profession',
+  '/penalties',
+  '/workflow',
+  '/appointments',
+  '/tasks',
+  '/notifications',
+  '/packages',
+  '/audit',
+  '/backup',
+  '/contact',
+  '/settings',
+  '/founder',
+]
+
+export function defaultModuleVisibility(): ModuleVisibility[] {
+  return ALL_MODULE_PATHS.map((path) => ({
+    path,
+    enabledForTiers: ['basic', 'professional', 'enterprise'] as SubscriptionTier[],
+    visibleToRoles: ['founder', 'admin', 'accountant'] as UserRole[],
+    forceHidden: false,
+  }))
+}
+
+export function defaultRolePermissions(): RolePermission[] {
+  return [
+    {
+      role: 'founder',
+      canEditTaxConfig: true,
+      canManageUsers: true,
+      canViewAuditLog: true,
+      canExportData: true,
+      canManageInvoices: true,
+      canManageAppointments: true,
+      canDeleteRecords: true,
+      canViewReports: true,
+    },
+    {
+      role: 'admin',
+      canEditTaxConfig: true,
+      canManageUsers: true,
+      canViewAuditLog: true,
+      canExportData: true,
+      canManageInvoices: true,
+      canManageAppointments: true,
+      canDeleteRecords: true,
+      canViewReports: true,
+    },
+    {
+      role: 'accountant',
+      canEditTaxConfig: false,
+      canManageUsers: false,
+      canViewAuditLog: false,
+      canExportData: true,
+      canManageInvoices: true,
+      canManageAppointments: true,
+      canDeleteRecords: false,
+      canViewReports: true,
+    },
+  ]
+}
+
 function seedCompanies(): Company[] {
   const y = nowYear()
   return [
@@ -103,30 +167,11 @@ function seedCompanies(): Company[] {
       email: 'info@almanara.iq',
       notes: '',
       createdAt: `${y}-01-01`,
-    },
-    {
-      id: 'comp-2',
-      name: 'شركة الفارس للاستيراد والتوزيع',
-      taxId: '4102098765',
-      activity: 'استيراد وتوزيع السلع الغذائية والكمالية',
-      sector: 'private',
-      address: 'بغداد — المنصور، شارع الوحدة',
-      phone: '07700998877',
-      email: 'sales@alfaris-iq.com',
-      notes: 'شركة تجارة متنوعة',
-      createdAt: `${y}-02-14`,
-    },
-    {
-      id: 'comp-3',
-      name: 'مؤسسة الرافدين للمقاولات العامة',
-      taxId: '4102123456',
-      activity: 'مقاولات عامة وإنشاءات',
-      sector: 'public',
-      address: 'الموصل — الدواسة، شارع الصناعة',
-      phone: '07703456789',
-      email: 'rafidain@iq.com',
-      notes: 'مؤسسة مقاولات وسكنية',
-      createdAt: `${y}-03-08`,
+      ownerIdType: 'taxNumber',
+      ownerIdentifier: '4102012345',
+      ownerPhone: '07701234567',
+      ownerEmail: 'owner@almanara.iq',
+      status: 'active',
     },
   ]
 }
@@ -221,83 +266,40 @@ export function buildSeedData(): AppData {
       notes: 'دفعة أولى (تقسيط)',
       createdAt: `${year}-05-20`,
     },
-    {
-      id: 'corp-4',
-      companyId: companies[1].id,
-      year,
-      type: 'general',
-      profits: 27000000,
-      exemptions: 1500000,
-      taxable: 25500000,
-      rate: cfg.corporateRate,
-      tax: 3825000,
-      paid: 2500000,
-      notes: 'تنزيل دفع جزئي',
-      createdAt: `${year}-06-14`,
-    },
   ]
 
   const contracts: AppData['contracts'] = [
-    { id: 'ctr-1', companyId: companies[0].id, date: `${year}-02-10`, party: 'شركة بغداد للإنشاءات', subject: 'توريد مواد بناء', typeId: 'supply', amount: 15000000, rate: 0.033, tax: calcContract(15000000, 0.033), paid: 495000, notes: '' },
-    { id: 'ctr-2', companyId: companies[0].id, date: `${year}-03-22`, party: 'مكتب السلامة للاستشارات', subject: 'استشارات مالية', typeId: 'consult', amount: 8000000, rate: 0.1, tax: calcContract(8000000, 0.1), paid: 800000, notes: '' },
-    { id: 'ctr-3', companyId: companies[0].id, date: `${year}-05-05`, party: 'شركة الأفق للخدمات', subject: 'صيانة وأنظمة حاسوب', typeId: 'service', amount: 12000000, rate: 0.07, tax: calcContract(12000000, 0.07), paid: 0, notes: 'بذمة التسديد' },
-    { id: 'ctr-4', companyId: companies[1].id, date: `${year}-04-18`, party: 'مجموعة الفارس للمقاولات', subject: 'أعمال إنشائية', typeId: 'service', amount: 18500000, rate: 0.07, tax: calcContract(18500000, 0.07), paid: 1000000, notes: 'تسليم جزئي' },
-    { id: 'ctr-5', companyId: companies[1].id, date: `${year}-06-29`, party: 'مركز دار الحكمة للاستشارات', subject: 'استشارات إدارية', typeId: 'consult', amount: 6700000, rate: 0.1, tax: calcContract(6700000, 0.1), paid: 0, notes: 'جديد' },
-    { id: 'ctr-6', companyId: companies[2].id, date: `${year}-07-11`, party: 'صناعة الكفاح الغذائية', subject: 'توريد مواد غذائية', typeId: 'supply', amount: 11200000, rate: 0.033, tax: calcContract(11200000, 0.033), paid: 350000, notes: '' },
-    { id: 'ctr-7', companyId: companies[0].id, date: `${year}-07-01`, party: 'مكتب الرافدين للمحاماة', subject: 'استشارات قانونية', typeId: 'consult', amount: 5000000, rate: 0.1, tax: calcContract(5000000, 0.1), paid: 0, notes: 'جديد' },
+    { id: 'ctr-1', companyId: companies[0].id, date: `${year}-02-10`, party: 'شركة بغداد للإنشاءات', subject: 'توريد مواد بناء', typeId: 'supply', amount: 15000000, rate: 0.033, tax: calcContract(15000000, 0.033), paid: 495000, notes: '', startDate: '', endDate: '', contractorType: 'primary' },
+    { id: 'ctr-2', companyId: companies[0].id, date: `${year}-03-22`, party: 'مكتب السلامة للاستشارات', subject: 'استشارات مالية', typeId: 'consult', amount: 8000000, rate: 0.1, tax: calcContract(8000000, 0.1), paid: 800000, notes: '', startDate: '', endDate: '', contractorType: 'primary' },
+    { id: 'ctr-3', companyId: companies[0].id, date: `${year}-05-05`, party: 'شركة الأفق للخدمات', subject: 'صيانة وأنظمة حاسوب', typeId: 'service', amount: 12000000, rate: 0.07, tax: calcContract(12000000, 0.07), paid: 0, notes: 'بذمة التسديد', startDate: '', endDate: '', contractorType: 'primary' },
+    { id: 'ctr-7', companyId: companies[0].id, date: `${year}-07-01`, party: 'مكتب الرافدين للمحاماة', subject: 'استشارات قانونية', typeId: 'consult', amount: 5000000, rate: 0.1, tax: calcContract(5000000, 0.1), paid: 0, notes: 'جديد', startDate: '', endDate: '', contractorType: 'primary' },
   ]
 
   const properties: AppData['properties'] = [
     { id: 'prp-1', companyId: companies[0].id, year, name: 'المقر الرئيسي — الكرادة', location: 'بغداد، الكرادة', annualRent: 24000000, exemptAmount: 0, taxable: calcPropertyForm({ annualRent: 24000000, nature: 'none', familyHome: false, isNew: false, buildDate: '', isEmpty: false, emptyMonths: 0, rate: cfg.propertyRate, penaltyDelay: false, penaltyFalseInfo: false, penaltyFakeEmpty: false, penaltyUseChange: false, penaltyMonths: 0, monthlyPenaltyRate: cfg.propertyPenaltyRate }).taxable, rate: cfg.propertyRate, tax: calcPropertyForm({ annualRent: 24000000, nature: 'none', familyHome: false, isNew: false, buildDate: '', isEmpty: false, emptyMonths: 0, rate: cfg.propertyRate, penaltyDelay: false, penaltyFalseInfo: false, penaltyFakeEmpty: false, penaltyUseChange: false, penaltyMonths: 0, monthlyPenaltyRate: cfg.propertyPenaltyRate }).baseTax, paid: 2160000, penaltyMonths: 0, penalty: 0, totalDue: 2160000, notes: '', nature: 'none', familyHome: false, isNew: false, buildDate: '', isEmpty: false, emptyMonths: 0, maintenance: 2400000, exempt: false, exemptReason: '', penaltyDelay: false, penaltyFalseInfo: false, penaltyFakeEmpty: false, penaltyUseChange: false },
     { id: 'prp-2', companyId: companies[0].id, year, name: 'مستودع زيونة', location: 'بغداد، زيونة', annualRent: 12000000, exemptAmount: 0, taxable: 10800000, rate: cfg.propertyRate, tax: 1080000, paid: 600000, penaltyMonths: 2, penalty: 43200, totalDue: 1123200, notes: 'غرامة تأخير شهرين' },
-    { id: 'prp-3', companyId: companies[1].id, year, name: 'مركز الطلبات السريعة', location: 'بغداد، المنصور', annualRent: 16800000, exemptAmount: 0, taxable: 15120000, rate: cfg.propertyRate, tax: 1512000, paid: 800000, penaltyMonths: 1, penalty: 30240, totalDue: 1542240, notes: 'مراجعة شهرية' },
-    { id: 'prp-4', companyId: companies[2].id, year, name: 'محل تجاري — الدورة', location: 'البصرة، الدورة', annualRent: 11000000, exemptAmount: 0, taxable: 9900000, rate: cfg.propertyRate, tax: 990000, paid: 990000, penaltyMonths: 0, penalty: 0, totalDue: 990000, notes: 'نموذجي' },
     { id: 'prp-5', companyId: companies[0].id, year: year - 1, name: 'معرض الأعظمية', location: 'بغداد، الأعظمية', annualRent: 18000000, exemptAmount: 0, taxable: 16200000, rate: cfg.propertyRate, tax: 1620000, paid: 1620000, penaltyMonths: 0, penalty: 0, totalDue: 1620000, notes: '' },
   ]
 
   const lands: AppData['lands'] = [
     { id: 'lnd-1', companyId: companies[0].id, year, name: 'قطعة أرض رقم 12/م', location: 'بغداد، المنصور', area: 2500, value: 300000000, exemptArea: cfg.landExemptionArea, taxable: calcLand(300000000, 2500, cfg.landExemptionArea, cfg.landRate).taxable, rate: cfg.landRate, tax: calcLand(300000000, 2500, cfg.landExemptionArea, cfg.landRate).tax, paid: 4080000, notes: '' },
     { id: 'lnd-2', companyId: companies[0].id, year, name: 'مشروع سكني — أبي غريب', location: 'بغداد، أبي غريب', area: 12000, value: 900000000, exemptArea: cfg.landExemptionArea, taxable: calcLand(900000000, 12000, cfg.landExemptionArea, cfg.landRate).taxable, rate: cfg.landRate, tax: calcLand(900000000, 12000, cfg.landExemptionArea, cfg.landRate).tax, paid: 0, notes: 'بذمة التسديد' },
-    { id: 'lnd-3', companyId: companies[1].id, year, name: 'قطعة صناعية — الكاظمية', location: 'بغداد، الكاظمية', area: 5000, value: 420000000, exemptArea: cfg.landExemptionArea, taxable: calcLand(420000000, 5000, cfg.landExemptionArea, cfg.landRate).taxable, rate: cfg.landRate, tax: calcLand(420000000, 5000, cfg.landExemptionArea, cfg.landRate).tax, paid: 0, notes: 'قيد التسديد' },
   ]
 
   const professions: AppData['professions'] = [
     { id: 'prf-1', companyId: companies[0].id, year, name: 'عمار محمد (استشارات محاسبة)', income: 42000000, allowance: cfg.professionAllowance, taxable: calcProfession(42000000, cfg.professionAllowance, cfg.employeeBrackets).taxable, tax: calcProfession(42000000, cfg.professionAllowance, cfg.employeeBrackets).tax, paid: 0, notes: 'مقاولة سنوية' },
     { id: 'prf-2', companyId: companies[0].id, year, name: 'د. ليلى حسن (عيادة استشارية)', income: 36000000, allowance: cfg.professionAllowance, taxable: calcProfession(36000000, cfg.professionAllowance, cfg.employeeBrackets).taxable, tax: calcProfession(36000000, cfg.professionAllowance, cfg.employeeBrackets).tax, paid: 1500000, notes: '' },
-    { id: 'prf-3', companyId: companies[1].id, year, name: 'مكتب الفرات الهندسي', income: 55000000, allowance: cfg.professionAllowance, taxable: calcProfession(55000000, cfg.professionAllowance, cfg.employeeBrackets).taxable, tax: calcProfession(55000000, cfg.professionAllowance, cfg.employeeBrackets).tax, paid: 4100000, notes: '' },
-    { id: 'prf-4', companyId: companies[2].id, year, name: 'مكتب السلام الطبي', income: 28000000, allowance: cfg.professionAllowance, taxable: calcProfession(28000000, cfg.professionAllowance, cfg.employeeBrackets).taxable, tax: calcProfession(28000000, cfg.professionAllowance, cfg.employeeBrackets).tax, paid: 900000, notes: 'علاج أسنان' },
     { id: 'prf-5', companyId: companies[0].id, year: year - 1, name: 'مكتب الفرات الهندسي', income: 55000000, allowance: cfg.professionAllowance, taxable: calcProfession(55000000, cfg.professionAllowance, cfg.employeeBrackets).taxable, tax: calcProfession(55000000, cfg.professionAllowance, cfg.employeeBrackets).tax, paid: 4100000, notes: '' },
   ]
 
-  const sales: AppData['sales'] = [
-    { id: 'sal-1', companyId: companies[0].id, date: `${year}-01-12`, invoiceNo: 'INV-2026-001', description: 'فاتورة سلع غذائية متنوعة', typeId: 'essential', amount: 8500000, rate: 0.05, tax: calcSales(8500000, 0.05), paid: 425000, notes: '' },
-    { id: 'sal-2', companyId: companies[0].id, date: `${year}-02-08`, invoiceNo: 'INV-2026-014', description: 'مبيعات سلع عامة', typeId: 'standard', amount: 12000000, rate: 0.1, tax: calcSales(12000000, 0.1), paid: 1200000, notes: '' },
-    { id: 'sal-3', companyId: companies[0].id, date: `${year}-03-19`, invoiceNo: 'INV-2026-030', description: 'خدمات شحن وتوصيل', typeId: 'services', amount: 6500000, rate: 0.15, tax: calcSales(6500000, 0.15), paid: 0, notes: 'آجل' },
-    { id: 'sal-4', companyId: companies[1].id, date: `${year}-04-02`, invoiceNo: 'INV-2026-041', description: 'مبيعات سلع عامة', typeId: 'standard', amount: 9400000, rate: 0.1, tax: calcSales(9400000, 0.1), paid: 940000, notes: '' },
-    { id: 'sal-5', companyId: companies[1].id, date: `${year}-05-21`, invoiceNo: 'INV-2026-058', description: 'مبيعات أجهزة كهربائية', typeId: 'luxury', amount: 15000000, rate: 0.3, tax: calcSales(15000000, 0.3), paid: 0, notes: 'قيد التسديد' },
-    { id: 'sal-6', companyId: companies[2].id, date: `${year}-06-11`, invoiceNo: 'INV-2026-072', description: 'مبيعات سلع عامة', typeId: 'standard', amount: 7800000, rate: 0.1, tax: calcSales(7800000, 0.1), paid: 780000, notes: '' },
-    { id: 'sal-7', companyId: companies[2].id, date: `${year}-07-03`, invoiceNo: 'INV-2026-085', description: 'مبيعات سلع أساسية', typeId: 'essential', amount: 5200000, rate: 0.05, tax: calcSales(5200000, 0.05), paid: 260000, notes: '' },
-    { id: 'sal-8', companyId: companies[0].id, date: `${year}-07-18`, invoiceNo: 'INV-2026-106', description: 'خدمات استشارية ومهنية', typeId: 'services', amount: 13200000, rate: 0.15, tax: calcSales(13200000, 0.15), paid: 1980000, notes: 'مسدد جزئياً' },
-  ]
-
-  const taxpayers: AppData['taxpayers'] = [
-    { id: 'TP-001', taxId: 'IQ-2026-00001', name: 'شركة النور للتجارة والتوزيع', type: 'company', province: 'بغداد', phone: '07701234567', email: 'info@alnour.iq', address: 'بغداد - الكرادة', status: 'active' },
-    { id: 'TP-002', taxId: 'IQ-2026-00002', name: 'أحمد محمود العلي', type: 'individual', province: 'البصرة', phone: '07809876543', email: 'ahmad@mail.com', address: 'البصرة - العشار', status: 'active' },
-    { id: 'TP-003', taxId: 'IQ-2026-00003', name: 'مؤسسة الرافدين للمقاولات العامة', type: 'company', province: 'نينوى', phone: '07501112233', email: 'rafidain@iq.com', address: 'الموصل - الدواسة', status: 'active' },
-    { id: 'TP-004', taxId: 'IQ-2026-00004', name: 'دائرة ضريبة كربلاء', type: 'government', province: 'كربلاء', phone: '07601234567', email: 'karbala.tax@gov.iq', address: 'كربلاء - المركز', status: 'active' },
-    { id: 'TP-005', taxId: 'IQ-2026-00005', name: 'علي حسن الموسوي', type: 'individual', province: 'النجف', phone: '07711223344', email: 'ali@mail.com', address: 'النجف - حي السعد', status: 'inactive' },
-    { id: 'TP-006', taxId: 'IQ-2026-00006', name: 'شركة الفارس للاستيراد', type: 'company', province: 'ديالى', phone: '07744112233', email: 'sales@alfaris-iq.com', address: 'بعقوبة - شارع 14 رمضان', status: 'active' },
-    { id: 'TP-007', taxId: 'IQ-2026-00007', name: 'مكتب الهدى للمحاسبة', type: 'company', province: 'بغداد', phone: '07999001122', email: 'info@alhuda-accounting.iq', address: 'بغداد - الرصافة', status: 'active' },
-  ]
-
   const invoices: AppData['invoices'] = [
-    { id: 'INV-001', client: 'شركة النور للتجارة والتوزيع', taxType: 'ضريبة دخل الشركات', amount: 2500000, date: `${year}-03-01`, due: `${year}-04-01`, status: 'paid', notes: '' },
-    { id: 'INV-002', client: 'مؤسسة الرافدين للمقاولات العامة', taxType: 'ضريبة العقار', amount: 1800000, date: `${year}-03-10`, due: `${year}-04-10`, status: 'pending', notes: '' },
-    { id: 'INV-003', client: 'شركة بغداد المتحدة', taxType: 'ضريبة المبيعات', amount: 3200000, date: `${year}-02-15`, due: `${year}-03-15`, status: 'overdue', notes: '' },
-    { id: 'INV-004', client: 'مكتب الأمين للمحاسبة والاستشارات', taxType: 'ضريبة المهنة', amount: 950000, date: `${year}-03-20`, due: `${year}-04-20`, status: 'pending', notes: '' },
-    { id: 'INV-005', client: 'شركة الفرات للإنشاء والإعمار', taxType: 'ضريبة العرصات', amount: 4100000, date: `${year}-01-05`, due: `${year}-02-05`, status: 'paid', notes: '' },
-    { id: 'INV-006', client: 'مكتب الهدى للمحاسبة', taxType: 'ضريبة الشركات', amount: 5200000, date: `${year}-05-08`, due: `${year}-06-08`, status: 'pending', notes: 'خدمة استشارية' },
-    { id: 'INV-007', client: 'شركة الفارس للاستيراد', taxType: 'ضريبة المبيعات', amount: 2900000, date: `${year}-06-05`, due: `${year}-07-05`, status: 'paid', notes: '' },
+    { id: 'INV-001', client: 'شركة النور للتجارة والتوزيع', taxType: 'ضريبة دخل الشركات', taxRate: 0.15, amount: 2500000, taxAmount: 375000, date: `${year}-03-01`, due: `${year}-04-01`, period: `${year}-Q1`, relatedEntityId: 'corporate-1', status: 'paid', notes: '' },
+    { id: 'INV-002', client: 'مؤسسة الرافدين للمقاولات العامة', taxType: 'ضريبة العقار', taxRate: 0.1, amount: 1800000, taxAmount: 180000, date: `${year}-03-10`, due: `${year}-04-10`, period: `${year}-Q1`, relatedEntityId: 'property-1', status: 'pending', notes: '' },
+    { id: 'INV-003', client: 'شركة بغداد المتحدة', taxType: 'ضريبة العقود', taxRate: 0.07, amount: 3200000, taxAmount: 224000, date: `${year}-02-15`, due: `${year}-03-15`, period: `${year}-Q1`, relatedEntityId: 'contract-1', status: 'overdue', notes: '' },
+    { id: 'INV-004', client: 'مكتب الأمين للمحاسبة والاستشارات', taxType: 'ضريبة المهنة', taxRate: 0.15, amount: 950000, taxAmount: 142500, date: `${year}-03-20`, due: `${year}-04-20`, period: `${year}-Q1`, relatedEntityId: 'profession-1', status: 'pending', notes: '' },
+    { id: 'INV-005', client: 'شركة الفرات للإنشاء والإعمار', taxType: 'ضريبة العرصات', taxRate: 0.02, amount: 4100000, taxAmount: 82000, date: `${year}-01-05`, due: `${year}-02-05`, period: `${year}-Q1`, relatedEntityId: 'land-1', status: 'paid', notes: '' },
+    { id: 'INV-006', client: 'مكتب الهدى للمحاسبة', taxType: 'ضريبة الشركات', taxRate: 0.15, amount: 5200000, taxAmount: 780000, date: `${year}-05-08`, due: `${year}-06-08`, period: `${year}-Q2`, relatedEntityId: 'corporate-2', status: 'pending', notes: 'خدمة استشارية' },
+    { id: 'INV-007', client: 'شركة الفارس للاستيراد', taxType: 'ضريبة الاستقطاع', taxRate: 0.05, amount: 2900000, taxAmount: 145000, date: `${year}-06-05`, due: `${year}-07-05`, period: `${year}-Q2`, relatedEntityId: 'monthly-1', status: 'paid', notes: '' },
   ]
 
   const tickets: AppData['tickets'] = [
@@ -317,19 +319,17 @@ export function buildSeedData(): AppData {
   ]
 
   const appointments: AppData['appointments'] = [
-    { id: 'a-1', title: 'مراجعة ملف شركة النور الضريبي والمستندات', date: `${year}-08-15`, time: '10:00', client: 'شركة النور', notes: 'يرجى إحضار كشوفات المصارف', status: 'upcoming' },
-    { id: 'a-2', title: 'اجتماع لجنة التدقيق الضريبي العليا', date: `${year}-08-20`, time: '09:00', client: '', notes: 'قاعة الاجتماعات الرئيسية بالطابق الثاني', status: 'upcoming' },
-    { id: 'a-3', title: 'تسليم شهادة براءة ذمة رسمية للمكلف', date: `${year}-08-01`, time: '14:00', client: 'أحمد محمود', notes: 'التسليم المباشر للمكلف', status: 'completed' },
-    { id: 'a-4', title: 'مراجعة إقرار ضريبة الشركات - شركة الفارس', date: `${year}-08-22`, time: '11:30', client: 'شركة الفارس', notes: 'إحضار كشف حسابات بنكي', status: 'upcoming' },
+    { id: 'a-1', title: 'مراجعة ملف شركة النور الضريبي والمستندات', date: `${year}-08-15`, time: '10:00', client: 'شركة النور', notes: 'يرجى إحضار كشوفات المصارف', status: 'upcoming', subscriptionTier: 'professional', taxModule: 'corporate', period: `${year}-Q3`, autoGenerated: false },
+    { id: 'a-2', title: 'اجتماع لجنة التدقيق الضريبي العليا', date: `${year}-08-20`, time: '09:00', client: '', notes: 'قاعة الاجتماعات الرئيسية بالطابق الثاني', status: 'upcoming', subscriptionTier: 'enterprise', taxModule: 'corporate', period: `${year}-Q3`, autoGenerated: false },
+    { id: 'a-3', title: 'تسليم شهادة براءة ذمة رسمية للمكلف', date: `${year}-08-01`, time: '14:00', client: 'أحمد محمود', notes: 'التسليم المباشر للمكلف', status: 'completed', subscriptionTier: 'professional', taxModule: 'corporate', period: `${year}-Q3`, autoGenerated: false },
+    { id: 'a-4', title: 'مراجعة إقرار ضريبة الشركات - شركة الفارس', date: `${year}-08-22`, time: '11:30', client: 'شركة الفارس', notes: 'إحضار كشف حسابات بنكي', status: 'upcoming', subscriptionTier: 'professional', taxModule: 'corporate', period: `${year}-Q3`, autoGenerated: false },
   ]
 
   const tasks: AppData['tasks'] = [
-    { id: 't-1', title: 'مراجعة ملفات ضريبية معلقة ومؤجلة من 2025', status: 'done', priority: 'high', date: `${year}-03-20` },
-    { id: 't-2', title: 'إعداد تقرير الربع الأول المالي لمصلحة الضرائب', status: 'progress', priority: 'medium', date: `${year}-03-25` },
-    { id: 't-3', title: 'تحديث بيانات المكلفين والشركات المسجلة حديثاً', status: 'pending', priority: 'low', date: `${year}-03-28` },
-    { id: 't-4', title: 'اجتماع دوري مع فريق التدقيق والمراجعة الفنية', status: 'pending', priority: 'high', date: `${year}-03-30` },
-    { id: 't-5', title: 'إرسال إشعارات ومطالبات التأخير للمتخلفين', status: 'done', priority: 'medium', date: `${year}-03-15` },
-    { id: 't-6', title: 'تحديث البيانات الشهرية للمحافظات الأربع الكبرى', status: 'progress', priority: 'medium', date: `${year}-08-10` },
+    { id: 't-1', title: 'مراجعة ملفات ضريبية معلقة ومؤجلة من 2025', status: 'done', priority: 'high', date: `${year}-03-20`, taxType: 'corporate', period: `${year}-Q1`, autoGenerated: false, subscriptionTier: 'professional' },
+    { id: 't-2', title: 'إعداد تقرير الربع الأول المالي لمصلحة الضرائب', status: 'progress', priority: 'medium', date: `${year}-03-25`, taxType: 'corporate', period: `${year}-Q1`, autoGenerated: false, subscriptionTier: 'professional' },
+    { id: 't-3', title: 'إرسال إشعارات ومطالبات التأخير للمتخلفين', status: 'done', priority: 'medium', date: `${year}-03-15`, taxType: 'monthly', period: `${year}-03`, autoGenerated: true, subscriptionTier: 'professional' },
+    { id: 't-4', title: 'تحديث البيانات الشهرية للمحافظات الأربع الكبرى', status: 'progress', priority: 'medium', date: `${year}-08-10`, taxType: 'annual', period: `${year}`, autoGenerated: false, subscriptionTier: 'professional' },
   ]
 
   const auditLogs: AppData['auditLogs'] = [
@@ -347,14 +347,6 @@ export function buildSeedData(): AppData {
     { id: 'lh-5', date: `${year}-08-08 13:10:00`, user: 'admin', ip: '172.16.1.30', browser: 'Chrome 124', location: 'النجف، العراق', status: 'success' },
   ]
 
-  const documents: AppData['documents'] = [
-    { id: 'doc-1', companyId: companies[0].id, name: 'شهادة التسجيل الرسمية للشركة المعتمدة.pdf', category: 'تأسيس', size: '1.2 MB', date: `${year}-01-10`, url: '#' },
-    { id: 'doc-2', companyId: companies[0].id, name: 'ميزانية الشركة المدققة لسنة 2025 الرسمية.pdf', category: 'ميزانية', size: '4.5 MB', date: `${year}-03-15`, url: '#' },
-    { id: 'doc-3', companyId: companies[0].id, name: 'عقد إيجار المقر الرئيسي للشركة مصدقاً.pdf', category: 'عقارات', size: '2.1 MB', date: `${year}-01-15`, url: '#' },
-    { id: 'doc-4', companyId: companies[1].id, name: 'قرار تأسيس المنشأة.pdf', category: 'تأسيس', size: '900 KB', date: `${year}-02-02`, url: '#' },
-    { id: 'doc-5', companyId: companies[2].id, name: 'كشف حساب بنكي سنوي.xlsx', category: 'مالية', size: '2.8 MB', date: `${year}-05-11`, url: '#' },
-  ]
-
   const apiKeys: AppData['apiKeys'] = [
     { id: 'key-1', name: 'تكامل ERP', key: 'tk_9f2a1c4e7b8d', status: 'active', lastUsed: `${year}-08-11 10:00:00`, created: `${year}-01-05`, notes: 'ربط مع نظام ERP الخاص بالمؤسسة' },
     { id: 'key-2', name: 'نسخ احتياطي', key: 'tk_5b7d9f3a6c8e', status: 'active', lastUsed: '', created: `${year}-02-18`, notes: 'مزامنة البيانات مع خدمة النسخ الاحتياطي' },
@@ -362,7 +354,7 @@ export function buildSeedData(): AppData {
   ]
 
   return {
-    version: 3,
+    version: 4,
     companies,
     employees,
     monthlyRows,
@@ -372,15 +364,15 @@ export function buildSeedData(): AppData {
     properties,
     lands,
     professions,
-    sales,
     config: cfg,
     users: [
+      { id: 'user-founder', username: 'founder', password: 'founder@2026', name: 'مؤسس النظام', role: 'founder', status: 'active' },
       { id: 'user-admin', username: 'admin', password: 'admin123', name: 'مدير النظام', role: 'admin' },
       { id: 'user-accountant', username: 'accountant', password: '123456', name: 'المحاسب', role: 'accountant' },
       { id: 'user-auditor', username: 'auditor', password: 'aud123', name: 'مراجع داخلي', role: 'accountant' },
     ],
     activeCompanyId,
-    taxpayers,
+    companyName: '',
     invoices,
     tickets,
     workflows,
@@ -388,8 +380,12 @@ export function buildSeedData(): AppData {
     tasks,
     auditLogs,
     loginHistory,
-    documents,
     apiKeys,
-    currentPackage: 'enterprise',
+    currentPackage: 'enterprise' as SubscriptionTier,
+    moduleVisibility: defaultModuleVisibility(),
+    rolePermissions: defaultRolePermissions(),
+    subscriptionGrants: [] as SubscriptionGrant[],
+    maintenanceMode: false,
+    maintenanceMessage: 'النظام في وضع الصيانة. يرجى المحاولة لاحقاً.',
   }
 }

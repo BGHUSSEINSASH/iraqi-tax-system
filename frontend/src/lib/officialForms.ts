@@ -1,6 +1,6 @@
 import type { AppData, Company, Employee, MonthlyRow, TaxConfig } from './types'
 import { fmt, monthName } from './format'
-import { calcEmployeeMonthly, progressiveTax } from './tax'
+import { calcEmployeeMonthly, calcEmployeeAnnual, progressiveTax } from './tax'
 import { translate } from '../i18n'
 import { dictionaries } from '../i18n/locales'
 import type { LangCode } from '../i18n/locales'
@@ -57,7 +57,6 @@ export function computeEmployeeAnnual(
   year: number,
   data: AppData,
 ): EmployeeMath {
-  const monthly = calcEmployeeMonthly(emp, cfg)
   const cid = emp.companyId
   const rows = (data.monthlyRows || []).filter(
     (r) => r.companyId === cid && r.year === year && r.employeeId === emp.id,
@@ -68,12 +67,9 @@ export function computeEmployeeAnnual(
       : Number(emp.leaveYear) === year && emp.leaveMonth
         ? Math.max(1, Math.min(12, Number(emp.leaveMonth)))
         : 12
-  const gross = monthly.gross * months
-  const deductions = monthly.deductions * months
-  const taxable = Math.max(0, gross - deductions)
-  const annualTax = progressiveTax(taxable, cfg.annualBrackets || cfg.employeeBrackets)
   const paidTax = rows.length > 0 ? rows.reduce((s, r) => s + (r.adjusted || 0), 0) : 0
-  return { gross, deductions, taxable, tax: annualTax, months, paidTax }
+  const r = calcEmployeeAnnual(emp, cfg, months, paidTax)
+  return { gross: r.gross, deductions: r.deductions, taxable: r.taxable, tax: r.tax, months: r.months, paidTax: r.paidTax }
 }
 
 function fmtLine(val: unknown, width = '120px', bold = true): string {
@@ -135,13 +131,74 @@ export function buildEmployeeDD14Html(
     </tr>`
   }
 
-  const taxableColumn = annualTaxable <= 250000 ? 'a' : annualTaxable <= 500000 ? 'b' : annualTaxable <= 1000000 ? 'c' : 'd'
-  const bracketStart = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 250000 : taxableColumn === 'c' ? 500000 : 1000000
-  const bracketRate = taxableColumn === 'a' ? 0.03 : taxableColumn === 'b' ? 0.05 : taxableColumn === 'c' ? 0.1 : 0.15
-  const baseTax = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 7500 : taxableColumn === 'c' ? 20000 : 70000
-  const row3Amount = Math.max(0, annualTaxable - bracketStart)
-  const row5Amount = Math.round(row3Amount * bracketRate)
-  const row7Amount = Math.round(baseTax + row5Amount)
+  // Tax calculation display matching system logic
+  // For partial years (< 12 months): monthly tax * months
+  // For full year (12 months): annual brackets
+  let taxableColumn: 'a' | 'b' | 'c' | 'd'
+  let bracketStart: number
+  let bracketRate: number
+  let baseTax: number
+  let row3Amount: number
+  let row5Amount: number
+  let row7Amount: number
+  let displayNote = ''
+  let displayTaxableIncome: number
+
+  if (monthsShown < 12) {
+    // Partial year - display matches monthly tax * months logic
+    const monthly = calcEmployeeMonthly(emp, cfg)
+    const monthlyTaxable = monthly.taxable
+    const monthlyTax = monthly.tax
+    
+    // Determine which monthly bracket was used
+    let monthlyBracket = 'a'
+    let monthlyBracketStart = 0
+    let monthlyBracketRate = 0.03
+    let monthlyBaseTax = 0
+    
+    if (monthlyTaxable > 83333.33) {
+      monthlyBracket = 'd'
+      monthlyBracketStart = 83333.33
+      monthlyBracketRate = 0.15
+      monthlyBaseTax = 5833.33 // 20833*3% + 20833*5% + 41666*10% = 625 + 1041.65 + 4166.67 = 5833.32
+    } else if (monthlyTaxable > 41666.67) {
+      monthlyBracket = 'c'
+      monthlyBracketStart = 41666.67
+      monthlyBracketRate = 0.10
+      monthlyBaseTax = 1666.67 // 20833*3% + 20833*5% = 625 + 1041.65 = 1666.65
+    } else if (monthlyTaxable > 20833.33) {
+      monthlyBracket = 'b'
+      monthlyBracketStart = 20833.33
+      monthlyBracketRate = 0.05
+      monthlyBaseTax = 625 // 20833*3%
+    } else {
+      monthlyBracket = 'a'
+      monthlyBracketStart = 0
+      monthlyBracketRate = 0.03
+      monthlyBaseTax = 0
+    }
+    
+    taxableColumn = monthlyBracket as 'a' | 'b' | 'c' | 'd'
+    bracketStart = monthlyBracketStart
+    bracketRate = monthlyBracketRate
+    baseTax = monthlyBaseTax
+    row3Amount = Math.max(0, monthlyTaxable - bracketStart)
+    row5Amount = Math.round(row3Amount * bracketRate)
+    row7Amount = Math.round(baseTax + row5Amount)
+    displayTaxableIncome = monthlyTaxable
+    
+    displayNote = `<div style="margin-top:4px; padding:5px; border:1px solid #3b82f6; color:#1e40af; background:#eff6ff; font-size:10px;">ملاحظة: يتم احتساب الضريبة بالسنة الجزئية كضريبة شهرية (${fmtN(monthlyTax)}) × ${monthsShown} شهر = ${fmtN(annualTax)}</div>`
+  } else {
+    // Full year - annual brackets
+    taxableColumn = annualTaxable <= 250000 ? 'a' : annualTaxable <= 500000 ? 'b' : annualTaxable <= 1000000 ? 'c' : 'd'
+    bracketStart = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 250000 : taxableColumn === 'c' ? 500000 : 1000000
+    bracketRate = taxableColumn === 'a' ? 0.03 : taxableColumn === 'b' ? 0.05 : taxableColumn === 'c' ? 0.1 : 0.15
+    baseTax = taxableColumn === 'a' ? 0 : taxableColumn === 'b' ? 7500 : taxableColumn === 'c' ? 20000 : 70000
+    row3Amount = Math.max(0, annualTaxable - bracketStart)
+    row5Amount = Math.round(row3Amount * bracketRate)
+    row7Amount = Math.round(baseTax + row5Amount)
+    displayTaxableIncome = annualTaxable
+  }
 
   const bracketCells = (v: number): string => {
     const cols = ['a', 'b', 'c', 'd']
@@ -169,7 +226,19 @@ export function buildEmployeeDD14Html(
   const otherAllow = emp.otherBenefits || 0
   const bonuses = emp.bonuses || 0
   const retirement = emp.socialSecurity ? (emp.basicSalary || 0) * (cfg.socialSecurityRate || 0) : 0
-  const legalAllow = cfg.legalAllowance + (emp.maritalStatus === 'married' && emp.spouseAtHome ? cfg.spouseAllowance : 0) + Math.min(emp.childrenCount || 0, cfg.maxChildren || 6) * (cfg.childAllowance || 0)
+  
+  // Legal allowance matching calcEmployeeMonthly: fixed annual values / 12
+  const marital = emp.marital ?? (emp.maritalStatus === 'married' ? (emp.spouseAtHome ? 'married_housewife' : 'married_working') : emp.maritalStatus)
+  const children = Math.min(emp.child ?? emp.childrenCount ?? 0, 6)
+  const isOver63 = emp.over63 === 'yes'
+  let baseAllowance = 2500000
+  if (marital === 'married_housewife') baseAllowance = 4500000
+  else if (marital === 'widowed' || marital === 'divorced') baseAllowance = 3200000
+  const childAllowance = children * 200000
+  const ageAllowance = isOver63 ? 300000 : 0
+  const legalAllowMonthly = (baseAllowance + childAllowance + ageAllowance) / 12
+  const legalAllow = legalAllowMonthly * monthsShown
+  
   const privateExempt = Math.min(houseAllowance, (emp.basicSalary || 0) * (cfg.privateSectorExemptionRate || 0))
 
   const mathStr = `${tr('mathPrefix')} ${monthsShown === 12 ? tr('mathAnnual') : tr('mathMonthly', { months: monthsShown })}`
@@ -299,7 +368,7 @@ export function buildEmployeeDD14Html(
       </tr>
       <tr>
         <td style="padding:3px;">${tr('dd14Row2a')}</td>
-        <td style="padding:3px; text-align:center; font-weight:bold;">${fmtN(legalAllow * monthsShown)}</td>
+        <td style="padding:3px; text-align:center; font-weight:bold;">${fmtN(legalAllow)}</td>
       </tr>
       <tr>
         <td style="padding:3px;">${tr('dd14Row2b')}</td>
@@ -330,6 +399,7 @@ export function buildEmployeeDD14Html(
         <td style="padding:4px 3px; text-align:center; font-weight:bold; font-size:13px; color:#15803d;">${fmtN(annualTax)}</td>
       </tr>
     </table>
+    ${displayNote}
     <div style="margin-top:7px; font-size:10.5px;">
       <ul style="margin:0; padding-right:20px; line-height:1.35;">
         <li>${tr('dd14Page2Note1')}</li>
@@ -340,6 +410,7 @@ export function buildEmployeeDD14Html(
     <div style="margin-top:9px; font-weight:bold;">${tr('dd14TaxCalculationTitle')}</div>
     <div style="margin-top:3px; font-size:10.5px;">
       ${tr('dd14TaxCalcIntro')}
+      ${displayNote}
       <ul style="margin:3px 0; padding-right:20px; line-height:1.35;">
         <li>${tr('dd14BracketA')}</li>
         <li>${tr('dd14BracketB')}</li>
@@ -358,7 +429,7 @@ export function buildEmployeeDD14Html(
         <tr>
           <td style="padding:2px; font-weight:bold;">1</td>
           <td style="padding:2px;">${tr('bracketTaxableIncome')}</td>
-          ${bracketCells(annualTaxable)}
+          ${bracketCells(displayTaxableIncome)}
         </tr>
         <tr style="color:#666;">
           <td style="padding:2px;">2</td>

@@ -9,7 +9,6 @@ import {
   Home,
   Map,
   Briefcase,
-  ShoppingCart,
   FileSpreadsheet,
   CircleDollarSign,
   TrendingUp,
@@ -52,7 +51,6 @@ export default function Dashboard() {
   const properties = data.properties.filter((r) => r.companyId === cid)
   const lands = data.lands.filter((r) => r.companyId === cid)
   const professions = data.professions.filter((r) => r.companyId === cid)
-  const sales = data.sales.filter((r) => r.companyId === cid)
 
   const thisMonthRows = monthly.filter((r) => r.year === year && r.month === month)
   const thisMonthTax = thisMonthRows.reduce((s, r) => s + r.adjusted, 0)
@@ -76,17 +74,15 @@ export default function Dashboard() {
       { name: t('tax.property.title'), value: s(properties.filter((x) => x.year === year)) },
       { name: t('tax.land.title'), value: s(lands.filter((x) => x.year === year)) },
       { name: t('tax.profession.title'), value: s(professions.filter((x) => x.year === year)) },
-      { name: t('tax.sales.title'), value: s(sales) },
     ].filter((x) => x.value > 0)
-  }, [corp, monthly, contracts, properties, lands, professions, sales, year, t])
+  }, [corp, monthly, contracts, properties, lands, professions, year, t])
 
   const totalOutstanding =
     corp.filter((r) => r.year === year).reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0) +
     contracts.reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0) +
     properties.filter((r) => r.year === year).reduce((a, r) => a + Math.max(0, r.totalDue - r.paid), 0) +
     lands.filter((r) => r.year === year).reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0) +
-    professions.filter((r) => r.year === year).reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0) +
-    sales.reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0)
+    professions.filter((r) => r.year === year).reduce((a, r) => a + Math.max(0, r.tax - r.paid), 0)
 
   const totalTaxYear =
     yearTaxPie.reduce((a, x) => a + x.value, 0)
@@ -96,13 +92,12 @@ export default function Dashboard() {
   const recent = useMemo(() => {
     const items: { date: string; label: string; amount: number; kind: string }[] = [
       ...contracts.map((r) => ({ date: r.date, label: `${t('dashboard.contractLabel')}: ${r.party}`, amount: r.tax, kind: 'contract' })),
-      ...sales.map((r) => ({ date: r.date, label: `${t('dashboard.salesLabel')}: ${r.invoiceNo}`, amount: r.tax, kind: 'sales' })),
       ...properties.map((r) => ({ date: `${r.year}-06-01`, label: `${t('dashboard.propertyLabel')}: ${r.name}`, amount: r.tax, kind: 'property' })),
     ]
     return items
       .sort((a, b) => (a.date < b.date ? 1 : -1))
       .slice(0, 6)
-  }, [contracts, sales, properties, t])
+  }, [contracts, properties, t])
 
   const quick = [
     { to: '/tax/monthly', label: t('tax.monthly.title'), icon: <CalendarClock size={22} />, tone: 'bg-brand-50 text-brand-600' },
@@ -112,7 +107,6 @@ export default function Dashboard() {
     { to: '/tax/property', label: t('tax.property.title'), icon: <Home size={22} />, tone: 'bg-amber-50 text-amber-600' },
     { to: '/tax/land', label: t('tax.land.title'), icon: <Map size={22} />, tone: 'bg-red-50 text-red-600' },
     { to: '/tax/profession', label: t('tax.profession.title'), icon: <Briefcase size={22} />, tone: 'bg-purple-50 text-purple-600' },
-    { to: '/tax/sales', label: t('tax.sales.title'), icon: <ShoppingCart size={22} />, tone: 'bg-ink-100 text-ink-600' },
   ]
 
   return (
@@ -281,11 +275,10 @@ export default function Dashboard() {
                       className={cx(
                         'flex h-9 w-9 items-center justify-center rounded-lg',
                         r.kind === 'contract' && 'bg-violet-50 text-violet-600',
-                        r.kind === 'sales' && 'bg-ink-100 text-ink-600',
                         r.kind === 'property' && 'bg-amber-50 text-amber-600',
                       )}
                     >
-                      {r.kind === 'contract' ? <FileSignature size={17} /> : r.kind === 'sales' ? <ShoppingCart size={17} /> : <Home size={17} />}
+                      {r.kind === 'contract' ? <FileSignature size={17} /> : <Home size={17} />}
                     </div>
                     <div>
                       <div className="text-sm font-medium text-ink-800">{r.label}</div>
