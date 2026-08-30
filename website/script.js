@@ -2,7 +2,7 @@
    المكلف — Website Script
    ══════════════════════════════════════════════════════════════════════════ */
 
-const APP_URL = 'http://127.0.0.1:5173/iraqi-tax-system/'
+const APP_URL = 'https://bghusseinsash.github.io/iraqi-tax-system/app/'
 
 // ── Open app ──────────────────────────────────────────────────────────────────
 function openApp() {
