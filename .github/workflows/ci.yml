@@ -35,7 +35,7 @@ jobs:
 
       - name: Backend smoke test
         working-directory: backend
-        run: node -e "import('./src/server.js').then(()=>console.log('backend ok')).catch(err=>{console.error(err);process.exit(1)})"
+        run: node -e "process.env.NODE_ENV='test'; import('./src/server.js').then(()=>console.log('backend ok')).catch(err=>{console.error(err);process.exit(1)})"
 
   frontend-check:
     name: Frontend validation
