@@ -52,18 +52,26 @@
     /* ── Detect Automation / AI Bots ───────────────────────────────── */
     function _bot() {
       try {
-        return [
+        // Only flag signs that are EXCLUSIVE to automation tools
+        // (not present in any real browser)
+        const hardSigns = [
           navigator.webdriver === true,
-          !!window.__playwright, !!window.__playwright_clock, !!window.__pwFunctions,
-          !!window.__puppeteer, !!window.callPhantom, !!window._phantom,
-          !!window.__nightmare, !!window.__selenium,
-          !!window.__webdriver_evaluate, !!window.__driver_evaluate,
-          !!window.domAutomation, !!window.domAutomationController,
-          !!document.$cdc_asdjflasutopfhvcZLmcfl_, !!document.$wdc_,
-          /HeadlessChrome|PhantomJS|selenium|webdriver/i.test(navigator.userAgent),
-          navigator.languages === undefined || navigator.languages.length === 0,
-          !window.outerWidth && !window.outerHeight,
-        ].some(Boolean);
+          !!window.__playwright,
+          !!window.__playwright_clock,
+          !!window.__pwFunctions,
+          !!window.callPhantom,
+          !!window._phantom,
+          !!window.__nightmare,
+          !!window.__webdriver_evaluate,
+          !!window.__driver_evaluate,
+          !!window.domAutomation,
+          !!window.domAutomationController,
+          !!document.$cdc_asdjflasutopfhvcZLmcfl_,
+          !!document.$wdc_,
+          /PhantomJS/i.test(navigator.userAgent),
+          /\bHeadlessChrome\/\d/i.test(navigator.userAgent) && !navigator.plugins.length,
+        ];
+        return hardSigns.some(Boolean);
       } catch(e) { return false; }
     }
 

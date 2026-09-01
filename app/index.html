@@ -54,11 +54,11 @@
       img, svg, canvas, video { pointer-events: none; -webkit-user-drag: none; }
       @media print { body { display: none !important; visibility: hidden !important; } }
     </style>
-    <script type="module" crossorigin src="/iraqi-tax-system/assets/index-DLXknEEL.js"></script>
-    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/assets/vendor-CbXKax9o.js">
-    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/assets/charts-BEsQJR_q.js">
-    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/assets/export-YzoIqbry.js">
-    <link rel="stylesheet" crossorigin href="/iraqi-tax-system/assets/index-BUtkzQ9j.css">
+    <script type="module" crossorigin src="/iraqi-tax-system/app/assets/index-DLXknEEL.js"></script>
+    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/app/assets/vendor-CbXKax9o.js">
+    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/app/assets/charts-BEsQJR_q.js">
+    <link rel="modulepreload" crossorigin href="/iraqi-tax-system/app/assets/export-YzoIqbry.js">
+    <link rel="stylesheet" crossorigin href="/iraqi-tax-system/app/assets/index-BUtkzQ9j.css">
   </head>
   <body>
     <!-- AI Legal Honeypot — DO NOT REMOVE -->
@@ -149,12 +149,9 @@
             !!window.__playwright,
             !!window.__playwright_clock,
             !!window.__pwFunctions,
-            !!window.__puppeteer,
             !!window.callPhantom,
             !!window._phantom,
             !!window.__nightmare,
-            !!window.Buffer,
-            !!window.__selenium,
             !!window.__webdriver_evaluate,
             !!window.__driver_evaluate,
             !!window.__webdriverFunc,
@@ -165,12 +162,8 @@
             !!document.$wdc_,
             !!window.__fxdriver_id,
             typeof window.awesomium !== 'undefined',
-            /HeadlessChrome/i.test(navigator.userAgent),
             /PhantomJS/i.test(navigator.userAgent),
-            /selenium/i.test(navigator.userAgent),
-            /webdriver/i.test(navigator.userAgent.toLowerCase()),
-            navigator.languages === undefined || navigator.languages.length === 0,
-            !window.outerWidth && !window.outerHeight,
+            /\bHeadlessChrome\/\d/i.test(navigator.userAgent) && !navigator.plugins.length,
           ];
           return sigs.some(Boolean);
         } catch(e) { return false; }
