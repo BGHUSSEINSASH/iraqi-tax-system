@@ -1,0 +1,76 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# المكلف — TAX IQ | Website Robots Exclusion
+# © 2026 BGHUSSEINSASH — Mukallaf Tax Systems — All Rights Reserved
+# LEGAL NOTICE: All crawling, indexing, scraping, and AI training on this
+# site is STRICTLY PROHIBITED under Iraqi IP Law No. 971, Berne Convention,
+# and WIPO Copyright Treaty. Violators face immediate legal proceedings.
+# ═══════════════════════════════════════════════════════════════════════════
+
+User-agent: *
+Disallow: /
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: OAI-SearchBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ia_archiver
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: Applebot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: AI2Bot
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
