@@ -2,10 +2,45 @@
    المكلف — TAX IQ | Website Styles
    Brand: Indigo #2D3580  |  Silver #9BA3C7  |  White #FFFFFF
    Inspired by "Folded Planes" brand identity — Concept 1F
+   ═══════════════════════════════════════════════════════════════════════════
+   © 2026 BGHUSSEINSASH — Mukallaf Tax Systems — All Rights Reserved
+   PROPRIETARY & CONFIDENTIAL — Unauthorized copying is prohibited.
+   Iraqi IP Law No. 971 | Berne Convention | WIPO Copyright Treaty
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Global Protection Layer ─────────────────────────────────────────────── */
+*, *::before, *::after {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
+  -webkit-user-drag: none !important;
+  -khtml-user-drag: none !important;
+  -webkit-touch-callout: none !important;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+input, textarea, select, [contenteditable="true"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  user-select: text !important;
+}
+
+img, svg, canvas, video { pointer-events: none !important; -webkit-user-drag: none !important; }
+
+@media print {
+  * { display: none !important; visibility: hidden !important; }
+  body::after {
+    display: block !important; visibility: visible !important;
+    content: '© 2026 BGHUSSEINSASH — Mukallaf Tax Systems. Printing prohibited. Iraqi IP Law No. 971.';
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 18px; color: #e11d48; font-weight: bold; text-align: center;
+  }
+}
+
 /* ── Reset & Base ─────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   --indigo:    #2D3580;
