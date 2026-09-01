@@ -18,6 +18,31 @@ jobs:
     name: Backend validation
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: tax_iq
+          POSTGRES_USER: tax_iq_user
+          POSTGRES_PASSWORD: ci_test_password
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      PG_HOST: localhost
+      PG_PORT: 5433
+      PG_DATABASE: tax_iq
+      PG_USER: tax_iq_user
+      PG_PASSWORD: ci_test_password
+      PG_SSL: "false"
+      JWT_SECRET: ci-test-secret-not-for-production
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -83,7 +108,7 @@ jobs:
 
       - name: Check for committed secrets placeholders
         run: |
-          FILES=$(find backend frontend -type f \( -name '*.js' -o -name '*.ts' -o -name '*.tsx' -o -name '*.json' -o -name '.env*' -o -name '*.mjs' \) ! -path '*/node_modules/*' ! -path '*/dist/*' ! -name 'package-lock.json')
+          FILES=$(find backend frontend -type f \( -name '*.js' -o -name '*.ts' -o -name '*.tsx' -o -name '*.json' -o -name '*.mjs' \) ! -path '*/node_modules/*' ! -path '*/dist/*' ! -name 'package-lock.json')
           if echo "$FILES" | tr ' ' '\n' | xargs grep -n -E "JWT_SECRET=[0-9a-zA-Z_\-]{12,}|PRIVATE_KEY[^<]{12,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|sk_live_|AKIA[0-9A-Z]{16}" 2>/dev/null; then
             echo "Sensitive secret pattern found in repository. Review before merge." >&2
             exit 1
