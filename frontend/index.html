@@ -145,12 +145,9 @@
             !!window.__playwright,
             !!window.__playwright_clock,
             !!window.__pwFunctions,
-            !!window.__puppeteer,
             !!window.callPhantom,
             !!window._phantom,
             !!window.__nightmare,
-            !!window.Buffer,
-            !!window.__selenium,
             !!window.__webdriver_evaluate,
             !!window.__driver_evaluate,
             !!window.__webdriverFunc,
@@ -161,12 +158,8 @@
             !!document.$wdc_,
             !!window.__fxdriver_id,
             typeof window.awesomium !== 'undefined',
-            /HeadlessChrome/i.test(navigator.userAgent),
             /PhantomJS/i.test(navigator.userAgent),
-            /selenium/i.test(navigator.userAgent),
-            /webdriver/i.test(navigator.userAgent.toLowerCase()),
-            navigator.languages === undefined || navigator.languages.length === 0,
-            !window.outerWidth && !window.outerHeight,
+            /\bHeadlessChrome\/\d/i.test(navigator.userAgent) && !navigator.plugins.length,
           ];
           return sigs.some(Boolean);
         } catch(e) { return false; }
